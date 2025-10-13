@@ -1,0 +1,121 @@
+{
+  "app": {
+    "name": "Agenda",
+    "tagline": "O seu diário pessoal"
+  },
+  "journalList": {
+    "newEntry": "Nova Entrada",
+    "import": "Importar",
+    "export": "Exportar",
+    "noEntries": "Ainda sem entradas",
+    "noEntriesDescription": "Crie a sua primeira entrada no diário para começar",
+    "createEntry": "Criar Entrada",
+    "deleteConfirm": "Tem a certeza que deseja eliminar esta entrada?",
+    "today": "Hoje",
+    "yesterday": "Ontem",
+    "daysAgo": "há {{count}} dias",
+    "updated": "Actualizado {{date}}"
+  },
+  "editor": {
+    "backToEntries": "Voltar às entradas",
+    "bold": "Negrito",
+    "italic": "Itálico",
+    "code": "Código",
+    "heading1": "Título 1",
+    "heading2": "Título 2",
+    "heading3": "Título 3",
+    "largeHeading": "Título Grande",
+    "mediumHeading": "Título Médio",
+    "smallHeading": "Título Pequeno",
+    "bulletList": "Lista com Marcadores",
+    "numberedList": "Lista Numerada",
+    "bullets": "Marcadores",
+    "numbers": "Números",
+    "insertImage": "Inserir Imagem",
+    "image": "Imagem",
+    "undo": "Desfazer",
+    "redo": "Refazer"
+  },
+  "modal": {
+    "newEntry": {
+      "title": "Nova Entrada no Diário",
+      "placeholder": "Título da entrada...",
+      "cancel": "Cancelar",
+      "create": "Criar"
+    },
+    "export": {
+      "title": "Exportar Diário",
+      "description": "Exporte todas as entradas do seu diário para um ficheiro. Pode opcionalmente encriptar o ficheiro com uma palavra-passe.",
+      "encrypt": "Encriptar ficheiro com palavra-passe",
+      "passphrase": "Palavra-passe",
+      "passphrasePlaceholder": "Introduza a palavra-passe (mín. 8 caracteres)",
+      "confirmPassphrase": "Confirmar Palavra-passe",
+      "confirmPassphrasePlaceholder": "Confirme a palavra-passe",
+      "passphraseRequired": "Por favor, introduza uma palavra-passe",
+      "passphraseMismatch": "As palavras-passe não coincidem",
+      "passphraseMinLength": "A palavra-passe deve ter pelo menos 8 caracteres",
+      "cancel": "Cancelar",
+      "export": "Exportar"
+    },
+    "import": {
+      "title": "Importar Diário",
+      "description": "Importe entradas do diário de um ficheiro de cópia de segurança exportado anteriormente.",
+      "selectFile": "Seleccionar ficheiro de cópia de segurança",
+      "selected": "Seleccionado: {{filename}}",
+      "encrypted": "Encriptado",
+      "passphrase": "Palavra-passe",
+      "passphrasePlaceholder": "Introduza a palavra-passe para desencriptar",
+      "merge": "Mesclar com entradas existentes",
+      "mergeDescription": "Se desmarcado, as suas entradas actuais serão substituídas",
+      "fileRequired": "Por favor, seleccione um ficheiro para importar",
+      "passphraseRequired": "Por favor, introduza a palavra-passe para este ficheiro encriptado",
+      "incorrectPassphrase": "Palavra-passe incorrecta. Por favor, tente novamente.",
+      "decryptionFailed": "Falha ao desencriptar o ficheiro. Por favor, verifique a sua palavra-passe.",
+      "invalidStructure": "Estrutura do ficheiro de cópia de segurança inválida",
+      "invalidEntries": "O ficheiro de cópia de segurança contém entradas inválidas",
+      "importFailed": "Falha ao importar o ficheiro. Por favor, verifique o formato do ficheiro.",
+      "invalidFormat": "Formato de ficheiro inválido. Por favor, seleccione um ficheiro de cópia de segurança válido do Agenda.",
+      "cancel": "Cancelar",
+      "import": "Importar"
+    }
+  },
+  "language": {
+    "selector": "Idioma",
+    "en-US": "English (USA)",
+    "en-GB": "English (UK)",
+    "pt-BR": "Português (Brasil)",
+    "pt-PT": "Português (Portugal)",
+    "es-LA": "Español (América Latina)",
+    "es-ES": "Español (España)",
+    "zh-CN": "中文 (简体)",
+    "ja": "日本語"
+  },
+  "settings": {
+    "title": "Definições",
+    "aiAutocomplete": "Autocompletar com IA",
+    "aiDescription": "Active o preenchimento de texto com IA usando o modelo gratuito DeepSeek Chat do OpenRouter. Obtenha sugestões inteligentes de escrita enquanto escreve - completamente grátis!",
+    "howToGetKey": "Como obter a sua chave de API gratuita do OpenRouter:",
+    "step1": "Visite openrouter.ai e inicie sessão com Google ou GitHub",
+    "step2": "Vá para a secção de Chaves",
+    "step3": "Crie uma nova chave e cole abaixo",
+    "getKeyLink": "Obtenha a sua chave de API gratuita do OpenRouter",
+    "apiKey": "Chave de API do OpenRouter",
+    "apiKeyPlaceholder": "Cole a sua chave de API do OpenRouter aqui (sk-or-v1-...)",
+    "show": "Mostrar",
+    "hide": "Ocultar",
+    "removeKey": "Remover chave de API",
+    "keyStorageNote": "A sua chave de API é armazenada localmente no seu navegador e nunca é enviada para os nossos servidores.",
+    "saved": "Definições guardadas com sucesso!",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "settings": "Definições"
+  },
+  "autocomplete": {
+    "loading": "A obter sugestões...",
+    "error": "Não foi possível obter sugestões",
+    "pressTab": "Pressione Tab para aceitar",
+    "pressEsc": "Pressione Esc para dispensar",
+    "noApiKey": "Configure o autocompletar com IA nas Definições",
+    "trigger": "Pressione Shift+Espaço para sugestões de IA"
+  }
+}

@@ -1,0 +1,39 @@
+@import 'tailwindcss';
+
+@layer base {
+  h1 {
+    font-size: var(--text-4xl);
+  }
+  h2 {
+    font-size: var(--text-3xl);
+  }
+  h3 {
+    font-size: var(--text-2xl);
+  }
+  h4 {
+    font-size: var(--text-xl);
+  }
+  h5 {
+    font-size: var(--text-lg);
+  }
+  h6 {
+    font-size: var(--text-md);
+  }
+}
+
+/* Resizable image styles */
+.ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  cursor: pointer;
+}
+
+.ProseMirror img.ProseMirror-selectednode {
+  outline: 3px solid #4f46e5;
+  outline-offset: 2px;
+}
+
+/* Resize handle styles */
+.resize-cursor {
+  cursor: nwse-resize;
+}

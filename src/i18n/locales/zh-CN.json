@@ -1,0 +1,121 @@
+{
+  "app": {
+    "name": "日程",
+    "tagline": "您的个人日记"
+  },
+  "journalList": {
+    "newEntry": "新条目",
+    "import": "导入",
+    "export": "导出",
+    "noEntries": "暂无条目",
+    "noEntriesDescription": "创建您的第一个日记条目以开始",
+    "createEntry": "创建条目",
+    "deleteConfirm": "您确定要删除此条目吗？",
+    "today": "今天",
+    "yesterday": "昨天",
+    "daysAgo": "{{count}}天前",
+    "updated": "更新于{{date}}"
+  },
+  "editor": {
+    "backToEntries": "返回条目",
+    "bold": "粗体",
+    "italic": "斜体",
+    "code": "代码",
+    "heading1": "标题1",
+    "heading2": "标题2",
+    "heading3": "标题3",
+    "largeHeading": "大标题",
+    "mediumHeading": "中标题",
+    "smallHeading": "小标题",
+    "bulletList": "项目符号列表",
+    "numberedList": "编号列表",
+    "bullets": "项目符号",
+    "numbers": "编号",
+    "insertImage": "插入图片",
+    "image": "图片",
+    "undo": "撤销",
+    "redo": "重做"
+  },
+  "modal": {
+    "newEntry": {
+      "title": "新建日记条目",
+      "placeholder": "条目标题...",
+      "cancel": "取消",
+      "create": "创建"
+    },
+    "export": {
+      "title": "导出日记",
+      "description": "将您的所有日记条目导出到文件。您可以选择使用密码短语加密文件。",
+      "encrypt": "使用密码短语加密文件",
+      "passphrase": "密码短语",
+      "passphrasePlaceholder": "输入密码短语（至少8个字符）",
+      "confirmPassphrase": "确认密码短语",
+      "confirmPassphrasePlaceholder": "确认密码短语",
+      "passphraseRequired": "请输入密码短语",
+      "passphraseMismatch": "密码短语不匹配",
+      "passphraseMinLength": "密码短语必须至少8个字符",
+      "cancel": "取消",
+      "export": "导出"
+    },
+    "import": {
+      "title": "导入日记",
+      "description": "从先前导出的备份文件中导入日记条目。",
+      "selectFile": "选择备份文件",
+      "selected": "已选择：{{filename}}",
+      "encrypted": "已加密",
+      "passphrase": "密码短语",
+      "passphrasePlaceholder": "输入密码短语以解密",
+      "merge": "与现有条目合并",
+      "mergeDescription": "如果未选中，您当前的条目将被替换",
+      "fileRequired": "请选择要导入的文件",
+      "passphraseRequired": "请输入此加密文件的密码短语",
+      "incorrectPassphrase": "密码短语不正确。请重试。",
+      "decryptionFailed": "解密文件失败。请检查您的密码短语。",
+      "invalidStructure": "备份文件结构无效",
+      "invalidEntries": "备份文件包含无效条目",
+      "importFailed": "导入文件失败。请检查文件格式。",
+      "invalidFormat": "文件格式无效。请选择有效的日程备份文件。",
+      "cancel": "取消",
+      "import": "导入"
+    }
+  },
+  "language": {
+    "selector": "语言",
+    "en-US": "English (USA)",
+    "en-GB": "English (UK)",
+    "pt-BR": "Português (Brasil)",
+    "pt-PT": "Português (Portugal)",
+    "es-LA": "Español (América Latina)",
+    "es-ES": "Español (España)",
+    "zh-CN": "中文 (简体)",
+    "ja": "日本語"
+  },
+  "settings": {
+    "title": "设置",
+    "aiAutocomplete": "AI自动补全",
+    "aiDescription": "使用OpenRouter的免费DeepSeek Chat模型启用AI驱动的文本补全。在您输入时获得智能写作建议 - 完全免费！",
+    "howToGetKey": "如何获取您的免费OpenRouter API密钥：",
+    "step1": "访问openrouter.ai并使用Google或GitHub登录",
+    "step2": "转到密钥部���",
+    "step3": "创建新密钥并粘贴到下面",
+    "getKeyLink": "获取您的免费OpenRouter API密钥",
+    "apiKey": "OpenRouter API密钥",
+    "apiKeyPlaceholder": "在此粘贴您的OpenRouter API密钥（sk-or-v1-...）",
+    "show": "显示",
+    "hide": "隐藏",
+    "removeKey": "删除API密钥",
+    "keyStorageNote": "您的API密钥存储在您的浏览器本地，绝不会发送到我们的服务器。",
+    "saved": "设置保存成功！",
+    "cancel": "取消",
+    "save": "保存",
+    "settings": "设置"
+  },
+  "autocomplete": {
+    "loading": "正在获取建议...",
+    "error": "无法获取建议",
+    "pressTab": "按Tab接受",
+    "pressEsc": "按Esc关闭",
+    "noApiKey": "在设置中配置AI自动补全",
+    "trigger": "按Shift+空格键获取AI建议"
+  }
+}

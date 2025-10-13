@@ -1,0 +1,121 @@
+{
+  "app": {
+    "name": "Agenda",
+    "tagline": "Tu diario personal"
+  },
+  "journalList": {
+    "newEntry": "Nueva Entrada",
+    "import": "Importar",
+    "export": "Exportar",
+    "noEntries": "Aún no hay entradas",
+    "noEntriesDescription": "Crea tu primera entrada en el diario para comenzar",
+    "createEntry": "Crear Entrada",
+    "deleteConfirm": "¿Estás seguro de que quieres eliminar esta entrada?",
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "daysAgo": "hace {{count}} días",
+    "updated": "Actualizado {{date}}"
+  },
+  "editor": {
+    "backToEntries": "Volver a entradas",
+    "bold": "Negrita",
+    "italic": "Cursiva",
+    "code": "Código",
+    "heading1": "Encabezado 1",
+    "heading2": "Encabezado 2",
+    "heading3": "Encabezado 3",
+    "largeHeading": "Encabezado Grande",
+    "mediumHeading": "Encabezado Mediano",
+    "smallHeading": "Encabezado Pequeño",
+    "bulletList": "Lista con Viñetas",
+    "numberedList": "Lista Numerada",
+    "bullets": "Viñetas",
+    "numbers": "Números",
+    "insertImage": "Insertar Imagen",
+    "image": "Imagen",
+    "undo": "Deshacer",
+    "redo": "Rehacer"
+  },
+  "modal": {
+    "newEntry": {
+      "title": "Nueva Entrada en el Diario",
+      "placeholder": "Título de la entrada...",
+      "cancel": "Cancelar",
+      "create": "Crear"
+    },
+    "export": {
+      "title": "Exportar Diario",
+      "description": "Exporta todas las entradas de tu diario a un archivo. Puedes opcionalmente encriptar el archivo con una contraseña.",
+      "encrypt": "Encriptar archivo con contraseña",
+      "passphrase": "Contraseña",
+      "passphrasePlaceholder": "Ingresa la contraseña (mín. 8 caracteres)",
+      "confirmPassphrase": "Confirmar Contraseña",
+      "confirmPassphrasePlaceholder": "Confirma la contraseña",
+      "passphraseRequired": "Por favor, ingresa una contraseña",
+      "passphraseMismatch": "Las contraseñas no coinciden",
+      "passphraseMinLength": "La contraseña debe tener al menos 8 caracteres",
+      "cancel": "Cancelar",
+      "export": "Exportar"
+    },
+    "import": {
+      "title": "Importar Diario",
+      "description": "Importa entradas del diario desde un archivo de respaldo exportado anteriormente.",
+      "selectFile": "Seleccionar archivo de respaldo",
+      "selected": "Seleccionado: {{filename}}",
+      "encrypted": "Encriptado",
+      "passphrase": "Contraseña",
+      "passphrasePlaceholder": "Ingresa la contraseña para desencriptar",
+      "merge": "Combinar con entradas existentes",
+      "mergeDescription": "Si no está marcado, tus entradas actuales serán reemplazadas",
+      "fileRequired": "Por favor, selecciona un archivo para importar",
+      "passphraseRequired": "Por favor, ingresa la contraseña para este archivo encriptado",
+      "incorrectPassphrase": "Contraseña incorrecta. Por favor, intenta nuevamente.",
+      "decryptionFailed": "Error al desencriptar el archivo. Por favor, verifica tu contraseña.",
+      "invalidStructure": "Estructura del archivo de respaldo inválida",
+      "invalidEntries": "El archivo de respaldo contiene entradas inválidas",
+      "importFailed": "Error al importar el archivo. Por favor, verifica el formato del archivo.",
+      "invalidFormat": "Formato de archivo inválido. Por favor, selecciona un archivo de respaldo válido de Agenda.",
+      "cancel": "Cancelar",
+      "import": "Importar"
+    }
+  },
+  "language": {
+    "selector": "Idioma",
+    "en-US": "English (USA)",
+    "en-GB": "English (UK)",
+    "pt-BR": "Português (Brasil)",
+    "pt-PT": "Português (Portugal)",
+    "es-LA": "Español (América Latina)",
+    "es-ES": "Español (España)",
+    "zh-CN": "中文 (简体)",
+    "ja": "日本語"
+  },
+  "settings": {
+    "title": "Configuración",
+    "aiAutocomplete": "Autocompletar con IA",
+    "aiDescription": "Activa el completado de texto con IA usando el modelo gratuito DeepSeek Chat de OpenRouter. Obtén sugerencias inteligentes de escritura mientras escribes - completamente gratis!",
+    "howToGetKey": "Cómo obtener tu clave de API gratuita de OpenRouter:",
+    "step1": "Visita openrouter.ai e inicia sesión con Google o GitHub",
+    "step2": "Ve a la sección de Claves",
+    "step3": "Crea una nueva clave y pégala abajo",
+    "getKeyLink": "Obtén tu clave de API gratuita de OpenRouter",
+    "apiKey": "Clave de API de OpenRouter",
+    "apiKeyPlaceholder": "Pega tu clave de API de OpenRouter aquí (sk-or-v1-...)",
+    "show": "Mostrar",
+    "hide": "Ocultar",
+    "removeKey": "Eliminar clave de API",
+    "keyStorageNote": "Tu clave de API se almacena localmente en tu navegador y nunca se envía a nuestros servidores.",
+    "saved": "¡Configuración guardada exitosamente!",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "settings": "Configuración"
+  },
+  "autocomplete": {
+    "loading": "Obteniendo sugerencias...",
+    "error": "No se pudieron obtener sugerencias",
+    "pressTab": "Presiona Tab para aceptar",
+    "pressEsc": "Presiona Esc para descartar",
+    "noApiKey": "Configura el autocompletar con IA en Configuración",
+    "trigger": "Presiona Shift+Espacio para sugerencias de IA"
+  }
+}

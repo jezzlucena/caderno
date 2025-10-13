@@ -1,0 +1,121 @@
+{
+  "app": {
+    "name": "アジェンダ",
+    "tagline": "あなたの個人日記"
+  },
+  "journalList": {
+    "newEntry": "新しいエントリ",
+    "import": "インポート",
+    "export": "エクスポート",
+    "noEntries": "エントリがありません",
+    "noEntriesDescription": "最初の日記エントリを作成して始めましょう",
+    "createEntry": "エントリを作成",
+    "deleteConfirm": "このエントリを削除してもよろしいですか？",
+    "today": "今日",
+    "yesterday": "昨日",
+    "daysAgo": "{{count}}日前",
+    "updated": "{{date}}に更新"
+  },
+  "editor": {
+    "backToEntries": "エントリに戻る",
+    "bold": "太字",
+    "italic": "斜体",
+    "code": "コード",
+    "heading1": "見出し1",
+    "heading2": "見出し2",
+    "heading3": "見出し3",
+    "largeHeading": "大見出し",
+    "mediumHeading": "中見出し",
+    "smallHeading": "小見出し",
+    "bulletList": "箇条書きリスト",
+    "numberedList": "番号付きリスト",
+    "bullets": "箇条書き",
+    "numbers": "番号",
+    "insertImage": "画像を挿入",
+    "image": "画像",
+    "undo": "元に戻す",
+    "redo": "やり直す"
+  },
+  "modal": {
+    "newEntry": {
+      "title": "新しい日記エントリ",
+      "placeholder": "エントリのタイトル...",
+      "cancel": "キャンセル",
+      "create": "作成"
+    },
+    "export": {
+      "title": "日記をエクスポート",
+      "description": "すべての日記エントリをファイルにエクスポートします。オプションでパスフレーズを使用してファイルを暗号化できます。",
+      "encrypt": "パスフレーズでファイルを暗号化",
+      "passphrase": "パスフレーズ",
+      "passphrasePlaceholder": "パスフレーズを入力（最低8文字）",
+      "confirmPassphrase": "パスフレーズの確認",
+      "confirmPassphrasePlaceholder": "パスフレーズを確認",
+      "passphraseRequired": "パスフレーズを入力してください",
+      "passphraseMismatch": "パスフレーズが一致しません",
+      "passphraseMinLength": "パスフレーズは最低8文字必要です",
+      "cancel": "キャンセル",
+      "export": "エクスポート"
+    },
+    "import": {
+      "title": "日記をインポート",
+      "description": "以前にエクスポートしたバックアップファイルから日記エントリをインポートします。",
+      "selectFile": "バックアップファイルを選択",
+      "selected": "選択済み：{{filename}}",
+      "encrypted": "暗号化済み",
+      "passphrase": "パスフレーズ",
+      "passphrasePlaceholder": "復号化するパスフレーズを入力",
+      "merge": "既存のエントリとマージ",
+      "mergeDescription": "チェックを外すと、現在のエントリが置き換えられます",
+      "fileRequired": "インポートするファイルを選択してください",
+      "passphraseRequired": "この暗号化ファイルのパスフレーズを入力してください",
+      "incorrectPassphrase": "パスフレーズが正しくありません。もう一度お試しください。",
+      "decryptionFailed": "ファイルの復号化に失敗しました。パスフレーズを確認してください。",
+      "invalidStructure": "バックアップファイルの構造が無効です",
+      "invalidEntries": "バックアップファイルに無効なエントリが含まれています",
+      "importFailed": "ファイルのインポートに失敗しました。ファイル形式を確認してください。",
+      "invalidFormat": "ファイル形式が無効です。有効なアジェンダバックアップファイルを選択してください。",
+      "cancel": "キャンセル",
+      "import": "インポート"
+    }
+  },
+  "language": {
+    "selector": "言語",
+    "en-US": "English (USA)",
+    "en-GB": "English (UK)",
+    "pt-BR": "Português (Brasil)",
+    "pt-PT": "Português (Portugal)",
+    "es-LA": "Español (América Latina)",
+    "es-ES": "Español (España)",
+    "zh-CN": "中文 (简体)",
+    "ja": "日本語"
+  },
+  "settings": {
+    "title": "設定",
+    "aiAutocomplete": "AI自動補完",
+    "aiDescription": "OpenRouterの無料DeepSeek Chatモデルを使用してAI駆動のテキスト補完を有効にします。入力時にインテリジェントな執筆提案を取得 - 完全無料！",
+    "howToGetKey": "無料のOpenRouter APIキーの取得方法：",
+    "step1": "openrouter.aiにアクセスし、GoogleまたはGitHubでサインインする",
+    "step2": "キーセクションに移動する",
+    "step3": "新しいキーを作成して下に貼り付ける",
+    "getKeyLink": "無料のOpenRouter APIキーを取得する",
+    "apiKey": "OpenRouter APIキー",
+    "apiKeyPlaceholder": "OpenRouter APIキーをここに貼り付けてください（sk-or-v1-...）",
+    "show": "表示",
+    "hide": "非表示",
+    "removeKey": "APIキーを削除",
+    "keyStorageNote": "APIキーはブラウザのローカルに保存され、当社のサーバーに送信されることはありません。",
+    "saved": "設定が正常に保存されました！",
+    "cancel": "キャンセル",
+    "save": "保存",
+    "settings": "設定"
+  },
+  "autocomplete": {
+    "loading": "提案を取得中...",
+    "error": "提案を取得できませんでした",
+    "pressTab": "Tabキーで受け入れる",
+    "pressEsc": "Escキーで閉じる",
+    "noApiKey": "設定でAI自動補完を設定してください",
+    "trigger": "Shift+スペースキーでAI提案を表示"
+  }
+}
