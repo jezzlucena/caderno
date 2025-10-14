@@ -117,5 +117,15 @@
     "pressEsc": "Press Esc to dismiss",
     "noApiKey": "Set up AI autocomplete in Settings",
     "trigger": "Press Shift+Space for AI suggestions"
+  },
+  "exportPDF": {
+    "title": "Export to PDF",
+    "description": "Select the journal entries you want to export to PDF format.",
+    "selectAll": "Select All",
+    "cancel": "Cancel",
+    "export": "Export PDF",
+    "exporting": "Exporting to PDF...",
+    "pleaseWait": "Please wait whilst we generate your PDF",
+    "error": "Failed to export PDF. Please try again."
   }
 }

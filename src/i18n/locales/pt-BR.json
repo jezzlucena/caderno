@@ -117,5 +117,15 @@
     "pressEsc": "Pressione Esc para dispensar",
     "noApiKey": "Configure o autocompletar com IA nas Configurações",
     "trigger": "Pressione Shift+Espaço para sugestões de IA"
+  },
+  "exportPDF": {
+    "title": "Exportar para PDF",
+    "description": "Selecione as entradas do diário que deseja exportar para o formato PDF.",
+    "selectAll": "Selecionar Tudo",
+    "cancel": "Cancelar",
+    "export": "Exportar PDF",
+    "exporting": "Exportando para PDF...",
+    "pleaseWait": "Por favor, aguarde enquanto geramos seu PDF",
+    "error": "Falha ao exportar PDF. Por favor, tente novamente."
   }
 }

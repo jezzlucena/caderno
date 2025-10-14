@@ -1,4 +1,4 @@
-import { PlusIcon, DocumentTextIcon, TrashIcon, ClockIcon, ArrowDownTrayIcon, Cog6ToothIcon, FolderPlusIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, DocumentTextIcon, TrashIcon, ClockIcon, ArrowDownTrayIcon, Cog6ToothIcon, FolderPlusIcon, DocumentArrowDownIcon } from '@heroicons/react/24/outline';
 import { useJournalStore } from '../store/useStore';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -6,6 +6,7 @@ import ExportModal from './ExportModal';
 import ImportModal from './ImportModal';
 import LanguageSelector from './LanguageSelector';
 import SettingsModal from './SettingsModal';
+import ExportPDFModal from './ExportPDFModal';
 
 export default function JournalList() {
   const { entries, addEntry, deleteEntry, setCurrentEntry } = useJournalStore();
@@ -15,6 +16,7 @@ export default function JournalList() {
   const [showExportModal, setShowExportModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [showExportPDFModal, setShowExportPDFModal] = useState(false);
 
   const handleCreateEntry = () => {
     if (newEntryTitle.trim()) {
@@ -103,6 +105,13 @@ export default function JournalList() {
               title={t('journalList.export')}
             >
               <ArrowDownTrayIcon width={18} />
+            </button>
+            <button
+              onClick={() => setShowExportPDFModal(true)}
+              className="flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors border border-gray-300"
+              title={t('exportPDF.title')}
+            >
+              <DocumentArrowDownIcon width={18} />
             </button>
           </div>
         </header>
@@ -200,6 +209,9 @@ export default function JournalList() {
 
       {/* Import Modal */}
       {showImportModal && <ImportModal onClose={() => setShowImportModal(false)} />}
+
+      {/* Export PDF Modal */}
+      {showExportPDFModal && <ExportPDFModal onClose={() => setShowExportPDFModal(false)} />}
     </div>
   );
 }

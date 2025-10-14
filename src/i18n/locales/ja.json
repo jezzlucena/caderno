@@ -117,5 +117,15 @@
     "pressEsc": "Escキーで閉じる",
     "noApiKey": "設定でAI自動補完を設定してください",
     "trigger": "Shift+スペースキーでAI提案を表示"
+  },
+  "exportPDF": {
+    "title": "PDFにエクスポート",
+    "description": "PDF形式にエクスポートしたい日記エントリを選択してください。",
+    "selectAll": "すべて選択",
+    "cancel": "キャンセル",
+    "export": "PDFをエクスポート",
+    "exporting": "PDFにエクスポート中...",
+    "pleaseWait": "PDFを生成していますので、しばらくお待ちください",
+    "error": "PDFのエクスポートに失敗しました。もう一度お試しください。"
   }
 }

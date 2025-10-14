@@ -117,5 +117,15 @@
     "pressEsc": "按Esc关闭",
     "noApiKey": "在设置中配置AI自动补全",
     "trigger": "按Shift+空格键获取AI建议"
+  },
+  "exportPDF": {
+    "title": "导出为PDF",
+    "description": "选择要导出为PDF格式的日记条目。",
+    "selectAll": "全选",
+    "cancel": "取消",
+    "export": "导出PDF",
+    "exporting": "正在导出PDF...",
+    "pleaseWait": "正在生成PDF，请稍候",
+    "error": "导出PDF失败。请重试。"
   }
 }
