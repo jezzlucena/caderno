@@ -14,6 +14,7 @@
     "today": "Today",
     "yesterday": "Yesterday",
     "daysAgo": "{{count}} days ago",
+    "created": "Created {{date}}",
     "updated": "Updated {{date}}"
   },
   "editor": {
@@ -108,7 +109,25 @@
     "saved": "Settings saved successfully!",
     "cancel": "Cancel",
     "save": "Save",
-    "settings": "Settings"
+    "settings": "Settings",
+    "cloudSync": {
+      "title": "Cloud Sync (IPFS Blockchain)",
+      "description": "Sync your journal entries to decentralized IPFS storage with military-grade encryption. Your data is stored across multiple nodes for maximum redundancy.",
+      "howToGetKey": "How to get your free Lighthouse API key:",
+      "step1": "Visit files.lighthouse.storage and sign in",
+      "step2": "Go to API Key section",
+      "step3": "Create a new API key and paste it below",
+      "getKeyLink": "Get your free Lighthouse API key",
+      "apiKey": "Lighthouse API Key",
+      "apiKeyPlaceholder": "Paste your Lighthouse API key here",
+      "passphrase": "Sync Passphrase",
+      "passphrasePlaceholder": "Enter a strong passphrase for encryption",
+      "passphraseNote": "This passphrase encrypts your data before uploading. Keep it safe - you'll need it to decrypt your data!",
+      "autoSync": "Enable automatic sync",
+      "autoSyncDescription": "Automatically sync your entries to IPFS after every change",
+      "clearSettings": "Clear cloud sync settings",
+      "storageNote": "Your API key and passphrase are stored locally and never sent to our servers."
+    }
   },
   "autocomplete": {
     "loading": "Getting suggestions...",
@@ -127,5 +146,38 @@
     "exporting": "Exporting to PDF...",
     "pleaseWait": "Please wait while we generate your PDF",
     "error": "Failed to export PDF. Please try again."
+  },
+  "cloudSync": {
+    "title": "Cloud Sync",
+    "description": "Securely sync your journal entries to decentralized storage (IPFS) with end-to-end encryption.",
+    "notConfigured": "Cloud sync is not configured. Please set up your Lighthouse API key and passphrase in Settings first.",
+    "lastSync": "Last synced: {{date}}",
+    "close": "Close",
+    "upload": {
+      "title": "Upload to Cloud",
+      "description": "Upload {{count}} entries to IPFS blockchain storage",
+      "button": "Upload to IPFS",
+      "uploading": "Uploading to IPFS..."
+    },
+    "download": {
+      "title": "Download from Cloud",
+      "description": "Download your encrypted journal entries from IPFS.",
+      "button": "Download from IPFS",
+      "downloading": "Downloading from IPFS...",
+      "merge": "Merge with existing entries",
+      "mergeDescription": "If unchecked, your current entries will be replaced"
+    },
+    "success": {
+      "uploaded": "Successfully uploaded {{count}} entries! CID: {{cid}}",
+      "downloaded": "Successfully downloaded {{count}} entries from IPFS!"
+    },
+    "errors": {
+      "noApiKey": "Please set up your Lighthouse API key in Settings first.",
+      "noPassphrase": "Please set up your sync passphrase in Settings first.",
+      "noEntries": "No entries to upload.",
+      "noCid": "No backup found. Please upload your entries first.",
+      "uploadFailed": "Upload failed: {{error}}",
+      "downloadFailed": "Download failed: {{error}}"
+    }
   }
 }

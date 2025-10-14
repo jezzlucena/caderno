@@ -14,6 +14,7 @@
     "today": "今天",
     "yesterday": "昨天",
     "daysAgo": "{{count}}天前",
+    "created": "创建于{{date}}",
     "updated": "更新于{{date}}"
   },
   "editor": {

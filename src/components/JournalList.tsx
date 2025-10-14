@@ -1,4 +1,4 @@
-import { PlusIcon, DocumentTextIcon, TrashIcon, ClockIcon, ArrowDownTrayIcon, Cog6ToothIcon, FolderPlusIcon, DocumentArrowDownIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, DocumentTextIcon, TrashIcon, ClockIcon, ArrowDownTrayIcon, Cog6ToothIcon, FolderPlusIcon, DocumentArrowDownIcon, CloudIcon, SparklesIcon, CalendarIcon } from '@heroicons/react/24/outline';
 import { useJournalStore } from '../store/useStore';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -7,6 +7,7 @@ import ImportModal from './ImportModal';
 import LanguageSelector from './LanguageSelector';
 import SettingsModal from './SettingsModal';
 import ExportPDFModal from './ExportPDFModal';
+import CloudSyncModal from './CloudSyncModal';
 
 export default function JournalList() {
   const { entries, addEntry, deleteEntry, setCurrentEntry } = useJournalStore();
@@ -17,6 +18,7 @@ export default function JournalList() {
   const [showImportModal, setShowImportModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showExportPDFModal, setShowExportPDFModal] = useState(false);
+  const [showCloudSyncModal, setShowCloudSyncModal] = useState(false);
 
   const handleCreateEntry = () => {
     if (newEntryTitle.trim()) {
@@ -113,6 +115,13 @@ export default function JournalList() {
             >
               <DocumentArrowDownIcon width={18} />
             </button>
+            <button
+              onClick={() => setShowCloudSyncModal(true)}
+              className="flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors border border-gray-300"
+              title={t('cloudSync.title')}
+            >
+              <CloudIcon width={18} />
+            </button>
           </div>
         </header>
 
@@ -142,12 +151,20 @@ export default function JournalList() {
                       <h3 className="text-lg font-semibold text-gray-800 mb-2 group-hover:text-indigo-600 transition-colors">
                         {entry.title}
                       </h3>
-                      <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                        {entry.summary || getPreviewText(entry.content)}
+                      <p className="text-sm text-gray-500 mb-3 line-clamp-2">
+                        <SparklesIcon className="inline-block -mt-0.5" width={18} />
+                        {' '}
+                        <span>{entry.summary || getPreviewText(entry.content)}</span>
                       </p>
-                      <div className="flex items-center gap-2 text-xs text-gray-500">
-                        <ClockIcon width={14} />
-                        <span>{t('journalList.updated', { date: formatDate(entry.updatedAt) })}</span>
+                      <div className="flex items-center gap-4 text-xs text-gray-500">
+                        <div className="flex items-center gap-1.5">
+                          <CalendarIcon width={14} />
+                          <span>{t('journalList.created', { date: formatDate(entry.createdAt) })}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <ClockIcon width={14} />
+                          <span>{t('journalList.updated', { date: formatDate(entry.updatedAt) })}</span>
+                        </div>
                       </div>
                     </div>
                     <button
@@ -212,6 +229,9 @@ export default function JournalList() {
 
       {/* Export PDF Modal */}
       {showExportPDFModal && <ExportPDFModal onClose={() => setShowExportPDFModal(false)} />}
+
+      {/* Cloud Sync Modal */}
+      {showCloudSyncModal && <CloudSyncModal onClose={() => setShowCloudSyncModal(false)} />}
     </div>
   );
 }

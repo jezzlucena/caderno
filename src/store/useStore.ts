@@ -24,9 +24,16 @@ export interface JournalEntry {
   updatedAt: number;
 }
 
+export interface SyncMetadata {
+  cid: string;
+  timestamp: number;
+  entryCount: number;
+}
+
 interface JournalState {
   entries: JournalEntry[];
   currentEntryId: string | null;
+  lastSyncMetadata: SyncMetadata | null;
   addEntry: (title: string) => void;
   updateEntry: (id: string, content: string, title?: string, summary?: string) => void;
   deleteEntry: (id: string) => void;
@@ -34,7 +41,65 @@ interface JournalState {
   getCurrentEntry: () => JournalEntry | null;
   exportEntries: () => JournalEntry[];
   importEntries: (entries: JournalEntry[], merge?: boolean) => void;
+  setLastSyncMetadata: (metadata: SyncMetadata | null) => void;
 }
+
+interface CloudSyncSettings {
+  lighthouseApiKey: string;
+  syncPassphrase: string;
+  autoSync: boolean;
+  lastCid: string;
+}
+
+interface SettingsState {
+  cloudSync: CloudSyncSettings;
+  setLighthouseApiKey: (key: string) => void;
+  setSyncPassphrase: (passphrase: string) => void;
+  setAutoSync: (enabled: boolean) => void;
+  setLastCid: (cid: string) => void;
+  clearCloudSyncSettings: () => void;
+}
+
+export const useSettingsStore = create<SettingsState>()(
+  persist(
+    (set) => ({
+      cloudSync: {
+        lighthouseApiKey: '',
+        syncPassphrase: '',
+        autoSync: false,
+        lastCid: '',
+      },
+      setLighthouseApiKey: (key: string) =>
+        set((state) => ({
+          cloudSync: { ...state.cloudSync, lighthouseApiKey: key },
+        })),
+      setSyncPassphrase: (passphrase: string) =>
+        set((state) => ({
+          cloudSync: { ...state.cloudSync, syncPassphrase: passphrase },
+        })),
+      setAutoSync: (enabled: boolean) =>
+        set((state) => ({
+          cloudSync: { ...state.cloudSync, autoSync: enabled },
+        })),
+      setLastCid: (cid: string) =>
+        set((state) => ({
+          cloudSync: { ...state.cloudSync, lastCid: cid },
+        })),
+      clearCloudSyncSettings: () =>
+        set({
+          cloudSync: {
+            lighthouseApiKey: '',
+            syncPassphrase: '',
+            autoSync: false,
+            lastCid: '',
+          },
+        }),
+    }),
+    {
+      name: 'agenda-settings-storage',
+    }
+  )
+);
 
 export const useJournalStore = create<JournalState>()(
   persist(
@@ -50,6 +115,7 @@ export const useJournalStore = create<JournalState>()(
         },
       ],
       currentEntryId: null,
+      lastSyncMetadata: null,
       addEntry: (title: string) => {
         const newEntry: JournalEntry = {
           id: Date.now().toString(),
@@ -101,6 +167,9 @@ export const useJournalStore = create<JournalState>()(
             : entries,
           currentEntryId: null,
         }));
+      },
+      setLastSyncMetadata: (metadata: SyncMetadata | null) => {
+        set({ lastSyncMetadata: metadata });
       },
     }),
     {

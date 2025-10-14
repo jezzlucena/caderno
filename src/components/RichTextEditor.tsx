@@ -28,6 +28,7 @@ export default function RichTextEditor() {
   const [suggestionError, setSuggestionError] = useState<string>('');
   const [showSuggestion, setShowSuggestion] = useState(false);
   const apiKey = getStoredApiKey();
+  const summaryTimerRef = useRef<number | null>(null);
 
   const editor = useEditor({
     extensions: [
@@ -69,7 +70,18 @@ export default function RichTextEditor() {
     },
     onUpdate: ({ editor }) => {
       if (currentEntry) {
-        updateEntry(currentEntry.id, editor.getHTML());
+        const content = editor.getHTML();
+        updateEntry(currentEntry.id, content);
+
+        // Clear existing timer
+        if (summaryTimerRef.current) {
+          clearTimeout(summaryTimerRef.current);
+        }
+
+        // Set new timer for debounced summary generation (10 seconds)
+        summaryTimerRef.current = window.setTimeout(() => {
+          handleGenerateSummary(content);
+        }, 10000);
       }
       // Hide suggestion when user types
       if (showSuggestion) {
@@ -84,29 +96,50 @@ export default function RichTextEditor() {
     }
   }, [currentEntry, editor]);
 
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (summaryTimerRef.current) {
+        clearTimeout(summaryTimerRef.current);
+      }
+    };
+  }, []);
+
   const handleBack = () => {
     if (currentEntry && editor) {
       const content = editor.getHTML();
 
-      // Update entry with current content first
-      updateEntry(currentEntry.id, content, currentEntry.title, 'Summarizing...');
-
-      // Optionally generate summary in background (non-blocking)
-      if (apiKey) {
-        getCompletion(content, apiKey, {
-          maxTokens: 1000,
-          temperature: 0.7,
-          mode: 'summarize',
-        }).then(prediction => {
-          const summary = prediction.split('</think>\n\n')[1];
-          updateEntry(currentEntry.id, content, currentEntry.title, summary);
-        }).catch(() => {
-          // Silently fail - summary generation is optional
-        });
+      // Clear pending timer if any
+      if (summaryTimerRef.current) {
+        clearTimeout(summaryTimerRef.current);
+        summaryTimerRef.current = null;
       }
+
+      // Update entry with current content first
+      updateEntry(currentEntry.id, content, currentEntry.title);
+
+      // Immediately generate summary when leaving the editor
+      handleGenerateSummary(content);
     }
 
     setCurrentEntry(null);
+  };
+
+  const handleGenerateSummary = (content: string) => {
+    if (!currentEntry) return;
+
+    if (apiKey) {
+      getCompletion(content, apiKey, {
+        maxTokens: 1000,
+        temperature: 0.7,
+        mode: 'summarize',
+      }).then(prediction => {
+        const summary = prediction.split('</think>\n\n')[1];
+        updateEntry(currentEntry.id, content, currentEntry.title, summary);
+      }).catch(() => {
+        // Silently fail - summary generation is optional
+      });
+    }
   };
 
   const getTextContext = (): string => {

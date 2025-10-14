@@ -14,6 +14,7 @@
     "today": "Hoje",
     "yesterday": "Ontem",
     "daysAgo": "há {{count}} dias",
+    "created": "Criado {{date}}",
     "updated": "Actualizado {{date}}"
   },
   "editor": {
