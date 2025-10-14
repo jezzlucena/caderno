@@ -93,6 +93,10 @@
   },
   "settings": {
     "title": "Settings",
+    "language": {
+      "title": "Language",
+      "description": "Choose your preferred language for the application."
+    },
     "aiAutocomplete": "AI Autocomplete",
     "aiDescription": "Enable AI-powered text completion using OpenRouter's free DeepSeek Chat model. Get intelligent writing suggestions as you type - completely free!",
     "howToGetKey": "How to get your free OpenRouter API key:",

@@ -22,6 +22,7 @@ export interface JournalEntry {
   summary: string;
   createdAt: number;
   updatedAt: number;
+  isAISummarizing?: boolean;
 }
 
 export interface SyncMetadata {
@@ -42,6 +43,7 @@ interface JournalState {
   exportEntries: () => JournalEntry[];
   importEntries: (entries: JournalEntry[], merge?: boolean) => void;
   setLastSyncMetadata: (metadata: SyncMetadata | null) => void;
+  setIsAISummarizing: (id: string, isAISummarizing: boolean) => void;
 }
 
 interface CloudSyncSettings {
@@ -160,7 +162,7 @@ export const useJournalStore = create<JournalState>()(
         return get().entries;
       },
       importEntries: (entries: JournalEntry[], merge = false) => {
-        const newEntries = entries.map(e => { e.id = Date.now().toString(); return e });
+        const newEntries = entries.map(e => { e.id = (Date.now() + Math.round(Math.random() * 1000000)).toString(); return e });
         set((state) => ({
           entries: merge
             ? [...newEntries, ...state.entries.filter(e => !entries.find(ne => ne.id === e.id))]
@@ -170,6 +172,15 @@ export const useJournalStore = create<JournalState>()(
       },
       setLastSyncMetadata: (metadata: SyncMetadata | null) => {
         set({ lastSyncMetadata: metadata });
+      },
+      setIsAISummarizing: (id: string, isAISummarizing: boolean) => {
+        set((state) => ({
+          entries: state.entries.map((entry) =>
+            entry.id === id
+              ? { ...entry, isAISummarizing }
+              : entry
+          ),
+        }));
       },
     }),
     {

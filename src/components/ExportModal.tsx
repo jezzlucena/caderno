@@ -10,10 +10,18 @@ interface ExportModalProps {
 
 export default function ExportModal({ onClose }: ExportModalProps) {
   const { exportEntries } = useJournalStore();
+  const [isClosing, setIsClosing] = useState(false);
   const [encrypt, setEncrypt] = useState(false);
   const [passphrase, setPassphrase] = useState('');
   const [confirmPassphrase, setConfirmPassphrase] = useState('');
   const [error, setError] = useState('');
+
+  const handleClose = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+    }, 300);
+  };
 
   const handleExport = () => {
     setError('');
@@ -73,16 +81,26 @@ export default function ExportModal({ onClose }: ExportModalProps) {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 
-    onClose();
+    handleClose();
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md">
+    <div
+      className={`fixed inset-0 bg-black/30 flex items-center justify-center p-4 z-50 ${
+        isClosing ? 'animate-fadeOut' : 'animate-fadeIn'
+      }`}
+      onClick={handleClose}
+    >
+      <div
+        className={`bg-white rounded-xl shadow-2xl p-6 w-full max-w-md ${
+          isClosing ? 'animate-slideDown' : 'animate-slideUp'
+        }`}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-bold text-gray-800">Export Journal</h2>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
           >
             <XMarkIcon width={24} />
@@ -147,7 +165,7 @@ export default function ExportModal({ onClose }: ExportModalProps) {
 
         <div className="flex gap-3 justify-end">
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
           >
             Cancel

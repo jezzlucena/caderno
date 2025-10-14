@@ -93,6 +93,10 @@
   },
   "settings": {
     "title": "设置",
+    "language": {
+      "title": "语言",
+      "description": "选择您偏好的应用程序语言。"
+    },
     "aiAutocomplete": "AI自动补全",
     "aiDescription": "使用OpenRouter的免费DeepSeek Chat模型启用AI驱动的文本补全。在您输入时获得智能写作建议 - 完全免费！",
     "howToGetKey": "如何获取您的免费OpenRouter API密钥：",

@@ -14,6 +14,7 @@ export default function CloudSyncModal({ onClose }: CloudSyncModalProps) {
   const { entries, importEntries, setLastSyncMetadata, lastSyncMetadata } = useJournalStore();
   const { cloudSync, setLastCid } = useSettingsStore();
 
+  const [isClosing, setIsClosing] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -21,6 +22,13 @@ export default function CloudSyncModal({ onClose }: CloudSyncModalProps) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [mergeOnDownload, setMergeOnDownload] = useState(true);
+
+  const handleClose = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+    }, 300);
+  };
 
   const handleUpload = async () => {
     setError(null);
@@ -137,12 +145,22 @@ export default function CloudSyncModal({ onClose }: CloudSyncModalProps) {
   const hasBackup = cloudSync.lastCid || lastSyncMetadata?.cid;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-lg">
+    <div
+      className={`fixed inset-0 bg-black/30 flex items-center justify-center p-4 z-50 ${
+        isClosing ? 'animate-fadeOut' : 'animate-fadeIn'
+      }`}
+      onClick={handleClose}
+    >
+      <div
+        className={`bg-white rounded-xl shadow-2xl p-6 w-full max-w-lg ${
+          isClosing ? 'animate-slideDown' : 'animate-slideUp'
+        }`}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-bold text-gray-800">{t('cloudSync.title')}</h2>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
             disabled={isUploading || isDownloading}
           >
@@ -277,7 +295,7 @@ export default function CloudSyncModal({ onClose }: CloudSyncModalProps) {
         {/* Close Button */}
         <div className="flex justify-end mt-6">
           <button
-            onClick={onClose}
+            onClick={handleClose}
             disabled={isUploading || isDownloading}
             className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >

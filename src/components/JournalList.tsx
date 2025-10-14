@@ -1,10 +1,9 @@
-import { PlusIcon, DocumentTextIcon, TrashIcon, ClockIcon, ArrowDownTrayIcon, Cog6ToothIcon, FolderPlusIcon, DocumentArrowDownIcon, CloudIcon, SparklesIcon, CalendarIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, DocumentTextIcon, TrashIcon, ClockIcon, ArrowDownTrayIcon, Cog6ToothIcon, FolderPlusIcon, DocumentArrowDownIcon, CloudIcon, SparklesIcon, CalendarIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useJournalStore } from '../store/useStore';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ExportModal from './ExportModal';
 import ImportModal from './ImportModal';
-import LanguageSelector from './LanguageSelector';
 import SettingsModal from './SettingsModal';
 import ExportPDFModal from './ExportPDFModal';
 import CloudSyncModal from './CloudSyncModal';
@@ -13,18 +12,28 @@ export default function JournalList() {
   const { entries, addEntry, deleteEntry, setCurrentEntry } = useJournalStore();
   const { t } = useTranslation();
   const [showNewEntryModal, setShowNewEntryModal] = useState(false);
+  const [isClosingNewEntry, setIsClosingNewEntry] = useState(false);
   const [newEntryTitle, setNewEntryTitle] = useState('');
   const [showExportModal, setShowExportModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showExportPDFModal, setShowExportPDFModal] = useState(false);
   const [showCloudSyncModal, setShowCloudSyncModal] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+
+  const handleCloseNewEntry = () => {
+    setIsClosingNewEntry(true);
+    setTimeout(() => {
+      setShowNewEntryModal(false);
+      setIsClosingNewEntry(false);
+    }, 300);
+  };
 
   const handleCreateEntry = () => {
     if (newEntryTitle.trim()) {
       addEntry(newEntryTitle.trim());
       setNewEntryTitle('');
-      setShowNewEntryModal(false);
+      handleCloseNewEntry();
     }
   };
 
@@ -64,7 +73,7 @@ export default function JournalList() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="h-full w-full bg-gradient-to-br from-blue-50 to-indigo-100 overflow-auto">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <header className="mb-8">
           <div className="flex items-center justify-between mb-4">
@@ -76,54 +85,116 @@ export default function JournalList() {
               </div>
             </div>
             <button
-              onClick={() => setShowNewEntryModal(true)}
-              className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-3 rounded-full transition-colors duration-200 shadow-md hover:shadow-lg"
-              title={t('journalList.newEntry')}
+              onClick={() => setShowMenu(!showMenu)}
+              className="flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-semibold py-3 px-3 rounded-full transition-all duration-200 shadow-md hover:shadow-lg border border-gray-300"
+              title="Menu"
             >
-              <PlusIcon width={20} />
-            </button>
-          </div>
-
-          {/* Export/Import buttons */}
-          <div className="flex gap-2 justify-end">
-            <LanguageSelector />
-            <button
-              onClick={() => setShowSettingsModal(true)}
-              className="flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors border border-gray-300"
-              title={t('settings.settings')}
-            >
-              <Cog6ToothIcon width={18} />
-            </button>
-            <button
-              onClick={() => setShowImportModal(true)}
-              className="flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors border border-gray-300"
-              title={t('journalList.import')}
-            >
-              <FolderPlusIcon width={18} />
-            </button>
-            <button
-              onClick={() => setShowExportModal(true)}
-              className="flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors border border-gray-300"
-              title={t('journalList.export')}
-            >
-              <ArrowDownTrayIcon width={18} />
-            </button>
-            <button
-              onClick={() => setShowExportPDFModal(true)}
-              className="flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors border border-gray-300"
-              title={t('exportPDF.title')}
-            >
-              <DocumentArrowDownIcon width={18} />
-            </button>
-            <button
-              onClick={() => setShowCloudSyncModal(true)}
-              className="flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors border border-gray-300"
-              title={t('cloudSync.title')}
-            >
-              <CloudIcon width={18} />
+              <span className="transition-transform duration-200" style={{ transform: showMenu ? 'rotate(90deg)' : 'rotate(0deg)' }}>
+                {showMenu ? <XMarkIcon width={20} /> : <Bars3Icon width={20} />}
+              </span>
             </button>
           </div>
         </header>
+
+        {/* Hamburger Menu Dropdown */}
+        {showMenu && (
+          <div
+            className="fixed top-20 right-4 bg-white rounded-xl shadow-2xl border border-gray-200 p-4 z-50 min-w-[250px]"
+            style={{
+              animation: 'slideIn 0.2s ease-out forwards',
+            }}
+          >
+            <style>{`
+              @keyframes slideIn {
+                from {
+                  opacity: 0;
+                  transform: translateY(-10px) scale(0.95);
+                }
+                to {
+                  opacity: 1;
+                  transform: translateY(0) scale(1);
+                }
+              }
+              @keyframes fadeIn {
+                from {
+                  opacity: 0;
+                }
+                to {
+                  opacity: 1;
+                }
+              }
+            `}</style>
+            <div className="space-y-2">
+              <button
+                onClick={() => {
+                  setShowSettingsModal(true);
+                  setShowMenu(false);
+                }}
+                className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+              >
+                <Cog6ToothIcon width={20} />
+                <span className="font-medium">{t('settings.settings')}</span>
+              </button>
+
+              <div className="border-t border-gray-200 my-2"></div>
+
+              <button
+                onClick={() => {
+                  setShowImportModal(true);
+                  setShowMenu(false);
+                }}
+                className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+              >
+                <FolderPlusIcon width={20} />
+                <span className="font-medium">{t('journalList.import')}</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setShowExportModal(true);
+                  setShowMenu(false);
+                }}
+                className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+              >
+                <ArrowDownTrayIcon width={20} />
+                <span className="font-medium">{t('journalList.export')}</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setShowExportPDFModal(true);
+                  setShowMenu(false);
+                }}
+                className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+              >
+                <DocumentArrowDownIcon width={20} />
+                <span className="font-medium">{t('exportPDF.title')}</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setShowCloudSyncModal(true);
+                  setShowMenu(false);
+                }}
+                className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+              >
+                <CloudIcon width={20} />
+                <span className="font-medium">{t('cloudSync.title')}</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Backdrop for menu */}
+        {showMenu && (
+          <div
+            className="fixed inset-0 bg-black/10 z-40"
+            style={{
+              animation: 'fadeIn 0.2s ease-out forwards',
+            }}
+            onClick={() => setShowMenu(false)}
+          ></div>
+        )}
 
         <main>
           {entries.length === 0 ? (
@@ -144,8 +215,25 @@ export default function JournalList() {
                 <div
                   key={entry.id}
                   onClick={() => handleSelectEntry(entry.id)}
-                  className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer p-6 group"
+                  className={`bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer p-6 group ${
+                    entry.isAISummarizing ? 'shimmer' : ''
+                  }`}
+                  style={entry.isAISummarizing ? {
+                    backgroundImage: 'linear-gradient(90deg, transparent 0%, rgba(99, 102, 241, 0.1) 50%, transparent 100%)',
+                    backgroundSize: '200% 100%',
+                    animation: 'shimmer 2s infinite',
+                  } : undefined}
                 >
+                  <style>{`
+                    @keyframes shimmer {
+                      0% {
+                        background-position: -200% 0;
+                      }
+                      100% {
+                        background-position: 200% 0;
+                      }
+                    }
+                  `}</style>
                   <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0">
                       <h3 className="text-lg font-semibold text-gray-800 mb-2 group-hover:text-indigo-600 transition-colors">
@@ -182,10 +270,32 @@ export default function JournalList() {
         </main>
       </div>
 
+      {/* Floating Action Button - Create Entry */}
+      <button
+        onClick={() => setShowNewEntryModal(true)}
+        className="fixed bottom-8 right-8 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold p-4 rounded-full transition-all duration-200 shadow-2xl hover:shadow-3xl hover:scale-110 z-50"
+        title={t('journalList.newEntry')}
+        style={{
+          animation: 'fadeIn 0.3s ease-out',
+        }}
+      >
+        <PlusIcon width={28} height={28} />
+      </button>
+
       {/* New Entry Modal */}
       {showNewEntryModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md">
+        <div
+          className={`fixed inset-0 bg-black/30 flex items-center justify-center p-4 z-50 ${
+            isClosingNewEntry ? 'animate-fadeOut' : 'animate-fadeIn'
+          }`}
+          onClick={handleCloseNewEntry}
+        >
+          <div
+            className={`bg-white rounded-xl shadow-2xl p-6 w-full max-w-md ${
+              isClosingNewEntry ? 'animate-slideDown' : 'animate-slideUp'
+            }`}
+            onClick={(e) => e.stopPropagation()}
+          >
             <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('modal.newEntry.title')}</h2>
             <input
               type="text"
@@ -199,7 +309,7 @@ export default function JournalList() {
             <div className="flex gap-3 justify-end">
               <button
                 onClick={() => {
-                  setShowNewEntryModal(false);
+                  handleCloseNewEntry();
                   setNewEntryTitle('');
                 }}
                 className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"

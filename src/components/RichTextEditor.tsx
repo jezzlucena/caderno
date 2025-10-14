@@ -19,7 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { getCompletion, getStoredApiKey } from '../services/aiCompletion';
 
 export default function RichTextEditor() {
-  const { getCurrentEntry, updateEntry, setCurrentEntry } = useJournalStore();
+  const { getCurrentEntry, updateEntry, setCurrentEntry, setIsAISummarizing } = useJournalStore();
   const { t } = useTranslation();
   const currentEntry = getCurrentEntry();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -129,6 +129,9 @@ export default function RichTextEditor() {
     if (!currentEntry) return;
 
     if (apiKey) {
+      // Set summarizing state to true
+      setIsAISummarizing(currentEntry.id, true);
+
       getCompletion(content, apiKey, {
         maxTokens: 1000,
         temperature: 0.7,
@@ -136,8 +139,11 @@ export default function RichTextEditor() {
       }).then(prediction => {
         const summary = prediction.split('</think>\n\n')[1];
         updateEntry(currentEntry.id, content, currentEntry.title, summary);
+        // Set summarizing state to false when done
+        setIsAISummarizing(currentEntry.id, false);
       }).catch(() => {
         // Silently fail - summary generation is optional
+        setIsAISummarizing(currentEntry.id, false);
       });
     }
   };
@@ -248,7 +254,7 @@ export default function RichTextEditor() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="h-full w-full bg-gradient-to-br from-blue-50 to-indigo-100 overflow-auto">
       <div className="container mx-auto px-4 py-8">
         {/* Header with back button */}
         <div className="mb-6 flex items-center gap-4">

@@ -93,6 +93,10 @@
   },
   "settings": {
     "title": "設定",
+    "language": {
+      "title": "言語",
+      "description": "アプリケーションの優先言語を選択してください。"
+    },
     "aiAutocomplete": "AI自動補完",
     "aiDescription": "OpenRouterの無料DeepSeek Chatモデルを使用してAI駆動のテキスト補完を有効にします。入力時にインテリジェントな執筆提案を取得 - 完全無料！",
     "howToGetKey": "無料のOpenRouter APIキーの取得方法：",

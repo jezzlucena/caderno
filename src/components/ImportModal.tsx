@@ -9,6 +9,7 @@ interface ImportModalProps {
 
 export default function ImportModal({ onClose }: ImportModalProps) {
   const { importEntries } = useJournalStore();
+  const [isClosing, setIsClosing] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [passphrase, setPassphrase] = useState('');
   const [merge, setMerge] = useState(false);
@@ -19,6 +20,13 @@ export default function ImportModal({ onClose }: ImportModalProps) {
     encrypted: boolean;
     data: string;
   } | null>(null);
+
+  const handleClose = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+    }, 300);
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -111,12 +119,22 @@ export default function ImportModal({ onClose }: ImportModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md">
+    <div
+      className={`fixed inset-0 bg-black/30 flex items-center justify-center p-4 z-50 ${
+        isClosing ? 'animate-fadeOut' : 'animate-fadeIn'
+      }`}
+      onClick={handleClose}
+    >
+      <div
+        className={`bg-white rounded-xl shadow-2xl p-6 w-full max-w-md ${
+          isClosing ? 'animate-slideDown' : 'animate-slideUp'
+        }`}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-bold text-gray-800">Import Journal</h2>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
           >
             <XMarkIcon width={24} />
@@ -193,7 +211,7 @@ export default function ImportModal({ onClose }: ImportModalProps) {
 
         <div className="flex gap-3 justify-end">
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
           >
             Cancel

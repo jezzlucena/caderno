@@ -15,6 +15,7 @@ export default function ExportPDFModal({ onClose }: ExportPDFModalProps) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isExporting, setIsExporting] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [isClosing, setIsClosing] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -37,6 +38,13 @@ export default function ExportPDFModal({ onClose }: ExportPDFModalProps) {
     } else {
       setSelectedIds(new Set(entries.map(e => e.id)));
     }
+  };
+
+  const handleClose = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+    }, 300);
   };
 
   const formatDate = (timestamp: number) => {
@@ -217,12 +225,22 @@ export default function ExportPDFModal({ onClose }: ExportPDFModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-2xl max-h-[90vh] flex flex-col">
+    <div
+      className={`fixed inset-0 bg-black/30 flex items-center justify-center p-4 z-50 ${
+        isClosing ? 'animate-fadeOut' : 'animate-fadeIn'
+      }`}
+      onClick={handleClose}
+    >
+      <div
+        className={`bg-white rounded-xl shadow-2xl p-6 w-full max-w-2xl max-h-[90vh] flex flex-col ${
+          isClosing ? 'animate-slideDown' : 'animate-slideUp'
+        }`}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-bold text-gray-800">{t('exportPDF.title')}</h2>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
             disabled={isExporting}
           >
@@ -276,7 +294,7 @@ export default function ExportPDFModal({ onClose }: ExportPDFModalProps) {
 
             <div className="flex gap-3 justify-end">
               <button
-                onClick={onClose}
+                onClick={handleClose}
                 className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 {t('exportPDF.cancel')}

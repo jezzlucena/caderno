@@ -93,6 +93,10 @@
   },
   "settings": {
     "title": "Configuración",
+    "language": {
+      "title": "Idioma",
+      "description": "Elige tu idioma preferido para la aplicación."
+    },
     "aiAutocomplete": "Autocompletar con IA",
     "aiDescription": "Activa el completado de texto con IA usando el modelo gratuito DeepSeek Chat de OpenRouter. Obtén sugerencias inteligentes de escritura mientras escribes - completamente gratis!",
     "howToGetKey": "Cómo obtener tu clave de API gratuita de OpenRouter:",
