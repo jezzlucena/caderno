@@ -2,6 +2,7 @@ import { PlusIcon, DocumentTextIcon, TrashIcon, ClockIcon, ArrowDownTrayIcon, Co
 import { useJournalStore } from '../store/useStore';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { getStoredApiKey } from '../services/aiCompletion';
 import ExportModal from './ExportModal';
 import ImportModal from './ImportModal';
 import SettingsModal from './SettingsModal';
@@ -18,6 +19,7 @@ export default function JournalList() {
   const [showExportModal, setShowExportModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [settingsInitialScreen, setSettingsInitialScreen] = useState<'main' | 'language' | 'ai' | 'cloudSync' | 'scheduledExports'>('main');
   const [showExportPDFModal, setShowExportPDFModal] = useState(false);
   const [showCloudSyncModal, setShowCloudSyncModal] = useState(false);
   const [showScheduledExportsModal, setShowScheduledExportsModal] = useState(false);
@@ -80,8 +82,10 @@ export default function JournalList() {
     const temp = document.createElement('div');
     temp.innerHTML = html.replaceAll(/<(br|h\d|p)>/gi, '').replaceAll(/<\/(br|h\d|p)>/gi, '\n');
     const text = temp.textContent || temp.innerText || '';
-    return text.length > 100 && !text.endsWith('...') ? text.substring(0, 100) + '...' : text;
+    return text.length > 140 && !text.endsWith('...') ? text.substring(0, 140) + '...' : text;
   };
+
+  const hasAISetup = getStoredApiKey() !== null;
 
   return (
     <div className="h-full w-full bg-gradient-to-br from-blue-50 to-indigo-100 overflow-auto">
@@ -158,6 +162,7 @@ export default function JournalList() {
             <div className="space-y-2">
               <button
                 onClick={() => {
+                  setSettingsInitialScreen('main');
                   setShowSettingsModal(true);
                   handleCloseMenu();
                 }}
@@ -282,9 +287,15 @@ export default function JournalList() {
                         {entry.title}
                       </h3>
                       <p className="text-sm text-gray-500 mb-3 line-clamp-2">
-                        <SparklesIcon className="inline-block -mt-0.5" width={18} />
-                        {' '}
-                        <span>{entry.summary || getPreviewText(entry.content)}</span>
+                        {hasAISetup && entry.summary ? (
+                          <>
+                            <SparklesIcon className="inline-block -mt-0.5" width={18} />
+                            {' '}
+                            <span>{entry.summary}</span>
+                          </>
+                        ) : (
+                          <span>{getPreviewText(entry.content)}</span>
+                        )}
                       </p>
                       <div className="flex items-center gap-4 text-xs text-gray-500">
                         <div className="flex items-center gap-1.5">
@@ -333,7 +344,7 @@ export default function JournalList() {
           onClick={handleCloseNewEntry}
         >
           <div
-            className={`bg-white rounded-xl shadow-2xl p-6 w-full max-w-md ${
+            className={`bg-white rounded-xl shadow-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto ${
               isClosingNewEntry ? 'animate-slideDown' : 'animate-slideUp'
             }`}
             onClick={(e) => e.stopPropagation()}
@@ -371,7 +382,15 @@ export default function JournalList() {
       )}
 
       {/* Settings Modal */}
-      {showSettingsModal && <SettingsModal onClose={() => setShowSettingsModal(false)} />}
+      {showSettingsModal && (
+        <SettingsModal 
+          onClose={() => {
+            setShowSettingsModal(false);
+            setSettingsInitialScreen('main');
+          }}
+          initialScreen={settingsInitialScreen}
+        />
+      )}
 
       {/* Export Modal */}
       {showExportModal && <ExportModal onClose={() => setShowExportModal(false)} />}
@@ -383,10 +402,28 @@ export default function JournalList() {
       {showExportPDFModal && <ExportPDFModal onClose={() => setShowExportPDFModal(false)} />}
 
       {/* Cloud Sync Modal */}
-      {showCloudSyncModal && <CloudSyncModal onClose={() => setShowCloudSyncModal(false)} />}
+      {showCloudSyncModal && (
+        <CloudSyncModal 
+          onClose={() => setShowCloudSyncModal(false)}
+          onOpenSettings={(screen) => {
+            setShowCloudSyncModal(false);
+            setSettingsInitialScreen(screen);
+            setShowSettingsModal(true);
+          }}
+        />
+      )}
 
       {/* Scheduled Exports Modal */}
-      {showScheduledExportsModal && <ScheduledExportsModal onClose={() => setShowScheduledExportsModal(false)} />}
+      {showScheduledExportsModal && (
+        <ScheduledExportsModal 
+          onClose={() => setShowScheduledExportsModal(false)}
+          onOpenSettings={(screen) => {
+            setShowScheduledExportsModal(false);
+            setSettingsInitialScreen(screen);
+            setShowSettingsModal(true);
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -1,5 +1,5 @@
-// AI completion service using OpenRouter's free DeepSeek Chat v3 model
-// Users can get a free API key at https://openrouter.ai/keys
+// AI completion service using HuggingFace's Free AI Language Model SmollM3
+// Users can get a free API key at https://huggingface.co/settings/tokens
 
 const OPENROUTER_API_URL = 'https://router.huggingface.co/v1/chat/completions';
 export const PREDICT_TEXT_MESSAGES_GENERATOR = (text: string) => {
@@ -71,7 +71,7 @@ export async function getCompletion(
         throw new Error('Rate limit exceeded. Please try again in a moment.');
       }
       if (response.status === 402) {
-        throw new Error('Insufficient credits. Please check your OpenRouter account.');
+        throw new Error('Insufficient credits. Please check your HuggingFace account.');
       }
       const errorData = await response.json().catch(() => null);
       const errorMessage = errorData?.error?.message || `API error: ${response.status}`;

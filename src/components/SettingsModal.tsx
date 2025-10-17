@@ -19,12 +19,15 @@ type SettingsScreen = 'main' | 'language' | 'ai' | 'cloudSync' | 'scheduledExpor
 
 interface SettingsModalProps {
   onClose: () => void;
+  initialScreen?: SettingsScreen;
 }
 
-export default function SettingsModal({ onClose }: SettingsModalProps) {
+export default function SettingsModal({ onClose, initialScreen = 'main' }: SettingsModalProps) {
   const { t, i18n } = useTranslation();
-  const [currentScreen, setCurrentScreen] = useState<SettingsScreen>('main');
+  const [currentScreen, setCurrentScreen] = useState<SettingsScreen>(initialScreen);
   const [isClosing, setIsClosing] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [transitionDirection, setTransitionDirection] = useState<'left' | 'right'>('left');
   const [apiKey, setApiKey] = useState('');
   const [showKey, setShowKey] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -72,6 +75,17 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
     setTimeout(() => {
       onClose();
     }, 300); // Match animation duration
+  };
+
+  const navigateToScreen = (screen: SettingsScreen) => {
+    const direction = screen === 'main' ? 'right' : 'left';
+    setTransitionDirection(direction);
+    setIsTransitioning(true);
+    
+    setTimeout(() => {
+      setCurrentScreen(screen);
+      setIsTransitioning(false);
+    }, 300);
   };
 
   const handleSave = () => {
@@ -131,7 +145,7 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
     <div className="space-y-3">
       {/* Language Option */}
       <button
-        onClick={() => setCurrentScreen('language')}
+        onClick={() => navigateToScreen('language')}
         className="w-full flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-colors border border-gray-200"
       >
         <div className="flex items-center gap-3">
@@ -146,7 +160,7 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
 
       {/* AI Autocomplete Option */}
       <button
-        onClick={() => setCurrentScreen('ai')}
+        onClick={() => navigateToScreen('ai')}
         className="w-full flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-colors border border-gray-200"
       >
         <div className="flex items-center gap-3">
@@ -161,7 +175,7 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
 
       {/* Cloud Sync Option */}
       <button
-        onClick={() => setCurrentScreen('cloudSync')}
+        onClick={() => navigateToScreen('cloudSync')}
         className="w-full flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-colors border border-gray-200"
       >
         <div className="flex items-center gap-3">
@@ -176,7 +190,7 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
 
       {/* Scheduled Exports Option */}
       <button
-        onClick={() => setCurrentScreen('scheduledExports')}
+        onClick={() => navigateToScreen('scheduledExports')}
         className="w-full flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-colors border border-gray-200"
       >
         <div className="flex items-center gap-3">
@@ -194,7 +208,7 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
   const renderLanguageScreen = () => (
     <div className="space-y-4">
       <button
-        onClick={() => setCurrentScreen('main')}
+        onClick={() => navigateToScreen('main')}
         className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors mb-4"
       >
         <ArrowLeftIcon width={20} />
@@ -233,7 +247,7 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
   const renderAIScreen = () => (
     <div className="space-y-4">
       <button
-        onClick={() => setCurrentScreen('main')}
+        onClick={() => navigateToScreen('main')}
         className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors mb-4"
       >
         <ArrowLeftIcon width={20} />
@@ -307,7 +321,7 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
 
       <div className="flex gap-3 justify-end mt-6">
         <button
-          onClick={() => setCurrentScreen('main')}
+          onClick={() => navigateToScreen('main')}
           className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
         >
           {t('settings.cancel')}
@@ -331,7 +345,7 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
   const renderScheduledExportsScreen = () => (
     <div className="space-y-4">
       <button
-        onClick={() => setCurrentScreen('main')}
+        onClick={() => navigateToScreen('main')}
         className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors mb-4"
       >
         <ArrowLeftIcon width={20} />
@@ -429,7 +443,7 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
 
       <div className="flex gap-3 justify-end mt-6">
         <button
-          onClick={() => setCurrentScreen('main')}
+          onClick={() => navigateToScreen('main')}
           className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
         >
           {t('settings.cancel')}
@@ -453,7 +467,7 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
   const renderCloudSyncScreen = () => (
     <div className="space-y-4">
       <button
-        onClick={() => setCurrentScreen('main')}
+        onClick={() => navigateToScreen('main')}
         className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors mb-4"
       >
         <ArrowLeftIcon width={20} />
@@ -573,7 +587,7 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
 
       <div className="flex gap-3 justify-end mt-6">
         <button
-          onClick={() => setCurrentScreen('main')}
+          onClick={() => navigateToScreen('main')}
           className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
         >
           {t('settings.cancel')}
@@ -617,11 +631,21 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
           </button>
         </div>
 
-        {currentScreen === 'main' && renderMainScreen()}
-        {currentScreen === 'language' && renderLanguageScreen()}
-        {currentScreen === 'ai' && renderAIScreen()}
-        {currentScreen === 'cloudSync' && renderCloudSyncScreen()}
-        {currentScreen === 'scheduledExports' && renderScheduledExportsScreen()}
+        <div 
+          className={`transition-all duration-300 ${
+            isTransitioning
+              ? transitionDirection === 'left'
+                ? 'opacity-0 -translate-x-4'
+                : 'opacity-0 translate-x-4'
+              : 'opacity-100 translate-x-0'
+          }`}
+        >
+          {currentScreen === 'main' && renderMainScreen()}
+          {currentScreen === 'language' && renderLanguageScreen()}
+          {currentScreen === 'ai' && renderAIScreen()}
+          {currentScreen === 'cloudSync' && renderCloudSyncScreen()}
+          {currentScreen === 'scheduledExports' && renderScheduledExportsScreen()}
+        </div>
       </div>
     </div>
   );

@@ -7,9 +7,10 @@ import { uploadToIPFS, downloadFromIPFS } from '../services/cloudSync';
 
 interface CloudSyncModalProps {
   onClose: () => void;
+  onOpenSettings?: (screen: 'cloudSync') => void;
 }
 
-export default function CloudSyncModal({ onClose }: CloudSyncModalProps) {
+export default function CloudSyncModal({ onClose, onOpenSettings }: CloudSyncModalProps) {
   const { t } = useTranslation();
   const { entries, importEntries, setLastSyncMetadata, lastSyncMetadata } = useJournalStore();
   const { cloudSync, setLastCid } = useSettingsStore();
@@ -218,16 +219,18 @@ export default function CloudSyncModal({ onClose }: CloudSyncModalProps) {
 
             {/* Action Buttons */}
             <div className="flex flex-col gap-3">
-              <button
-                onClick={() => {
-                  handleClose();
-                  // User will open settings manually
-                }}
-                className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-              >
-                <Cog6ToothIcon width={20} />
-                <span>Go to Settings to Configure</span>
-              </button>
+                <button
+                  onClick={() => {
+                    if (onOpenSettings) {
+                      onOpenSettings('cloudSync');
+                    }
+                    handleClose();
+                  }}
+                  className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                >
+                  <Cog6ToothIcon width={20} />
+                  <span>Go to Settings to Configure</span>
+                </button>
               
               <button
                 onClick={handleClose}
@@ -238,10 +241,18 @@ export default function CloudSyncModal({ onClose }: CloudSyncModalProps) {
             </div>
 
             {/* Help Text */}
-            <div className="text-center">
+            <div className="text-center space-y-2">
               <p className="text-xs text-gray-500">
                 Your data is encrypted locally before upload. Only you can decrypt it with your passphrase.
               </p>
+              <a
+                href="https://github.com/jezzlucena/agenda/blob/main/CLOUD_SYNC_GUIDE.md"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block text-sm text-indigo-600 hover:text-indigo-700 underline"
+              >
+                View Full Setup Guide →
+              </a>
             </div>
           </div>
         ) : (

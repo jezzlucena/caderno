@@ -23,9 +23,10 @@ interface Recipient {
 
 interface ScheduledExportsModalProps {
   onClose: () => void;
+  onOpenSettings?: (screen: 'scheduledExports') => void;
 }
 
-export default function ScheduledExportsModal({ onClose }: ScheduledExportsModalProps) {
+export default function ScheduledExportsModal({ onClose, onOpenSettings }: ScheduledExportsModalProps) {
   const { entries } = useJournalStore();
   const { scheduledExports } = useSettingsStore();
   const [isClosing, setIsClosing] = useState(false);
@@ -255,8 +256,10 @@ export default function ScheduledExportsModal({ onClose }: ScheduledExportsModal
               <div className="flex flex-col gap-3">
                 <button
                   onClick={() => {
+                    if (onOpenSettings) {
+                      onOpenSettings('scheduledExports');
+                    }
                     handleClose();
-                    // User will open settings manually
                   }}
                   className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
                 >
@@ -275,7 +278,7 @@ export default function ScheduledExportsModal({ onClose }: ScheduledExportsModal
               {/* Help Link */}
               <div className="text-center">
                 <a
-                  href="https://github.com"
+                  href="https://github.com/jezzlucena/agenda/blob/main/SCHEDULED_EXPORTS_GUIDE.md"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-indigo-600 hover:text-indigo-700 underline"
