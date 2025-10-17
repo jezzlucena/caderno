@@ -578,9 +578,11 @@ export default function RichTextEditor() {
           onClick={() => {
             if (!apiKey) {
               setShowAISetupModal(true);
+            } else {
+              handleGetSuggestion();
             }
           }}
-          title={!apiKey ? 'Click to set up AI Autocomplete' : ''}
+          title={!apiKey ? 'Click to set up AI Autocomplete' : 'Click to get AI suggestions'}
         >
           <p className="text-xs text-gray-500 text-center">
             <kbd className="px-2 py-1 bg-white border border-gray-300 rounded text-xs">Shift + Space</kbd>
