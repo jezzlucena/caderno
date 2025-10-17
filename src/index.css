@@ -80,19 +80,19 @@
 }
 
 .animate-fadeIn {
-  animation: fadeIn 0.2s ease-out;
+  animation: fadeIn 0.2s ease-out forwards !important;
 }
 
 .animate-fadeOut {
-  animation: fadeOut 0.2s ease-in;
+  animation: fadeOut 0.2s ease-in forwards !important;
 }
 
 .animate-slideUp {
-  animation: slideUp 0.3s ease-out;
+  animation: slideUp 0.3s ease-out forwards !important;
 }
 
 .animate-slideDown {
-  animation: slideDown 0.3s ease-in;
+  animation: slideDown 0.3s ease-in forwards !important;
 }
 
 /* View transition animations */

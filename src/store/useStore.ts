@@ -53,13 +53,22 @@ interface CloudSyncSettings {
   lastCid: string;
 }
 
+interface ScheduledExportsSettings {
+  serverUrl: string;
+  apiKey: string;
+}
+
 interface SettingsState {
   cloudSync: CloudSyncSettings;
+  scheduledExports: ScheduledExportsSettings;
   setLighthouseApiKey: (key: string) => void;
   setSyncPassphrase: (passphrase: string) => void;
   setAutoSync: (enabled: boolean) => void;
   setLastCid: (cid: string) => void;
   clearCloudSyncSettings: () => void;
+  setScheduledExportsServerUrl: (url: string) => void;
+  setScheduledExportsApiKey: (key: string) => void;
+  clearScheduledExportsSettings: () => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -70,6 +79,10 @@ export const useSettingsStore = create<SettingsState>()(
         syncPassphrase: '',
         autoSync: false,
         lastCid: '',
+      },
+      scheduledExports: {
+        serverUrl: '',
+        apiKey: '',
       },
       setLighthouseApiKey: (key: string) =>
         set((state) => ({
@@ -94,6 +107,21 @@ export const useSettingsStore = create<SettingsState>()(
             syncPassphrase: '',
             autoSync: false,
             lastCid: '',
+          },
+        }),
+      setScheduledExportsServerUrl: (url: string) =>
+        set((state) => ({
+          scheduledExports: { ...state.scheduledExports, serverUrl: url },
+        })),
+      setScheduledExportsApiKey: (key: string) =>
+        set((state) => ({
+          scheduledExports: { ...state.scheduledExports, apiKey: key },
+        })),
+      clearScheduledExportsSettings: () =>
+        set({
+          scheduledExports: {
+            serverUrl: '',
+            apiKey: '',
           },
         }),
     }),

@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { XMarkIcon, ArrowDownTrayIcon, LockClosedIcon } from '@heroicons/react/24/outline';
 import { useJournalStore } from '../store/useStore';
 import CryptoJS from 'crypto-js';
-import { useTranslation } from 'react-i18next';
 
 interface ExportModalProps {
   onClose: () => void;
@@ -92,7 +91,7 @@ export default function ExportModal({ onClose }: ExportModalProps) {
       onClick={handleClose}
     >
       <div
-        className={`bg-white rounded-xl shadow-2xl p-6 w-full max-w-md ${
+        className={`bg-white rounded-xl shadow-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto ${
           isClosing ? 'animate-slideDown' : 'animate-slideUp'
         }`}
         onClick={(e) => e.stopPropagation()}

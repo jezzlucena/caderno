@@ -7,6 +7,7 @@ import ImportModal from './ImportModal';
 import SettingsModal from './SettingsModal';
 import ExportPDFModal from './ExportPDFModal';
 import CloudSyncModal from './CloudSyncModal';
+import ScheduledExportsModal from './ScheduledExportsModal';
 
 export default function JournalList() {
   const { entries, addEntry, deleteEntry, setCurrentEntry } = useJournalStore();
@@ -19,7 +20,9 @@ export default function JournalList() {
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showExportPDFModal, setShowExportPDFModal] = useState(false);
   const [showCloudSyncModal, setShowCloudSyncModal] = useState(false);
+  const [showScheduledExportsModal, setShowScheduledExportsModal] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [isClosingMenu, setIsClosingMenu] = useState(false);
 
   const handleCloseNewEntry = () => {
     setIsClosingNewEntry(true);
@@ -39,6 +42,14 @@ export default function JournalList() {
 
   const handleSelectEntry = (id: string) => {
     setCurrentEntry(id);
+  };
+
+  const handleCloseMenu = () => {
+    setIsClosingMenu(true);
+    setTimeout(() => {
+      setShowMenu(false);
+      setIsClosingMenu(false);
+    }, 200); // Match animation duration
   };
 
   const handleDeleteEntry = (id: string, e: React.MouseEvent) => {
@@ -99,9 +110,11 @@ export default function JournalList() {
         {/* Hamburger Menu Dropdown */}
         {showMenu && (
           <div
-            className="fixed top-20 right-4 bg-white rounded-xl shadow-2xl border border-gray-200 p-4 z-50 min-w-[250px]"
+            className={`fixed top-20 right-4 bg-white rounded-xl shadow-2xl border border-gray-200 p-4 z-50 min-w-[250px] ${
+              isClosingMenu ? 'animate-slideOut' : ''
+            }`}
             style={{
-              animation: 'slideIn 0.2s ease-out forwards',
+              animation: isClosingMenu ? 'slideOut 0.2s ease-in forwards' : 'slideIn 0.2s ease-out forwards',
             }}
           >
             <style>{`
@@ -115,6 +128,16 @@ export default function JournalList() {
                   transform: translateY(0) scale(1);
                 }
               }
+              @keyframes slideOut {
+                from {
+                  opacity: 1;
+                  transform: translateY(0) scale(1);
+                }
+                to {
+                  opacity: 0;
+                  transform: translateY(-10px) scale(0.95);
+                }
+              }
               @keyframes fadeIn {
                 from {
                   opacity: 0;
@@ -123,12 +146,20 @@ export default function JournalList() {
                   opacity: 1;
                 }
               }
+              @keyframes fadeOut {
+                from {
+                  opacity: 1;
+                }
+                to {
+                  opacity: 0;
+                }
+              }
             `}</style>
             <div className="space-y-2">
               <button
                 onClick={() => {
                   setShowSettingsModal(true);
-                  setShowMenu(false);
+                  handleCloseMenu();
                 }}
                 className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
               >
@@ -141,7 +172,7 @@ export default function JournalList() {
               <button
                 onClick={() => {
                   setShowImportModal(true);
-                  setShowMenu(false);
+                  handleCloseMenu();
                 }}
                 className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
               >
@@ -152,7 +183,7 @@ export default function JournalList() {
               <button
                 onClick={() => {
                   setShowExportModal(true);
-                  setShowMenu(false);
+                  handleCloseMenu();
                 }}
                 className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
               >
@@ -163,7 +194,7 @@ export default function JournalList() {
               <button
                 onClick={() => {
                   setShowExportPDFModal(true);
-                  setShowMenu(false);
+                  handleCloseMenu();
                 }}
                 className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
               >
@@ -174,12 +205,23 @@ export default function JournalList() {
               <button
                 onClick={() => {
                   setShowCloudSyncModal(true);
-                  setShowMenu(false);
+                  handleCloseMenu();
                 }}
                 className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
               >
                 <CloudIcon width={20} />
                 <span className="font-medium">{t('cloudSync.title')}</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setShowScheduledExportsModal(true);
+                  handleCloseMenu();
+                }}
+                className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+              >
+                <ClockIcon width={20} />
+                <span className="font-medium">Scheduled Exports</span>
               </button>
             </div>
           </div>
@@ -190,9 +232,9 @@ export default function JournalList() {
           <div
             className="fixed inset-0 bg-black/10 z-40"
             style={{
-              animation: 'fadeIn 0.2s ease-out forwards',
+              animation: isClosingMenu ? 'fadeOut 0.2s ease-in forwards' : 'fadeIn 0.2s ease-out forwards',
             }}
-            onClick={() => setShowMenu(false)}
+            onClick={handleCloseMenu}
           ></div>
         )}
 
@@ -342,6 +384,9 @@ export default function JournalList() {
 
       {/* Cloud Sync Modal */}
       {showCloudSyncModal && <CloudSyncModal onClose={() => setShowCloudSyncModal(false)} />}
+
+      {/* Scheduled Exports Modal */}
+      {showScheduledExportsModal && <ScheduledExportsModal onClose={() => setShowScheduledExportsModal(false)} />}
     </div>
   );
 }

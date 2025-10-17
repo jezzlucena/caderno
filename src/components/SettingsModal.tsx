@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { XMarkIcon, KeyIcon, SparklesIcon, CloudIcon, LanguageIcon, ChevronRightIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, KeyIcon, SparklesIcon, CloudIcon, LanguageIcon, ChevronRightIcon, ArrowLeftIcon, ClockIcon } from '@heroicons/react/24/outline';
 import { getStoredApiKey, setStoredApiKey, removeStoredApiKey } from '../services/aiCompletion';
 import { useSettingsStore } from '../store/useStore';
 
@@ -15,7 +15,7 @@ const languages = [
   { code: 'ja', name: '日本語' },
 ];
 
-type SettingsScreen = 'main' | 'language' | 'ai' | 'cloudSync';
+type SettingsScreen = 'main' | 'language' | 'ai' | 'cloudSync' | 'scheduledExports';
 
 interface SettingsModalProps {
   onClose: () => void;
@@ -31,10 +31,14 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
 
   const {
     cloudSync,
+    scheduledExports,
     setLighthouseApiKey,
     setSyncPassphrase,
     setAutoSync,
     clearCloudSyncSettings,
+    setScheduledExportsServerUrl,
+    setScheduledExportsApiKey,
+    clearScheduledExportsSettings,
   } = useSettingsStore();
 
   const [lighthouseKey, setLighthouseKey] = useState('');
@@ -42,6 +46,10 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
   const [autoSync, setAutoSyncLocal] = useState(false);
   const [showLighthouseKey, setShowLighthouseKey] = useState(false);
   const [showSyncPassphrase, setShowSyncPassphrase] = useState(false);
+
+  const [scheduledExportsServerUrl, setScheduledExportsServerUrlLocal] = useState('');
+  const [scheduledExportsApiKey, setScheduledExportsApiKeyLocal] = useState('');
+  const [showScheduledExportsApiKey, setShowScheduledExportsApiKey] = useState(false);
 
   useEffect(() => {
     const storedKey = getStoredApiKey();
@@ -53,7 +61,11 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
     setLighthouseKey(cloudSync.lighthouseApiKey);
     setSyncPassphraseLocal(cloudSync.syncPassphrase);
     setAutoSyncLocal(cloudSync.autoSync);
-  }, [cloudSync]);
+
+    // Load scheduled exports settings
+    setScheduledExportsServerUrlLocal(scheduledExports.serverUrl);
+    setScheduledExportsApiKeyLocal(scheduledExports.apiKey);
+  }, [cloudSync, scheduledExports]);
 
   const handleClose = () => {
     setIsClosing(true);
@@ -75,6 +87,10 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
     setSyncPassphrase(syncPassphrase.trim());
     setAutoSync(autoSync);
 
+    // Save scheduled exports settings
+    setScheduledExportsServerUrl(scheduledExportsServerUrl.trim());
+    setScheduledExportsApiKey(scheduledExportsApiKey.trim());
+
     setSaved(true);
     setTimeout(() => {
       handleClose();
@@ -95,6 +111,16 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
     setSyncPassphraseLocal('');
     setAutoSyncLocal(false);
     clearCloudSyncSettings();
+    setSaved(true);
+    setTimeout(() => {
+      setSaved(false);
+    }, 2000);
+  };
+
+  const handleClearScheduledExports = () => {
+    setScheduledExportsServerUrlLocal('');
+    setScheduledExportsApiKeyLocal('');
+    clearScheduledExportsSettings();
     setSaved(true);
     setTimeout(() => {
       setSaved(false);
@@ -143,6 +169,21 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
           <div className="text-left">
             <h3 className="font-semibold text-gray-800">{t('settings.cloudSync.title')}</h3>
             <p className="text-sm text-gray-600">{t('settings.cloudSync.description')}</p>
+          </div>
+        </div>
+        <ChevronRightIcon className="w-6 h-6 text-gray-400 flex-shrink-0" />
+      </button>
+
+      {/* Scheduled Exports Option */}
+      <button
+        onClick={() => setCurrentScreen('scheduledExports')}
+        className="w-full flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-colors border border-gray-200"
+      >
+        <div className="flex items-center gap-3">
+          <ClockIcon className="w-6 h-6 text-indigo-600 flex-shrink-0" />
+          <div className="text-left">
+            <h3 className="font-semibold text-gray-800">Scheduled Exports</h3>
+            <p className="text-sm text-gray-600">Configure automated PDF exports server</p>
           </div>
         </div>
         <ChevronRightIcon className="w-6 h-6 text-gray-400 flex-shrink-0" />
@@ -261,6 +302,128 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
 
         <p className="text-xs text-gray-500">
           {t('settings.keyStorageNote')}
+        </p>
+      </div>
+
+      <div className="flex gap-3 justify-end mt-6">
+        <button
+          onClick={() => setCurrentScreen('main')}
+          className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+        >
+          {t('settings.cancel')}
+        </button>
+        <button
+          onClick={handleSave}
+          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors"
+        >
+          {t('settings.save')}
+        </button>
+      </div>
+
+      {saved && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+          <p className="text-sm text-green-800">{t('settings.saved')}</p>
+        </div>
+      )}
+    </div>
+  );
+
+  const renderScheduledExportsScreen = () => (
+    <div className="space-y-4">
+      <button
+        onClick={() => setCurrentScreen('main')}
+        className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors mb-4"
+      >
+        <ArrowLeftIcon width={20} />
+        <span>{t('settings.title')}</span>
+      </button>
+
+      <div className="flex items-center gap-2 mb-3">
+        <ClockIcon width={20} className="text-indigo-600" />
+        <h3 className="text-lg font-semibold text-gray-800">Scheduled Exports</h3>
+      </div>
+      <p className="text-sm text-gray-600 mb-4">
+        Configure your server connection for automated scheduled PDF exports
+      </p>
+
+      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
+        <p className="text-sm text-amber-800 mb-2">
+          <strong>📘 Setup Instructions</strong>
+        </p>
+        <ol className="text-sm text-amber-700 space-y-1 list-decimal list-inside">
+          <li>Set up and run your Agenda Server (see agenda-server folder)</li>
+          <li>Generate an API key by POSTing to /api/auth/register</li>
+          <li>Enter your server URL and API key below</li>
+          <li>Use the "Scheduled Exports" menu option to manage schedules</li>
+        </ol>
+        <a
+          href="https://github.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-block mt-3 text-sm text-amber-600 hover:text-amber-800 underline"
+        >
+          View Setup Guide →
+        </a>
+      </div>
+
+      <div className="space-y-4">
+        {/* Server URL */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Server URL
+          </label>
+          <input
+            type="url"
+            value={scheduledExportsServerUrl}
+            onChange={(e) => setScheduledExportsServerUrlLocal(e.target.value)}
+            placeholder="http://localhost:3001"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            The URL where your Agenda Server is running
+          </p>
+        </div>
+
+        {/* API Key */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="flex items-center gap-2">
+              <KeyIcon width={16} />
+              API Key
+            </div>
+          </label>
+          <div className="relative">
+            <input
+              type={showScheduledExportsApiKey ? 'text' : 'password'}
+              value={scheduledExportsApiKey}
+              onChange={(e) => setScheduledExportsApiKeyLocal(e.target.value)}
+              placeholder="Enter your API key"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-24"
+            />
+            <button
+              type="button"
+              onClick={() => setShowScheduledExportsApiKey(!showScheduledExportsApiKey)}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500 hover:text-gray-700 px-3 py-1 rounded bg-gray-100 hover:bg-gray-200"
+            >
+              {showScheduledExportsApiKey ? t('settings.hide') : t('settings.show')}
+            </button>
+          </div>
+          <p className="text-xs text-gray-500 mt-1">
+            Generate this by POSTing to /api/auth/register on your server
+          </p>
+        </div>
+
+        {(scheduledExportsServerUrl || scheduledExportsApiKey) && (
+          <button
+            onClick={handleClearScheduledExports}
+            className="text-sm text-red-600 hover:text-red-700"
+          >
+            Clear Settings
+          </button>
+        )}
+
+        <p className="text-xs text-gray-500">
+          Settings are stored locally in your browser for security
         </p>
       </div>
 
@@ -458,6 +621,7 @@ export default function SettingsModal({ onClose }: SettingsModalProps) {
         {currentScreen === 'language' && renderLanguageScreen()}
         {currentScreen === 'ai' && renderAIScreen()}
         {currentScreen === 'cloudSync' && renderCloudSyncScreen()}
+        {currentScreen === 'scheduledExports' && renderScheduledExportsScreen()}
       </div>
     </div>
   );

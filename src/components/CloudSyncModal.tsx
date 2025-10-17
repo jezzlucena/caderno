@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { XMarkIcon, CloudArrowUpIcon, CloudArrowDownIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, CloudArrowUpIcon, CloudArrowDownIcon, CheckCircleIcon, Cog6ToothIcon, CloudIcon } from '@heroicons/react/24/outline';
 import { useJournalStore } from '../store/useStore';
 import { useSettingsStore } from '../store/useStore';
 import { useTranslation } from 'react-i18next';
@@ -152,7 +152,7 @@ export default function CloudSyncModal({ onClose }: CloudSyncModalProps) {
       onClick={handleClose}
     >
       <div
-        className={`bg-white rounded-xl shadow-2xl p-6 w-full max-w-lg ${
+        className={`bg-white rounded-xl shadow-2xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto ${
           isClosing ? 'animate-slideDown' : 'animate-slideUp'
         }`}
         onClick={(e) => e.stopPropagation()}
@@ -169,10 +169,80 @@ export default function CloudSyncModal({ onClose }: CloudSyncModalProps) {
         </div>
 
         {!isConfigured ? (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-            <p className="text-sm text-yellow-800">
-              {t('cloudSync.notConfigured')}
-            </p>
+          <div className="space-y-6">
+            {/* Header */}
+            <div className="text-center">
+              <div className="mx-auto w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mb-4">
+                <CloudIcon className="w-8 h-8 text-indigo-600" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">
+                Set Up Cloud Sync
+              </h3>
+              <p className="text-gray-600">
+                Securely backup and sync your journal entries across devices using IPFS
+              </p>
+            </div>
+
+            {/* Instructions */}
+            <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-lg p-6 space-y-4">
+              <h4 className="font-semibold text-gray-800 flex items-center gap-2">
+                <span className="flex items-center justify-center w-6 h-6 bg-indigo-600 text-white rounded-full text-sm">1</span>
+                Configure Cloud Sync
+              </h4>
+              <p className="text-sm text-gray-700 ml-8">
+                Go to <strong>Settings → Cloud Sync</strong> to enter your Lighthouse API key and encryption passphrase
+              </p>
+
+              <h4 className="font-semibold text-gray-800 flex items-center gap-2">
+                <span className="flex items-center justify-center w-6 h-6 bg-indigo-600 text-white rounded-full text-sm">2</span>
+                Get Your API Key
+              </h4>
+              <div className="text-sm text-gray-700 ml-8 space-y-2">
+                <p>To use Cloud Sync, you need a Lighthouse API key:</p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li>Visit <a href="https://files.lighthouse.storage/" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-700 underline">files.lighthouse.storage</a></li>
+                  <li>Create a free account</li>
+                  <li>Generate your API key</li>
+                  <li>Add it in Settings</li>
+                </ul>
+              </div>
+
+              <h4 className="font-semibold text-gray-800 flex items-center gap-2">
+                <span className="flex items-center justify-center w-6 h-6 bg-indigo-600 text-white rounded-full text-sm">3</span>
+                Set Encryption Passphrase
+              </h4>
+              <p className="text-sm text-gray-700 ml-8">
+                Choose a secure passphrase to encrypt your journal entries before uploading to IPFS
+              </p>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={() => {
+                  handleClose();
+                  // User will open settings manually
+                }}
+                className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+              >
+                <Cog6ToothIcon width={20} />
+                <span>Go to Settings to Configure</span>
+              </button>
+              
+              <button
+                onClick={handleClose}
+                className="w-full px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                I'll Set This Up Later
+              </button>
+            </div>
+
+            {/* Help Text */}
+            <div className="text-center">
+              <p className="text-xs text-gray-500">
+                Your data is encrypted locally before upload. Only you can decrypt it with your passphrase.
+              </p>
+            </div>
           </div>
         ) : (
           <>

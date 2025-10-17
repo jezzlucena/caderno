@@ -125,8 +125,8 @@ export default function ImportModal({ onClose }: ImportModalProps) {
       }`}
       onClick={handleClose}
     >
-      <div
-        className={`bg-white rounded-xl shadow-2xl p-6 w-full max-w-md ${
+          <div
+        className={`bg-white rounded-xl shadow-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto ${
           isClosing ? 'animate-slideDown' : 'animate-slideUp'
         }`}
         onClick={(e) => e.stopPropagation()}
