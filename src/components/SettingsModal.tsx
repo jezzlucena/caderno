@@ -24,10 +24,11 @@ interface SettingsModalProps {
 
 export default function SettingsModal({ onClose, initialScreen = 'main' }: SettingsModalProps) {
   const { t, i18n } = useTranslation();
-  const [currentScreen, setCurrentScreen] = useState<SettingsScreen>(initialScreen);
+  const [currentScreen, setCurrentScreen] = useState<SettingsScreen>('main');
   const [isClosing, setIsClosing] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [transitionDirection, setTransitionDirection] = useState<'left' | 'right'>('left');
+  const [highlightedSection, setHighlightedSection] = useState<SettingsScreen | null>(null);
   const [apiKey, setApiKey] = useState('');
   const [showKey, setShowKey] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -68,7 +69,18 @@ export default function SettingsModal({ onClose, initialScreen = 'main' }: Setti
     // Load scheduled exports settings
     setScheduledExportsServerUrlLocal(scheduledExports.serverUrl);
     setScheduledExportsApiKeyLocal(scheduledExports.apiKey);
-  }, [cloudSync, scheduledExports]);
+
+    // Educational animation: if initialScreen is not 'main', show click animation
+    if (initialScreen !== 'main') {
+      setTimeout(() => {
+        setHighlightedSection(initialScreen);
+        setTimeout(() => {
+          setHighlightedSection(null);
+          navigateToScreen(initialScreen);
+        }, 800); // Show highlight for 800ms before navigating
+      }, 400); // Wait 400ms after modal opens
+    }
+  }, [cloudSync, scheduledExports, initialScreen]);
 
   const handleClose = () => {
     setIsClosing(true);
@@ -146,7 +158,11 @@ export default function SettingsModal({ onClose, initialScreen = 'main' }: Setti
       {/* Language Option */}
       <button
         onClick={() => navigateToScreen('language')}
-        className="w-full flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-colors border border-gray-200"
+        className={`w-full flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-all border border-gray-200 ${
+          highlightedSection === 'language'
+            ? 'bg-indigo-100 border-indigo-400 scale-105 shadow-lg animate-pulse'
+            : ''
+        }`}
       >
         <div className="flex items-center gap-3">
           <LanguageIcon className="w-6 h-6 text-indigo-600 flex-shrink-0" />
@@ -161,7 +177,11 @@ export default function SettingsModal({ onClose, initialScreen = 'main' }: Setti
       {/* AI Autocomplete Option */}
       <button
         onClick={() => navigateToScreen('ai')}
-        className="w-full flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-colors border border-gray-200"
+        className={`w-full flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-all border border-gray-200 ${
+          highlightedSection === 'ai'
+            ? 'bg-indigo-100 border-indigo-400 scale-105 shadow-lg animate-pulse'
+            : ''
+        }`}
       >
         <div className="flex items-center gap-3">
           <SparklesIcon className="w-6 h-6 text-indigo-600 flex-shrink-0" />
@@ -176,7 +196,11 @@ export default function SettingsModal({ onClose, initialScreen = 'main' }: Setti
       {/* Cloud Sync Option */}
       <button
         onClick={() => navigateToScreen('cloudSync')}
-        className="w-full flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-colors border border-gray-200"
+        className={`w-full flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-all border border-gray-200 ${
+          highlightedSection === 'cloudSync'
+            ? 'bg-indigo-100 border-indigo-400 scale-105 shadow-lg animate-pulse'
+            : ''
+        }`}
       >
         <div className="flex items-center gap-3">
           <CloudIcon className="w-6 h-6 text-indigo-600 flex-shrink-0" />
@@ -191,7 +215,11 @@ export default function SettingsModal({ onClose, initialScreen = 'main' }: Setti
       {/* Scheduled Exports Option */}
       <button
         onClick={() => navigateToScreen('scheduledExports')}
-        className="w-full flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-colors border border-gray-200"
+        className={`w-full flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-all border border-gray-200 ${
+          highlightedSection === 'scheduledExports'
+            ? 'bg-indigo-100 border-indigo-400 scale-105 shadow-lg animate-pulse'
+            : ''
+        }`}
       >
         <div className="flex items-center gap-3">
           <ClockIcon className="w-6 h-6 text-indigo-600 flex-shrink-0" />
