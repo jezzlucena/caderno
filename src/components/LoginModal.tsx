@@ -34,10 +34,6 @@ export default function LoginModal({ onClose }: LoginModalProps) {
         if (subData.subscription) {
           setAuth({ ...data.user, subscription: subData.subscription }, data.token)
         }
-
-        console.log(subData)
-        console.log(data.user)
-        console.log(data.token)
       } catch (err) {
         console.error('Error fetching subscription:', err)
       }
