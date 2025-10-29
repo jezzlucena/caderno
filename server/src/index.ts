@@ -1,15 +1,14 @@
+import dotenv from 'dotenv';
+dotenv.config({ path: '../.env' });
+
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-import dotenv from 'dotenv';
 import { initializeDatabase, closeDatabase } from './config/database.js';
 import { scheduler } from './services/scheduler.js';
 import authRoutes from './routes/auth.js';
 import scheduleRoutes from './routes/schedules.js';
-
-// Load environment variables
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;

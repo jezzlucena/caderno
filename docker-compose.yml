@@ -1,0 +1,96 @@
+version: '3.8'
+
+services:
+  # Caderno Frontend Service
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: caderno-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      # Caderno Hub API URL
+      - VITE_HUB_API_URL=${VITE_HUB_API_URL:-http://localhost:3001/api}
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+      - ./index.html:/app/index.html
+      - ./vite.config.ts:/app/vite.config.ts
+      - ./tsconfig.json:/app/tsconfig.json
+      - ./tsconfig.app.json:/app/tsconfig.app.json
+      - ./tailwind.config.js:/app/tailwind.config.js
+      - ./package.json:/app/package.json
+    networks:
+      - caderno-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5173"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Caderno Server Service (for scheduled exports)
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: caderno-server
+    ports:
+      - "3002:3002"
+    environment:
+      # Server Configuration
+      - PORT=${SERVER_PORT:-3002}
+      - NODE_ENV=${NODE_ENV:-development}
+      
+      # Database
+      - DATABASE_PATH=${DATABASE_PATH:-/app/data/agenda.db}
+      
+      # Authentication
+      - JWT_SECRET=${JWT_SECRET:-your-secret-key-here-change-in-production}
+      - API_KEY_SALT=${API_KEY_SALT:-your-api-key-salt-here}
+      
+      # Email Configuration (Optional)
+      - SMTP_HOST=${SMTP_HOST:-smtp.gmail.com}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_SECURE=${SMTP_SECURE:-false}
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASS=${SMTP_PASS:-}
+      
+      # SMS Configuration (Optional)
+      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID:-}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN:-}
+      - TWILIO_PHONE_NUMBER=${TWILIO_PHONE_NUMBER:-}
+      
+      # CORS
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:5173,http://localhost:3000}
+      
+      # Rate Limiting
+      - RATE_LIMIT_WINDOW_MS=${RATE_LIMIT_WINDOW_MS:-900000}
+      - RATE_LIMIT_MAX_REQUESTS=${RATE_LIMIT_MAX_REQUESTS:-100}
+      
+      # Logging
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - LOG_FILE=${LOG_FILE:-/app/logs/server.log}
+    volumes:
+      - ./server/data:/app/data
+      - ./server/logs:/app/logs
+      - ./server/src:/app/src
+    networks:
+      - caderno-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  caderno-network:
+    driver: bridge
+
+volumes:
+  caderno-data:
+    driver: local

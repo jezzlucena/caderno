@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import JournalList from './components/JournalList';
 import RichTextEditor from './components/RichTextEditor';
+import DonationNotification from './components/DonationNotification';
 import { useJournalStore } from './store/useStore';
 
 type ViewState = 'list' | 'editor' | 'transitioning';
@@ -52,6 +53,9 @@ function App() {
           <RichTextEditor />
         </div>
       )}
+      
+      {/* Non-intrusive donation notification */}
+      <DonationNotification />
     </div>
   );
 }

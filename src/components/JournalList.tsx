@@ -1,14 +1,16 @@
-import { PlusIcon, DocumentTextIcon, TrashIcon, ClockIcon, ArrowDownTrayIcon, Cog6ToothIcon, FolderPlusIcon, DocumentArrowDownIcon, CloudIcon, SparklesIcon, CalendarIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, DocumentTextIcon, TrashIcon, ClockIcon, ArrowDownTrayIcon, Cog6ToothIcon, FolderPlusIcon, DocumentArrowDownIcon, CloudIcon, SparklesIcon, CalendarIcon, Bars3Icon, XMarkIcon, UserCircleIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
 import { useJournalStore } from '../store/useStore';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getStoredApiKey } from '../services/aiCompletion';
+import { useAuthStore } from '../store/useAuthStore';
 import ExportModal from './ExportModal';
 import ImportModal from './ImportModal';
 import SettingsModal from './SettingsModal';
 import ExportPDFModal from './ExportPDFModal';
 import CloudSyncModal from './CloudSyncModal';
 import ScheduledExportsModal from './ScheduledExportsModal';
+import LoginModal from './LoginModal';
 
 export default function JournalList() {
   const { entries, addEntry, deleteEntry, setCurrentEntry } = useJournalStore();
@@ -25,6 +27,13 @@ export default function JournalList() {
   const [showScheduledExportsModal, setShowScheduledExportsModal] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [isClosingMenu, setIsClosingMenu] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  
+  const { isAuthenticated, user, clearAuth } = useAuthStore();
+
+  const handleSignOut = () => {
+    clearAuth();
+  };
 
   const handleCloseNewEntry = () => {
     setIsClosingNewEntry(true);
@@ -99,15 +108,46 @@ export default function JournalList() {
                 <p className="text-sm text-gray-600">{t('app.tagline')}</p>
               </div>
             </div>
-            <button
-              onClick={() => setShowMenu(!showMenu)}
-              className="flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-semibold py-3 px-3 rounded-full transition-all duration-200 shadow-md hover:shadow-lg border border-gray-300"
-              title="Menu"
-            >
-              <span className="transition-transform duration-200" style={{ transform: showMenu ? 'rotate(90deg)' : 'rotate(0deg)' }}>
-                {showMenu ? <XMarkIcon width={20} /> : <Bars3Icon width={20} />}
-              </span>
-            </button>
+            <div className="flex items-center gap-2">
+              {isAuthenticated ? (
+                <div className="flex items-center gap-2">
+                  <div className="text-right mr-2">
+                    <p className="text-sm font-medium text-gray-700">{user?.email}</p>
+                    {user?.subscription && user.subscription.planId !== 'free' && (
+                      <p className="text-xs text-indigo-600 font-semibold">
+                        {user.subscription.planId.charAt(0).toUpperCase() + user.subscription.planId.slice(1)} Plan
+                      </p>
+                    )}
+                  </div>
+                  <button
+                    onClick={handleSignOut}
+                    className="flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-semibold py-2 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg border border-gray-300"
+                    title="Sign Out"
+                  >
+                    <ArrowRightOnRectangleIcon width={20} />
+                    <span className="text-sm">Sign Out</span>
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setShowLoginModal(true)}
+                  className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
+                  title="Sign In"
+                >
+                  <UserCircleIcon width={20} />
+                  <span className="text-sm">Sign In</span>
+                </button>
+              )}
+              <button
+                onClick={() => setShowMenu(!showMenu)}
+                className="flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-semibold py-3 px-3 rounded-full transition-all duration-200 shadow-md hover:shadow-lg border border-gray-300"
+                title="Menu"
+              >
+                <span className="transition-transform duration-200" style={{ transform: showMenu ? 'rotate(90deg)' : 'rotate(0deg)' }}>
+                  {showMenu ? <XMarkIcon width={20} /> : <Bars3Icon width={20} />}
+                </span>
+              </button>
+            </div>
           </div>
         </header>
 
@@ -424,6 +464,9 @@ export default function JournalList() {
           }}
         />
       )}
+
+      {/* Login Modal */}
+      {showLoginModal && <LoginModal onClose={() => setShowLoginModal(false)} />}
     </div>
   );
 }
