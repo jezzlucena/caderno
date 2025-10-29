@@ -269,7 +269,7 @@ PORT=3001
 NODE_ENV=production
 
 # Database
-DATABASE_PATH=./data/agenda.db
+DATABASE_PATH=./data/caderno.db
 
 # Authentication
 JWT_SECRET=your-secure-secret-key-change-this

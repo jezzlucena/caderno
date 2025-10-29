@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const dbPath = process.env.DATABASE_PATH || path.join(__dirname, '../../data/agenda.db');
+const dbPath = process.env.DATABASE_PATH || path.join(__dirname, '../../database/caderno.db');
 const dbDir = path.dirname(dbPath);
 
 // Ensure data directory exists

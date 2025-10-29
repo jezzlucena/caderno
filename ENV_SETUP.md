@@ -26,7 +26,7 @@ PORT=3001
 NODE_ENV=development
 
 # Database
-DATABASE_PATH=./data/agenda.db
+DATABASE_PATH=./data/caderno.db
 
 # Authentication
 JWT_SECRET=your-secret-key-here-change-in-production
@@ -64,7 +64,7 @@ Create a `.env` file in `caderno-hub/server/`:
 
 ```bash
 # Database
-MONGODB_URI=mongodb://localhost:27017/caderno-hub
+MONGO_URL=mongodb://localhost:27017/caderno-hub
 
 # JWT Secret
 JWT_SECRET=your-secret-key-change-this-in-production
@@ -203,7 +203,7 @@ VITE_HUB_API_URL=https://api.caderno-hub.com/api
 
 ### Caderno Hub Server
 ```bash
-MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/caderno-hub
+MONGO_URL=mongodb+srv://user:pass@cluster.mongodb.net/caderno-hub
 JWT_SECRET=complex-random-secret-key-here
 SESSION_SECRET=another-complex-secret-here
 FRONTEND_URL=https://caderno.com

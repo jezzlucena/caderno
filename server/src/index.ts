@@ -11,7 +11,7 @@ import authRoutes from './routes/auth.js';
 import scheduleRoutes from './routes/schedules.js';
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.SERVER_PORT || 3001;
 
 // Security middleware
 app.use(helmet());

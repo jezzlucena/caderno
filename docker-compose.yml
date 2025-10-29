@@ -38,14 +38,14 @@ services:
       dockerfile: Dockerfile
     container_name: caderno-server
     ports:
-      - "3002:3002"
+      - "3001:3001"
     environment:
       # Server Configuration
-      - PORT=${SERVER_PORT:-3002}
-      - NODE_ENV=${NODE_ENV:-development}
+      - SERVER_PORT=${SERVER_PORT}
+      - NODE_ENV=${NODE_ENV}
       
       # Database
-      - DATABASE_PATH=${DATABASE_PATH:-/app/data/agenda.db}
+      - DATABASE_PATH=${DATABASE_PATH}
       
       # Authentication
       - JWT_SECRET=${JWT_SECRET:-your-secret-key-here-change-in-production}
