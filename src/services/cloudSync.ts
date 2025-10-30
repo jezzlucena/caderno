@@ -56,7 +56,7 @@ export const uploadToIPFS = async (
 
     // Create a File object from the encrypted data
     const blob = new Blob([encryptedData], { type: 'application/octet-stream' });
-    const file = new File([blob], 'agenda-backup.encrypted', {
+    const file = new File([blob], 'caderno-backup.encrypted', {
       type: 'application/octet-stream',
     });
 
@@ -123,7 +123,6 @@ export const downloadFromIPFS = async (
  */
 export const getStorageStatus = async (
   cid: string,
-  apiKey: string
 ): Promise<{ size: number; status: string }> => {
   try {
     // This is a placeholder - Lighthouse API might have different methods

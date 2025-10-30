@@ -1,9 +1,9 @@
 version: '3.8'
 
 services:
-  agenda-server:
+  caderno-server:
     build: .
-    container_name: agenda-server
+    container_name: caderno-server
     ports:
       - "3001:3001"
     volumes:

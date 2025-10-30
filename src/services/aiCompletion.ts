@@ -53,7 +53,7 @@ export async function getCompletion(
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
         'HTTP-Referer': window.location.origin,
-        'X-Title': 'Agenda Journal',
+        'X-Title': 'Caderno Journal',
       },
       body: JSON.stringify({
         model: 'HuggingFaceTB/SmolLM3-3B',
@@ -94,13 +94,13 @@ export async function getCompletion(
 }
 
 export function getStoredApiKey(): string | null {
-  return localStorage.getItem('agenda-ai-api-key');
+  return localStorage.getItem('caderno-ai-api-key');
 }
 
 export function setStoredApiKey(apiKey: string): void {
-  localStorage.setItem('agenda-ai-api-key', apiKey);
+  localStorage.setItem('caderno-ai-api-key', apiKey);
 }
 
 export function removeStoredApiKey(): void {
-  localStorage.removeItem('agenda-ai-api-key');
+  localStorage.removeItem('caderno-ai-api-key');
 }

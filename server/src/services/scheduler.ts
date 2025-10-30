@@ -129,7 +129,7 @@ export class Scheduler {
 
       // Send emails
       if (emailRecipients.length > 0) {
-        const fileName = `agenda-export-${new Date().toISOString().split('T')[0]}.pdf`;
+        const fileName = `caderno-export-${new Date().toISOString().split('T')[0]}.pdf`;
         await this.emailService.sendPDFEmail(emailRecipients, pdfBuffer, fileName, selectedEntries.length);
         sentCount += emailRecipients.length;
       }

@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "Agenda",
+    "name": "Caderno",
     "tagline": "O seu diário pessoal"
   },
   "journalList": {
@@ -75,7 +75,7 @@
       "invalidStructure": "Estrutura do ficheiro de cópia de segurança inválida",
       "invalidEntries": "O ficheiro de cópia de segurança contém entradas inválidas",
       "importFailed": "Falha ao importar o ficheiro. Por favor, verifique o formato do ficheiro.",
-      "invalidFormat": "Formato de ficheiro inválido. Por favor, seleccione um ficheiro de cópia de segurança válido do Agenda.",
+      "invalidFormat": "Formato de ficheiro inválido. Por favor, seleccione um ficheiro de cópia de segurança válido do Caderno.",
       "cancel": "Cancelar",
       "import": "Importar"
     }

@@ -257,7 +257,7 @@ export default function SettingsModal({ onClose, initialScreen = 'main' }: Setti
             key={language.code}
             onClick={() => {
               i18n.changeLanguage(language.code);
-              localStorage.setItem('agenda-language', language.code);
+              localStorage.setItem('caderno-language', language.code);
             }}
             className={`w-full text-left px-4 py-3 rounded-lg transition-colors border ${
               i18n.language === language.code
@@ -393,7 +393,7 @@ export default function SettingsModal({ onClose, initialScreen = 'main' }: Setti
           <strong>📘 Setup Instructions</strong>
         </p>
         <ol className="text-sm text-amber-700 space-y-1 list-decimal list-inside">
-          <li>Set up and run your Agenda Server (see agenda-server folder)</li>
+          <li>Set up and run your Caderno Server (see caderno-server folder)</li>
           <li>Generate an API key by POSTing to /api/auth/register</li>
           <li>Enter your server URL and API key below</li>
           <li>Use the "Scheduled Exports" menu option to manage schedules</li>
@@ -422,7 +422,7 @@ export default function SettingsModal({ onClose, initialScreen = 'main' }: Setti
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
           <p className="text-xs text-gray-500 mt-1">
-            The URL where your Agenda Server is running
+            The URL where your Caderno Server is running
           </p>
         </div>
 

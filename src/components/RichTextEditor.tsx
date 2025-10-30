@@ -108,7 +108,7 @@ export default function RichTextEditor() {
 
   // Check if AI setup modal should be shown
   useEffect(() => {
-    const dismissed = localStorage.getItem('agenda-ai-setup-dismissed');
+    const dismissed = localStorage.getItem('caderno-ai-setup-dismissed');
     if (!apiKey && !dismissed) {
       setShowAISetupModal(true);
     }
@@ -227,7 +227,7 @@ export default function RichTextEditor() {
 
   const handleDismissAISetupModal = () => {
     if (dontShowAgain) {
-      localStorage.setItem('agenda-ai-setup-dismissed', 'true');
+      localStorage.setItem('caderno-ai-setup-dismissed', 'true');
     }
     setShowAISetupModal(false);
   };
@@ -385,7 +385,7 @@ export default function RichTextEditor() {
               {/* Help Link */}
               <div className="text-center">
                 <a
-                  href="https://github.com/jezzlucena/agenda/blob/main/AI_AUTOCOMPLETE_GUIDE.md"
+                  href="https://github.com/jezzlucena/caderno/blob/main/AI_AUTOCOMPLETE_GUIDE.md"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-indigo-600 hover:text-indigo-700 underline"

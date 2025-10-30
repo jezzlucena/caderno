@@ -63,10 +63,10 @@ export default function ExportModal({ onClose }: ExportModalProps) {
         encrypted: true,
         data: encrypted,
       });
-      fileName = `agenda-backup-encrypted-${new Date().toISOString().split('T')[0]}.json`;
+      fileName = `caderno-backup-encrypted-${new Date().toISOString().split('T')[0]}.json`;
     } else {
       fileContent = JSON.stringify(dataToExport, null, 2);
-      fileName = `agenda-backup-${new Date().toISOString().split('T')[0]}.json`;
+      fileName = `caderno-backup-${new Date().toISOString().split('T')[0]}.json`;
     }
 
     // Create and download the file

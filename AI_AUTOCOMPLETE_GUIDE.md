@@ -2,7 +2,7 @@
 
 ## Overview
 
-AI Autocomplete in Agenda provides intelligent writing suggestions and automatic entry summaries powered by HuggingFace's free SmollM3 language model. This feature helps you write faster and automatically generates concise summaries of your journal entries.
+AI Autocomplete in Caderno provides intelligent writing suggestions and automatic entry summaries powered by HuggingFace's free SmollM3 language model. This feature helps you write faster and automatically generates concise summaries of your journal entries.
 
 ## Visual Guide
 
@@ -10,7 +10,7 @@ AI Autocomplete in Agenda provides intelligent writing suggestions and automatic
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  Agenda                                             ☰ Menu ←┐
+│  Caderno                                             ☰ Menu ←┐
 ├─────────────────────────────────────────────────────────────┤│
 │                                                             ││
 │  ┌────────────────────────────────────┐                     ││
@@ -127,14 +127,14 @@ AI Autocomplete in Agenda provides intelligent writing suggestions and automatic
 2. Sign up for a free account (you can use Google or GitHub)
 3. Go to your [Settings → Access Tokens](https://huggingface.co/settings/tokens)
 4. Click "New token" or "Create new token"
-5. Give it a name (e.g., "Agenda Journal")
+5. Give it a name (e.g., "Caderno Journal")
 6. Select "Read" permission (this is sufficient for using the inference API)
 7. Click "Generate token"
 8. Copy your token (it will start with `hf_`)
 
-### Step 2: Add API Key to Agenda
+### Step 2: Add API Key to Caderno
 
-1. Open Agenda
+1. Open Caderno
 2. Click the menu button (☰) in the top right
 3. Select "Settings"
 4. Navigate to "AI Autocomplete" section
@@ -175,7 +175,7 @@ Alternatively, click the bottom bar that says "Press Shift+Space for AI suggesti
 
 1. **Text Completion**: When you request a suggestion, the last 200 characters of your text are sent to the AI model for context
 2. **Summary Generation**: When generating a summary, your entire entry content is analyzed
-3. **Privacy**: All processing happens on HuggingFace's servers. Your API key and content are only sent to HuggingFace, never to Agenda's servers
+3. **Privacy**: All processing happens on HuggingFace's servers. Your API key and content are only sent to HuggingFace, never to Caderno's servers
 
 ### Rate Limits
 
@@ -214,8 +214,8 @@ HuggingFace's free tier includes:
 ## Privacy & Security
 
 - **Local Storage**: Your API key is stored in your browser's local storage
-- **No Server Storage**: Agenda never stores your API key or content on its servers
-- **Direct Communication**: Your content is sent directly to HuggingFace, not through Agenda's servers
+- **No Server Storage**: Caderno never stores your API key or content on its servers
+- **Direct Communication**: Your content is sent directly to HuggingFace, not through Caderno's servers
 - **Your Control**: You can remove your API key at any time from Settings
 
 ## Tips for Best Results
@@ -240,7 +240,7 @@ Your journal entries and summaries will remain intact, but new summaries won't b
 For issues related to:
 - **API Key Generation**: Contact HuggingFace support
 - **Model Performance**: Report issues to HuggingFace
-- **Agenda Integration**: Report bugs using the `/reportbug` command in the Agenda chat
+- **Caderno Integration**: Report bugs using the `/reportbug` command in the Caderno chat
 
 ## Additional Resources
 

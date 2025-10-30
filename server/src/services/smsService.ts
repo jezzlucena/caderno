@@ -31,7 +31,7 @@ export class SMSService {
   }
 
   async sendPDFNotification(to: string[], entryCount: number): Promise<void> {
-    const message = `📱 Agenda Journal: Your scheduled export with ${entryCount} ${entryCount === 1 ? 'entry' : 'entries'} has been sent to your email. Check your inbox!`;
+    const message = `📱 Caderno Journal: Your scheduled export with ${entryCount} ${entryCount === 1 ? 'entry' : 'entries'} has been sent to your email. Check your inbox!`;
 
     const promises = to.map((phoneNumber) => this.sendSMS(phoneNumber, message));
     await Promise.all(promises);

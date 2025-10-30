@@ -46,7 +46,7 @@ export default function ImportModal({ onClose }: ImportModalProps) {
           setNeedsPassphrase(parsed.encrypted);
           setFileData(parsed);
         } catch (err) {
-          setError('Invalid file format. Please select a valid Agenda backup file.');
+          setError('Invalid file format. Please select a valid Caderno backup file.');
           console.error(err);
         }
       };

@@ -126,7 +126,7 @@ export const useSettingsStore = create<SettingsState>()(
         }),
     }),
     {
-      name: 'agenda-settings-storage',
+      name: 'caderno-settings-storage',
     }
   )
 );
@@ -137,9 +137,9 @@ export const useJournalStore = create<JournalState>()(
       entries: [
         {
           id: '1',
-          title: 'Welcome to Agenda',
-          content: '<h1>Welcome to Agenda</h1><p>Start writing your notes here...</p>',
-          summary: 'Welcome to Agenda',
+          title: 'Welcome to Caderno',
+          content: '<h1>Welcome to Caderno</h1><p>Start writing your notes here...</p>',
+          summary: 'Welcome to Caderno',
           createdAt: Date.now(),
           updatedAt: Date.now(),
         },
@@ -212,7 +212,7 @@ export const useJournalStore = create<JournalState>()(
       },
     }),
     {
-      name: 'agenda-journal-storage',
+      name: 'caderno-journal-storage',
     }
   )
 );

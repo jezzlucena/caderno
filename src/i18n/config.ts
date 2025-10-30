@@ -25,7 +25,7 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: localStorage.getItem('agenda-language') || 'en-US',
+    lng: localStorage.getItem('caderno-language') || 'en-US',
     fallbackLng: 'en-US',
     interpolation: {
       escapeValue: false,

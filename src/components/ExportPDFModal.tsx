@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { XMarkIcon, DocumentArrowDownIcon } from '@heroicons/react/24/outline';
-import { useJournalStore, type JournalEntry } from '../store/useStore';
+import { useJournalStore } from '../store/useStore';
 import { useTranslation } from 'react-i18next';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -209,7 +209,7 @@ export default function ExportPDFModal({ onClose }: ExportPDFModalProps) {
         }
       }
 
-      const fileName = 'agenda-export-' + new Date().toISOString().split('T')[0] + '.pdf';
+      const fileName = 'caderno-export-' + new Date().toISOString().split('T')[0] + '.pdf';
       pdf.save(fileName);
 
       setProgress(100);

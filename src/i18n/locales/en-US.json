@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "Agenda",
+    "name": "Caderno",
     "tagline": "Your personal journal"
   },
   "journalList": {
@@ -75,7 +75,7 @@
       "invalidStructure": "Invalid backup file structure",
       "invalidEntries": "Backup file contains invalid entries",
       "importFailed": "Failed to import file. Please check the file format.",
-      "invalidFormat": "Invalid file format. Please select a valid Agenda backup file.",
+      "invalidFormat": "Invalid file format. Please select a valid Caderno backup file.",
       "cancel": "Cancel",
       "import": "Import"
     }

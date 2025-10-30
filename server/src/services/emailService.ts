@@ -51,19 +51,19 @@ export class EmailService {
     fileName: string,
     entryCount: number
   ): Promise<void> {
-    const subject = `Your Agenda Journal Export - ${entryCount} ${entryCount === 1 ? 'Entry' : 'Entries'}`;
+    const subject = `Your Caderno Journal Export - ${entryCount} ${entryCount === 1 ? 'Entry' : 'Entries'}`;
     
     const html = `
       <html>
         <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 10px; margin-bottom: 20px;">
-            <h1 style="color: white; margin: 0;">Agenda Journal Export</h1>
+            <h1 style="color: white; margin: 0;">Caderno Journal Export</h1>
           </div>
           
           <div style="background: #f9fafb; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
             <p style="color: #374151; font-size: 16px; line-height: 1.6;">
               Your scheduled journal export is ready! This PDF contains <strong>${entryCount}</strong> 
-              ${entryCount === 1 ? 'entry' : 'entries'} from your Agenda journal.
+              ${entryCount === 1 ? 'entry' : 'entries'} from your Caderno journal.
             </p>
           </div>
 
@@ -84,16 +84,16 @@ export class EmailService {
           </div>
 
           <div style="margin-top: 30px; text-align: center; color: #9ca3af; font-size: 12px;">
-            <p>This is an automated message from your Agenda server.</p>
+            <p>This is an automated message from your Caderno server.</p>
           </div>
         </body>
       </html>
     `;
 
     const text = `
-Your Agenda Journal Export
+Your Caderno Journal Export
 
-Your scheduled journal export is ready! This PDF contains ${entryCount} ${entryCount === 1 ? 'entry' : 'entries'} from your Agenda journal.
+Your scheduled journal export is ready! This PDF contains ${entryCount} ${entryCount === 1 ? 'entry' : 'entries'} from your Caderno journal.
 
 Export Details:
 - File: ${fileName}

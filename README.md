@@ -1,4 +1,4 @@
-# Agenda - Personal Journal App
+# Caderno - Personal Journal App
 
 A beautiful, privacy-focused personal journal application built with React, TypeScript, and modern web technologies. Write your thoughts, attach images, and leverage AI-powered autocomplete - all with optional encryption for maximum privacy.
 
@@ -77,7 +77,7 @@ Full support for 8 languages:
 ```bash
 # Clone the repository
 git clone <your-repo-url>
-cd agenda
+cd caderno
 
 # Install dependencies
 npm install
@@ -146,7 +146,7 @@ npm run preview
 ## Project Structure
 
 ```
-agenda/
+caderno/
 ├── src/
 │   ├── components/          # React components
 │   │   ├── RichTextEditor.tsx    # Main editor component

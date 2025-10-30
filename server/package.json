@@ -1,7 +1,7 @@
 {
-  "name": "agenda-server",
+  "name": "caderno-server",
   "version": "1.0.0",
-  "description": "Federated server for Agenda journal scheduled PDF exports",
+  "description": "Federated server for Caderno journal scheduled PDF exports",
   "main": "dist/index.js",
   "type": "module",
   "scripts": {

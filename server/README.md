@@ -1,6 +1,6 @@
-# Agenda Server - Federated Scheduled Export Server
+# Caderno Server - Federated Scheduled Export Server
 
-A self-hostable server for scheduling automated PDF exports of your Agenda journal entries with email and SMS delivery.
+A self-hostable server for scheduling automated PDF exports of your Caderno journal entries with email and SMS delivery.
 
 ## Features
 
@@ -23,7 +23,7 @@ A self-hostable server for scheduling automated PDF exports of your Agenda journ
 
 ```bash
 # Navigate to server directory
-cd agenda-server
+cd caderno-server
 
 # Install dependencies
 npm install
@@ -209,15 +209,15 @@ GET /health
 
 ```bash
 # Build image
-docker build -t agenda-server .
+docker build -t caderno-server .
 
 # Run container
 docker run -d \
   -p 3001:3001 \
   -v $(pwd)/data:/app/data \
   -v $(pwd)/.env:/app/.env \
-  --name agenda-server \
-  agenda-server
+  --name caderno-server \
+  caderno-server
 ```
 
 ### Docker Compose
@@ -226,7 +226,7 @@ docker run -d \
 version: '3.8'
 
 services:
-  agenda-server:
+  caderno-server:
     build: .
     ports:
       - "3001:3001"
@@ -241,7 +241,7 @@ services:
 ## Project Structure
 
 ```
-agenda-server/
+caderno-server/
 ├── src/
 │   ├── config/
 │   │   └── database.ts          # SQLite configuration
@@ -316,10 +316,10 @@ SQLite uses WAL mode. Ensure:
 
 ```bash
 # Backup database
-cp data/agenda.db backup/agenda-$(date +%Y%m%d).db
+cp data/caderno.db backup/caderno-$(date +%Y%m%d).db
 
 # Automated backup (cron)
-0 2 * * * cp /path/to/data/agenda.db /path/to/backup/agenda-$(date +\%Y\%m\%d).db
+0 2 * * * cp /path/to/data/caderno.db /path/to/backup/caderno-$(date +\%Y\%m\%d).db
 ```
 
 ## Contributing

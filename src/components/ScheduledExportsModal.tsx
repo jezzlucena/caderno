@@ -233,7 +233,7 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
                 <div className="text-sm text-gray-700 ml-8 space-y-2">
                   <p>If you haven't set up your server yet:</p>
                   <ul className="list-disc list-inside space-y-1 ml-2">
-                    <li>Navigate to the <code className="bg-white px-2 py-0.5 rounded">agenda-server</code> folder</li>
+                    <li>Navigate to the <code className="bg-white px-2 py-0.5 rounded">caderno-server</code> folder</li>
                     <li>Run <code className="bg-white px-2 py-0.5 rounded">npm install</code></li>
                     <li>Configure your <code className="bg-white px-2 py-0.5 rounded">.env</code> file</li>
                     <li>Start the server with <code className="bg-white px-2 py-0.5 rounded">npm run dev</code></li>
@@ -278,7 +278,7 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
               {/* Help Link */}
               <div className="text-center">
                 <a
-                  href="https://github.com/jezzlucena/agenda/blob/main/SCHEDULED_EXPORTS_GUIDE.md"
+                  href="https://github.com/jezzlucena/caderno/blob/main/SCHEDULED_EXPORTS_GUIDE.md"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-indigo-600 hover:text-indigo-700 underline"

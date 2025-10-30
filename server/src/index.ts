@@ -77,7 +77,7 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 // Initialize database and start server
 async function start() {
   try {
-    console.log('Starting Agenda Server...');
+    console.log('Starting Caderno Server...');
     
     // Initialize database
     initializeDatabase();

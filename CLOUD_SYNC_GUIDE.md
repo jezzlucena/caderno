@@ -2,7 +2,7 @@
 
 ## Overview
 
-Cloud Sync in Agenda allows you to securely backup and synchronize your journal entries across devices using decentralized IPFS (InterPlanetary File System) storage with end-to-end encryption. Your data is encrypted locally before being uploaded, ensuring that only you can access your journal entries.
+Cloud Sync in Caderno allows you to securely backup and synchronize your journal entries across devices using decentralized IPFS (InterPlanetary File System) storage with end-to-end encryption. Your data is encrypted locally before being uploaded, ensuring that only you can access your journal entries.
 
 ## Visual Guide
 
@@ -10,7 +10,7 @@ Cloud Sync in Agenda allows you to securely backup and synchronize your journal 
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  Agenda                                            ☰ Menu ←─┐
+│  Caderno                                            ☰ Menu ←─┐
 ├─────────────────────────────────────────────────────────────┤│
 │                                                             ││
 │  Your Journal Entries...                                    ││
@@ -183,12 +183,12 @@ Cloud Sync in Agenda allows you to securely backup and synchronize your journal 
 2. Sign up for a free account (you can use Google or GitHub)
 3. Go to the "API Key" section in your dashboard
 4. Click "Create New API Key" or "Generate API Key"
-5. Give it a name (e.g., "Agenda Journal Sync")
+5. Give it a name (e.g., "Caderno Journal Sync")
 6. Copy your API key
 
-### Step 2: Configure Cloud Sync in Agenda
+### Step 2: Configure Cloud Sync in Caderno
 
-1. Open Agenda
+1. Open Caderno
 2. Click the menu button (☰) in the top right
 3. Select "Settings"
 4. Navigate to "Cloud Sync (IPFS Blockchain)" section
@@ -279,7 +279,7 @@ Lighthouse free tier includes:
 
 ### Initial Setup on New Device
 
-1. Install Agenda on the new device
+1. Install Caderno on the new device
 2. Configure Cloud Sync with same API key
 3. **Use the exact same passphrase** as your original device
 4. Download from IPFS
@@ -442,7 +442,7 @@ This will:
 For issues related to:
 - **Lighthouse Service**: Contact Lighthouse support
 - **IPFS Network**: Check IPFS status and documentation
-- **Agenda Integration**: Report bugs using the `/reportbug` command in Agenda chat
+- **Caderno Integration**: Report bugs using the `/reportbug` command in Caderno chat
 
 ## Additional Resources
 

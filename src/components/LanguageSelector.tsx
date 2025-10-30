@@ -19,7 +19,7 @@ export default function LanguageSelector() {
 
   const changeLanguage = (languageCode: string) => {
     i18n.changeLanguage(languageCode);
-    localStorage.setItem('agenda-language', languageCode);
+    localStorage.setItem('caderno-language', languageCode);
     setIsOpen(false);
   };
 

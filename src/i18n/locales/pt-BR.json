@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "Agenda",
+    "name": "Caderno",
     "tagline": "Seu diário pessoal"
   },
   "journalList": {
@@ -75,7 +75,7 @@
       "invalidStructure": "Estrutura do arquivo de backup inválida",
       "invalidEntries": "O arquivo de backup contém entradas inválidas",
       "importFailed": "Falha ao importar o arquivo. Por favor, verifique o formato do arquivo.",
-      "invalidFormat": "Formato de arquivo inválido. Por favor, selecione um arquivo de backup válido do Agenda.",
+      "invalidFormat": "Formato de arquivo inválido. Por favor, selecione um arquivo de backup válido do Caderno.",
       "cancel": "Cancelar",
       "import": "Importar"
     }

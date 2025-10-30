@@ -246,7 +246,7 @@ export default function CloudSyncModal({ onClose, onOpenSettings }: CloudSyncMod
                 Your data is encrypted locally before upload. Only you can decrypt it with your passphrase.
               </p>
               <a
-                href="https://github.com/jezzlucena/agenda/blob/main/CLOUD_SYNC_GUIDE.md"
+                href="https://github.com/jezzlucena/caderno/blob/main/CLOUD_SYNC_GUIDE.md"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-block text-sm text-indigo-600 hover:text-indigo-700 underline"

@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Agenda journal app now includes a **Scheduled PDF Exports** feature that allows you to automatically send PDF compilations of your journal entries via email and SMS on a recurring schedule. This feature runs on a self-hostable federated server that you can deploy anywhere.
+The Caderno journal app now includes a **Scheduled PDF Exports** feature that allows you to automatically send PDF compilations of your journal entries via email and SMS on a recurring schedule. This feature runs on a self-hostable federated server that you can deploy anywhere.
 
 ## Visual Guide
 
@@ -10,7 +10,7 @@ The Agenda journal app now includes a **Scheduled PDF Exports** feature that all
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  Agenda                                             ☰ Menu ←┐
+│  Caderno                                             ☰ Menu ←┐
 ├─────────────────────────────────────────────────────────────┤│
 │                                                             ││
 │  Your Journal Entries...                                    ││
@@ -57,7 +57,7 @@ The Agenda journal app now includes a **Scheduled PDF Exports** feature that all
 │                                                             │
 │  Setup Instructions                                         │
 │  ┌────────────────────────────────────────────────────┐     │
-│  │ 1. Set up and run your Agenda Server               │     │
+│  │ 1. Set up and run your Caderno Server               │     │
 │  │ 2. Generate an API key                             │     │
 │  │ 3. Enter your server URL and API key below         │     │
 │  │ → View Setup Guide ──────────────────────────────  │     │
@@ -146,7 +146,7 @@ The Agenda journal app now includes a **Scheduled PDF Exports** feature that all
 
 ```
 ┌──────────────────┐
-│ Agenda App       │
+│ Caderno App       │
 │ (Your Browser)   │
 │                  │
 │  📝 Journal      │
@@ -157,7 +157,7 @@ The Agenda journal app now includes a **Scheduled PDF Exports** feature that all
          │    + entries data
          ↓
 ┌───────────────────────────────────────────┐
-│ Agenda Server (Self-Hosted)               │
+│ Caderno Server (Self-Hosted)               │
 │                                           │
 │  ┌─────────────┐    ┌─────────────┐       │
 │  │ SQLite DB   │    │ Scheduler   │       │
@@ -245,7 +245,7 @@ Before setting up scheduled exports, you'll need:
 
 #### 1.1 Navigate to Server Directory
 ```bash
-cd agenda-server
+cd caderno-server
 ```
 
 #### 1.2 Install Dependencies
@@ -343,7 +343,7 @@ curl -X POST http://localhost:3001/api/auth/register
 
 ### Step 3: Connect the Frontend
 
-1. **Open Agenda App**: Launch your Agenda journal application
+1. **Open Caderno App**: Launch your Caderno journal application
 2. **Open Menu**: Click the hamburger menu (≡) in the top-right corner
 3. **Select "Scheduled Exports"**: Click on the "Scheduled Exports" option
 4. **Enter Server Details**:
@@ -427,7 +427,7 @@ Recipients receive a beautifully formatted email with:
 
 If configured with Twilio, recipients receive:
 ```
-📱 Agenda Journal: Your scheduled export with X entries has been sent to your email. Check your inbox!
+📱 Caderno Journal: Your scheduled export with X entries has been sent to your email. Check your inbox!
 ```
 
 ## 🔒 Security & Privacy
@@ -440,7 +440,7 @@ If configured with Twilio, recipients receive:
 ### Best Practices
 1. Use strong, unique passwords for SMTP and API keys
 2. Deploy server behind HTTPS (use Let's Encrypt for free SSL)
-3. Regularly backup your database (`agenda-server/data/agenda.db`)
+3. Regularly backup your database (`caderno-server/data/caderno.db`)
 4. Keep your API key secret and never commit to version control
 5. Use environment variables for all sensitive configuration
 
@@ -454,7 +454,7 @@ The server includes built-in rate limiting:
 ### Using Docker Compose (Recommended)
 
 ```bash
-cd agenda-server
+cd caderno-server
 docker-compose up -d
 ```
 
@@ -462,15 +462,15 @@ docker-compose up -d
 
 ```bash
 # Build image
-docker build -t agenda-server .
+docker build -t caderno-server .
 
 # Run container
 docker run -d \
   -p 3001:3001 \
   -v $(pwd)/data:/app/data \
   -v $(pwd)/.env:/app/.env \
-  --name agenda-server \
-  agenda-server
+  --name caderno-server \
+  caderno-server
 ```
 
 ### Docker Management
@@ -497,7 +497,7 @@ docker-compose up -d
 
 **Check logs:**
 ```bash
-cd agenda-server
+cd caderno-server
 npm run dev
 ```
 
@@ -601,13 +601,13 @@ DELETE /api/schedules/:id
 Headers: X-API-Key: your-api-key
 ```
 
-Full API documentation available in `agenda-server/README.md`.
+Full API documentation available in `caderno-server/README.md`.
 
 ## 🗂️ File Structure
 
 ```
-agenda/
-├── agenda-server/                 # Federated server
+caderno/
+├── caderno-server/                 # Federated server
 │   ├── src/
 │   │   ├── config/               # Database configuration
 │   │   ├── models/               # Data models
@@ -631,20 +631,20 @@ agenda/
 
 ### Backup Database
 ```bash
-cd agenda-server
-cp data/agenda.db backup/agenda-$(date +%Y%m%d).db
+cd caderno-server
+cp data/caderno.db backup/caderno-$(date +%Y%m%d).db
 ```
 
 ### Automated Backup (cron)
 ```bash
 # Add to crontab
-0 2 * * * cp /path/to/agenda-server/data/agenda.db /path/to/backup/agenda-$(date +\%Y\%m\%d).db
+0 2 * * * cp /path/to/caderno-server/data/caderno.db /path/to/backup/caderno-$(date +\%Y\%m\%d).db
 ```
 
 ### Restore Database
 ```bash
-cd agenda-server
-cp backup/agenda-20251015.db data/agenda.db
+cd caderno-server
+cp backup/caderno-20251015.db data/caderno.db
 docker-compose restart  # If using Docker
 ```
 
@@ -668,14 +668,14 @@ Response:
 ### View Logs
 ```bash
 # Development
-cd agenda-server
+cd caderno-server
 npm run dev
 
 # Docker
 docker-compose logs -f
 
 # Log file (if configured)
-tail -f agenda-server/logs/server.log
+tail -f caderno-server/logs/server.log
 ```
 
 ## 🎓 Advanced Topics
@@ -707,7 +707,7 @@ Each user can run their own server for complete privacy:
 ### Getting Help
 - Server logs: `docker-compose logs -f` or `npm run dev`
 - GitHub Issues: [Report bugs or request features]
-- Documentation: `agenda-server/README.md`
+- Documentation: `caderno-server/README.md`
 
 ### Common Questions
 
