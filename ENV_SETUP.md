@@ -8,12 +8,12 @@ Create a `.env` file in the `caderno/` directory:
 
 ```bash
 # Required for Authentication with Caderno Hub
-VITE_HUB_API_URL=http://localhost:3001/api
+VITE_HUB_API_URL=http://localhost:3002/api
 ```
 
 **Configuration:**
 - `VITE_HUB_API_URL` - URL to your caderno-hub backend API
-  - Local development: `http://localhost:3001/api`
+  - Local development: `http://localhost:3002/api`
   - Production: `https://your-caderno-hub-domain.com/api`
 
 ## Caderno Server (.env)
@@ -22,7 +22,7 @@ If using the scheduled exports feature, create a `.env` file in `caderno/server/
 
 ```bash
 # Server Configuration
-PORT=3001
+SERVER_PORT=3002
 NODE_ENV=development
 
 # Database
@@ -76,7 +76,7 @@ SESSION_SECRET=your-session-secret-change-this-in-production
 FRONTEND_URL=http://localhost:5173
 
 # Server Port
-SERVER_PORT=3001
+SERVER_PORT=3002
 
 # Stripe Configuration
 STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
@@ -110,7 +110,7 @@ APPLE_PRIVATE_KEY=your-apple-private-key
 Create a `.env` file in `caderno-hub/`:
 
 ```bash
-VITE_API_URL=http://localhost:3001/api
+VITE_API_URL=http://localhost:3002/api
 VITE_STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key
 ```
 
@@ -207,7 +207,7 @@ MONGO_URL=mongodb+srv://user:pass@cluster.mongodb.net/caderno-hub
 JWT_SECRET=complex-random-secret-key-here
 SESSION_SECRET=another-complex-secret-here
 FRONTEND_URL=https://caderno.com
-SERVER_PORT=3001
+SERVER_PORT=3002
 STRIPE_SECRET_KEY=sk_live_...
 STRIPE_PUBLISHABLE_KEY=pk_live_...
 ```

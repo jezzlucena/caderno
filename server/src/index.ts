@@ -13,7 +13,7 @@ import scheduleRoutes from './routes/schedules.js';
 import ipfsRoutes from './routes/ipfs.js';
 
 const app = express();
-const PORT = process.env.SERVER_PORT || 3001;
+const PORT = process.env.SERVER_PORT || 3002;
 
 // Security middleware
 app.use(helmet());

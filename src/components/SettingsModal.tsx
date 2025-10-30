@@ -48,7 +48,7 @@ export default function SettingsModal({ onClose, initialScreen = 'main' }: Setti
   const [autoSync, setAutoSyncLocal] = useState(false);
   const [showSyncPassphrase, setShowSyncPassphrase] = useState(false);
 
-  const [scheduledExportsServerUrl, setScheduledExportsServerUrlLocal] = useState('');
+  const [scheduledExportsServerUrl, setScheduledExportsServerUrlLocal] = useState('http://localhost:3002');
   const [scheduledExportsApiKey, setScheduledExportsApiKeyLocal] = useState('');
   const [showScheduledExportsApiKey, setShowScheduledExportsApiKey] = useState(false);
 
@@ -412,7 +412,7 @@ export default function SettingsModal({ onClose, initialScreen = 'main' }: Setti
             type="url"
             value={scheduledExportsServerUrl}
             onChange={(e) => setScheduledExportsServerUrlLocal(e.target.value)}
-            placeholder="http://localhost:3001"
+            placeholder="http://localhost:3002"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
           <p className="text-xs text-gray-500 mt-1">

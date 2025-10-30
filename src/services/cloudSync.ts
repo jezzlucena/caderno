@@ -15,7 +15,7 @@ export interface SyncMetadata {
 
 // Get server URL from environment or default
 const getServerUrl = (): string => {
-  return import.meta.env.VITE_SERVER_URL || 'http://localhost:3001';
+  return import.meta.env.VITE_SERVER_URL || 'http://localhost:3002';
 };
 
 /**

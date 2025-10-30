@@ -483,7 +483,7 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
                 <div className="text-sm text-gray-700 ml-8">
                   <p className="mb-2">Run this command to generate your API key:</p>
                   <div className="bg-gray-900 text-gray-100 p-3 rounded-lg font-mono text-xs overflow-x-auto">
-                    curl -X POST http://localhost:3001/api/auth/register
+                    curl -X POST http://localhost:3002/api/auth/register
                   </div>
                 </div>
               </div>
