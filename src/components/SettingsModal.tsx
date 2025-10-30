@@ -36,7 +36,6 @@ export default function SettingsModal({ onClose, initialScreen = 'main' }: Setti
   const {
     cloudSync,
     scheduledExports,
-    setLighthouseApiKey,
     setSyncPassphrase,
     setAutoSync,
     clearCloudSyncSettings,
@@ -45,10 +44,8 @@ export default function SettingsModal({ onClose, initialScreen = 'main' }: Setti
     clearScheduledExportsSettings,
   } = useSettingsStore();
 
-  const [lighthouseKey, setLighthouseKey] = useState('');
   const [syncPassphrase, setSyncPassphraseLocal] = useState('');
   const [autoSync, setAutoSyncLocal] = useState(false);
-  const [showLighthouseKey, setShowLighthouseKey] = useState(false);
   const [showSyncPassphrase, setShowSyncPassphrase] = useState(false);
 
   const [scheduledExportsServerUrl, setScheduledExportsServerUrlLocal] = useState('');
@@ -62,7 +59,6 @@ export default function SettingsModal({ onClose, initialScreen = 'main' }: Setti
     }
 
     // Load cloud sync settings
-    setLighthouseKey(cloudSync.lighthouseApiKey);
     setSyncPassphraseLocal(cloudSync.syncPassphrase);
     setAutoSyncLocal(cloudSync.autoSync);
 
@@ -109,7 +105,6 @@ export default function SettingsModal({ onClose, initialScreen = 'main' }: Setti
     }
 
     // Save cloud sync settings
-    setLighthouseApiKey(lighthouseKey.trim());
     setSyncPassphrase(syncPassphrase.trim());
     setAutoSync(autoSync);
 
@@ -133,7 +128,6 @@ export default function SettingsModal({ onClose, initialScreen = 'main' }: Setti
   };
 
   const handleClearCloudSync = () => {
-    setLighthouseKey('');
     setSyncPassphraseLocal('');
     setAutoSyncLocal(false);
     clearCloudSyncSettings();
@@ -512,50 +506,19 @@ export default function SettingsModal({ onClose, initialScreen = 'main' }: Setti
 
       <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4 mb-4">
         <p className="text-sm text-indigo-800 mb-2">
-          <strong>{t('settings.cloudSync.howToGetKey')}</strong>
+          <strong>📘 Setup Instructions</strong>
         </p>
         <ol className="text-sm text-indigo-700 space-y-1 list-decimal list-inside">
-          <li>{t('settings.cloudSync.step1')}</li>
-          <li>{t('settings.cloudSync.step2')}</li>
-          <li>{t('settings.cloudSync.step3')}</li>
+          <li>Start your Caderno Server (see caderno/server folder)</li>
+          <li>Set a secure passphrase to encrypt your journal entries</li>
+          <li>Use the Cloud Sync button to backup your entries to IPFS</li>
         </ol>
-        <a
-          href="https://files.lighthouse.storage/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-block mt-3 text-sm text-indigo-600 hover:text-indigo-800 underline"
-        >
-          {t('settings.cloudSync.getKeyLink')} →
-        </a>
+        <p className="text-sm text-indigo-700 mt-2">
+          Your data is encrypted locally before upload. No API keys needed!
+        </p>
       </div>
 
       <div className="space-y-4">
-        {/* Lighthouse API Key */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            <div className="flex items-center gap-2">
-              <KeyIcon width={16} />
-              {t('settings.cloudSync.apiKey')}
-            </div>
-          </label>
-          <div className="relative">
-            <input
-              type={showLighthouseKey ? 'text' : 'password'}
-              value={lighthouseKey}
-              onChange={(e) => setLighthouseKey(e.target.value)}
-              placeholder={t('settings.cloudSync.apiKeyPlaceholder')}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-24"
-            />
-            <button
-              type="button"
-              onClick={() => setShowLighthouseKey(!showLighthouseKey)}
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500 hover:text-gray-700 px-3 py-1 rounded bg-gray-100 hover:bg-gray-200"
-            >
-              {showLighthouseKey ? t('settings.hide') : t('settings.show')}
-            </button>
-          </div>
-        </div>
-
         {/* Sync Passphrase */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -599,7 +562,7 @@ export default function SettingsModal({ onClose, initialScreen = 'main' }: Setti
           {t('settings.cloudSync.autoSyncDescription')}
         </p>
 
-        {(lighthouseKey || syncPassphrase) && (
+        {syncPassphrase && (
           <button
             onClick={handleClearCloudSync}
             className="text-sm text-red-600 hover:text-red-700"

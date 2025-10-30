@@ -7,8 +7,10 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { initializeDatabase, closeDatabase } from './config/database.js';
 import { scheduler } from './services/scheduler.js';
+import { ipfsService } from './services/ipfsService.js';
 import authRoutes from './routes/auth.js';
 import scheduleRoutes from './routes/schedules.js';
+import ipfsRoutes from './routes/ipfs.js';
 
 const app = express();
 const PORT = process.env.SERVER_PORT || 3001;
@@ -17,7 +19,7 @@ const PORT = process.env.SERVER_PORT || 3001;
 app.use(helmet());
 
 // CORS configuration
-const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:5173'];
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:5174', 'http://localhost:3000'];
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -45,17 +47,36 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Health check endpoint
 app.get('/health', (req, res) => {
+  const schedulerHealth = scheduler.getHealthStatus();
+  
   res.json({
-    status: 'ok',
+    status: schedulerHealth.status === 'healthy' ? 'ok' : schedulerHealth.status,
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    activeSchedules: scheduler.getActiveSchedules().length,
+    scheduler: {
+      status: schedulerHealth.status,
+      activeSchedules: schedulerHealth.activeSchedules,
+      activeExecutions: schedulerHealth.activeExecutions,
+      totalSchedules: schedulerHealth.totalSchedules,
+    },
+  });
+});
+
+// Detailed metrics endpoint
+app.get('/metrics', (req, res) => {
+  const schedulerHealth = scheduler.getHealthStatus();
+  
+  res.json({
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    scheduler: schedulerHealth,
   });
 });
 
 // API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/schedules', scheduleRoutes);
+app.use('/api/ipfs', ipfsRoutes);
 
 // 404 handler
 app.use((req, res) => {
@@ -82,6 +103,11 @@ async function start() {
     // Initialize database
     initializeDatabase();
     
+    // Initialize IPFS service
+    console.log('Initializing IPFS service...');
+    await ipfsService.initialize();
+    console.log('IPFS service initialized');
+    
     // Initialize scheduler
     await scheduler.initialize();
     
@@ -98,16 +124,18 @@ async function start() {
 }
 
 // Graceful shutdown
-process.on('SIGTERM', () => {
+process.on('SIGTERM', async () => {
   console.log('SIGTERM received, shutting down gracefully...');
-  scheduler.shutdown();
+  await scheduler.shutdown();
+  await ipfsService.shutdown();
   closeDatabase();
   process.exit(0);
 });
 
-process.on('SIGINT', () => {
+process.on('SIGINT', async () => {
   console.log('SIGINT received, shutting down gracefully...');
-  scheduler.shutdown();
+  await scheduler.shutdown();
+  await ipfsService.shutdown();
   closeDatabase();
   process.exit(0);
 });

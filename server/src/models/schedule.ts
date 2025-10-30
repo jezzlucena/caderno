@@ -11,6 +11,7 @@ export interface Schedule {
   entry_ids?: string[];
   date_range_start?: number;
   date_range_end?: number;
+  passphrase: string;
   created_at: number;
   updated_at: number;
   last_run?: number;
@@ -41,6 +42,10 @@ export class ScheduleModel {
     const id = randomBytes(16).toString('hex');
     const now = Date.now();
 
+    if (!data.passphrase) {
+      throw new Error('Passphrase is required');
+    }
+
     const schedule: Schedule = {
       id,
       user_id: userId,
@@ -51,6 +56,7 @@ export class ScheduleModel {
       entry_ids: data.entry_ids,
       date_range_start: data.date_range_start,
       date_range_end: data.date_range_end,
+      passphrase: data.passphrase,
       created_at: now,
       updated_at: now,
       last_run: data.last_run,
@@ -60,9 +66,9 @@ export class ScheduleModel {
     const stmt = db.prepare(`
       INSERT INTO schedules (
         id, user_id, name, cron_expression, enabled, entry_selection_type,
-        entry_ids, date_range_start, date_range_end, created_at, updated_at,
+        entry_ids, date_range_start, date_range_end, passphrase, created_at, updated_at,
         last_run, next_run
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     stmt.run(
@@ -75,6 +81,7 @@ export class ScheduleModel {
       schedule.entry_ids ? JSON.stringify(schedule.entry_ids) : null,
       schedule.date_range_start || null,
       schedule.date_range_end || null,
+      schedule.passphrase,
       schedule.created_at,
       schedule.updated_at,
       schedule.last_run || null,
@@ -170,6 +177,7 @@ export class ScheduleModel {
       entry_ids: row.entry_ids ? JSON.parse(row.entry_ids) : undefined,
       date_range_start: row.date_range_start || undefined,
       date_range_end: row.date_range_end || undefined,
+      passphrase: row.passphrase,
       created_at: row.created_at,
       updated_at: row.updated_at,
       last_run: row.last_run || undefined,

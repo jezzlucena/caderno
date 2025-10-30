@@ -8,10 +8,10 @@ services:
       dockerfile: Dockerfile
     container_name: caderno-frontend
     ports:
-      - "5173:5173"
+      - "5174:80"
     environment:
       # Caderno Hub API URL
-      - VITE_HUB_API_URL=${VITE_HUB_API_URL:-http://localhost:3001/api}
+      - VITE_HUB_API_URL=${VITE_HUB_API_URL}
     volumes:
       - ./src:/app/src
       - ./public:/app/public
@@ -25,7 +25,7 @@ services:
       - caderno-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5173"]
+      test: ["CMD", "curl", "-f", "http://localhost:5174"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -48,31 +48,31 @@ services:
       - DATABASE_PATH=${DATABASE_PATH}
       
       # Authentication
-      - JWT_SECRET=${JWT_SECRET:-your-secret-key-here-change-in-production}
-      - API_KEY_SALT=${API_KEY_SALT:-your-api-key-salt-here}
+      - JWT_SECRET=${JWT_SECRET}
+      - API_KEY_SALT=${API_KEY_SALT}
       
       # Email Configuration (Optional)
-      - SMTP_HOST=${SMTP_HOST:-smtp.gmail.com}
-      - SMTP_PORT=${SMTP_PORT:-587}
-      - SMTP_SECURE=${SMTP_SECURE:-false}
-      - SMTP_USER=${SMTP_USER:-}
-      - SMTP_PASS=${SMTP_PASS:-}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_SECURE=${SMTP_SECURE}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
       
       # SMS Configuration (Optional)
-      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID:-}
-      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN:-}
-      - TWILIO_PHONE_NUMBER=${TWILIO_PHONE_NUMBER:-}
+      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}
+      - TWILIO_PHONE_NUMBER=${TWILIO_PHONE_NUMBER}
       
       # CORS
-      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:5173,http://localhost:3000}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
       
       # Rate Limiting
-      - RATE_LIMIT_WINDOW_MS=${RATE_LIMIT_WINDOW_MS:-900000}
-      - RATE_LIMIT_MAX_REQUESTS=${RATE_LIMIT_MAX_REQUESTS:-100}
+      - RATE_LIMIT_WINDOW_MS=${RATE_LIMIT_WINDOW_MS}
+      - RATE_LIMIT_MAX_REQUESTS=${RATE_LIMIT_MAX_REQUESTS}
       
       # Logging
-      - LOG_LEVEL=${LOG_LEVEL:-info}
-      - LOG_FILE=${LOG_FILE:-/app/logs/server.log}
+      - LOG_LEVEL=${LOG_LEVEL}
+      - LOG_FILE=${LOG_FILE}
     volumes:
       - ./server/data:/app/data
       - ./server/logs:/app/logs

@@ -15,6 +15,7 @@ build/
 
 # Database
 database/
+data/
 *.db
 *.db-shm
 *.db-wal

@@ -35,11 +35,6 @@ export default function CloudSyncModal({ onClose, onOpenSettings }: CloudSyncMod
     setError(null);
     setSuccess(null);
 
-    if (!cloudSync.lighthouseApiKey) {
-      setError(t('cloudSync.errors.noApiKey'));
-      return;
-    }
-
     if (!cloudSync.syncPassphrase) {
       setError(t('cloudSync.errors.noPassphrase'));
       return;
@@ -58,8 +53,7 @@ export default function CloudSyncModal({ onClose, onOpenSettings }: CloudSyncMod
 
       const metadata = await uploadToIPFS(
         entries,
-        cloudSync.syncPassphrase,
-        cloudSync.lighthouseApiKey
+        cloudSync.syncPassphrase
       );
 
       setUploadProgress(90);
@@ -142,7 +136,7 @@ export default function CloudSyncModal({ onClose, onOpenSettings }: CloudSyncMod
     }
   };
 
-  const isConfigured = cloudSync.lighthouseApiKey && cloudSync.syncPassphrase;
+  const isConfigured = cloudSync.syncPassphrase;
   const hasBackup = cloudSync.lastCid || lastSyncMetadata?.cid;
 
   return (
@@ -188,32 +182,29 @@ export default function CloudSyncModal({ onClose, onOpenSettings }: CloudSyncMod
             <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-lg p-6 space-y-4">
               <h4 className="font-semibold text-gray-800 flex items-center gap-2">
                 <span className="flex items-center justify-center w-6 h-6 bg-indigo-600 text-white rounded-full text-sm">1</span>
-                Configure Cloud Sync
-              </h4>
-              <p className="text-sm text-gray-700 ml-8">
-                Go to <strong>Settings → Cloud Sync</strong> to enter your Lighthouse API key and encryption passphrase
-              </p>
-
-              <h4 className="font-semibold text-gray-800 flex items-center gap-2">
-                <span className="flex items-center justify-center w-6 h-6 bg-indigo-600 text-white rounded-full text-sm">2</span>
-                Get Your API Key
+                Start Caderno Server
               </h4>
               <div className="text-sm text-gray-700 ml-8 space-y-2">
-                <p>To use Cloud Sync, you need a Lighthouse API key:</p>
-                <ul className="list-disc list-inside space-y-1 ml-2">
-                  <li>Visit <a href="https://files.lighthouse.storage/" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-700 underline">files.lighthouse.storage</a></li>
-                  <li>Create a free account</li>
-                  <li>Generate your API key</li>
-                  <li>Add it in Settings</li>
-                </ul>
+                <p>Cloud Sync uses a self-hosted IPFS node. Start the server:</p>
+                <div className="bg-gray-900 text-gray-100 p-2 rounded font-mono text-xs">
+                  cd caderno/server && npm run dev
+                </div>
               </div>
 
               <h4 className="font-semibold text-gray-800 flex items-center gap-2">
-                <span className="flex items-center justify-center w-6 h-6 bg-indigo-600 text-white rounded-full text-sm">3</span>
+                <span className="flex items-center justify-center w-6 h-6 bg-indigo-600 text-white rounded-full text-sm">2</span>
                 Set Encryption Passphrase
               </h4>
               <p className="text-sm text-gray-700 ml-8">
-                Choose a secure passphrase to encrypt your journal entries before uploading to IPFS
+                Go to <strong>Settings → Cloud Sync</strong> and set a secure passphrase to encrypt your journal entries before uploading to IPFS
+              </p>
+
+              <h4 className="font-semibold text-gray-800 flex items-center gap-2">
+                <span className="flex items-center justify-center w-6 h-6 bg-indigo-600 text-white rounded-full text-sm">3</span>
+                Enjoy Free Forever Sync
+              </h4>
+              <p className="text-sm text-gray-700 ml-8">
+                No API keys, no subscriptions, no trials. Your data stays on your infrastructure with full IPFS network redundancy!
               </p>
             </div>
 

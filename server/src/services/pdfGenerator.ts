@@ -84,9 +84,10 @@ export class PDFGenerator {
 
       // Wait for any images to load
       await page.evaluate(() => {
+        // @ts-expect-error - document is available in browser context via Puppeteer
         const images = Array.from(document.images);
         return Promise.all(
-          images.map((img) => {
+          images.map((img: any) => {
             if (img.complete) return Promise.resolve();
             return new Promise((resolve) => {
               img.addEventListener('load', resolve);

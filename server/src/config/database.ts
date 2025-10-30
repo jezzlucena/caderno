@@ -14,7 +14,7 @@ if (!fs.existsSync(dbDir)) {
   fs.mkdirSync(dbDir, { recursive: true });
 }
 
-export const db = new Database(dbPath);
+export const db: Database.Database = new Database(dbPath);
 db.pragma('journal_mode = WAL');
 
 // Initialize database schema
@@ -37,6 +37,7 @@ export function initializeDatabase() {
       entry_ids TEXT,
       date_range_start INTEGER,
       date_range_end INTEGER,
+      passphrase TEXT NOT NULL,
       created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL,
       last_run INTEGER,

@@ -25,6 +25,13 @@ router.post('/', async (req: AuthRequest, res) => {
       });
     }
 
+    if (!passphrase) {
+      return res.status(400).json({
+        success: false,
+        error: 'Passphrase is required',
+      });
+    }
+
     // Store encrypted entries if provided
     if (entries_data && passphrase && req.user) {
       const encrypted = CryptoJS.AES.encrypt(JSON.stringify(entries_data), passphrase).toString();
@@ -50,6 +57,7 @@ router.post('/', async (req: AuthRequest, res) => {
       entry_ids,
       date_range_start,
       date_range_end,
+      passphrase,
     });
 
     // Add recipients
@@ -293,7 +301,7 @@ router.post('/:id/execute', async (req: AuthRequest, res) => {
     }
 
     // Execute schedule asynchronously
-    scheduler.executeSchedule(req.params.id).catch(error => {
+    scheduler.triggerScheduleExecution(req.params.id).catch(error => {
       console.error('Manual execution failed:', error);
     });
 

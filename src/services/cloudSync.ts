@@ -1,4 +1,3 @@
-import lighthouse from '@lighthouse-web3/sdk';
 import CryptoJS from 'crypto-js';
 import type { JournalEntry } from '../store/useStore';
 
@@ -13,6 +12,11 @@ export interface SyncMetadata {
   timestamp: number;
   entryCount: number;
 }
+
+// Get server URL from environment or default
+const getServerUrl = (): string => {
+  return import.meta.env.VITE_SERVER_URL || 'http://localhost:3001';
+};
 
 /**
  * Encrypts journal data before uploading to IPFS
@@ -37,12 +41,11 @@ export const decryptData = (encryptedData: string, passphrase: string): CloudSyn
 };
 
 /**
- * Uploads encrypted journal entries to IPFS via Lighthouse
+ * Uploads encrypted journal entries to IPFS via self-hosted server
  */
 export const uploadToIPFS = async (
   entries: JournalEntry[],
-  passphrase: string,
-  apiKey: string
+  passphrase: string
 ): Promise<SyncMetadata> => {
   try {
     const syncData: CloudSyncData = {
@@ -54,21 +57,29 @@ export const uploadToIPFS = async (
     // Encrypt the data
     const encryptedData = encryptData(syncData, passphrase);
 
-    // Create a File object from the encrypted data
-    const blob = new Blob([encryptedData], { type: 'application/octet-stream' });
-    const file = new File([blob], 'caderno-backup.encrypted', {
-      type: 'application/octet-stream',
+    // Upload to IPFS via server
+    const serverUrl = getServerUrl();
+    const response = await fetch(`${serverUrl}/api/ipfs/upload`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ data: encryptedData }),
     });
 
-    // Upload to IPFS via Lighthouse
-    const response = await lighthouse.upload([file], apiKey);
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Upload failed');
+    }
 
-    if (!response || !response.data || !response.data.Hash) {
-      throw new Error('Upload failed: No CID returned from Lighthouse');
+    const result = await response.json();
+
+    if (!result.success || !result.data || !result.data.cid) {
+      throw new Error('Upload failed: No CID returned from server');
     }
 
     const metadata: SyncMetadata = {
-      cid: response.data.Hash,
+      cid: result.data.cid,
       timestamp: Date.now(),
       entryCount: entries.length,
     };
@@ -83,23 +94,29 @@ export const uploadToIPFS = async (
 };
 
 /**
- * Downloads and decrypts journal entries from IPFS
+ * Downloads and decrypts journal entries from IPFS via self-hosted server
  */
 export const downloadFromIPFS = async (
   cid: string,
   passphrase: string
 ): Promise<CloudSyncData> => {
   try {
-    // Download from IPFS via public gateway
-    const gatewayUrl = `https://gateway.lighthouse.storage/ipfs/${cid}`;
-
-    const response = await fetch(gatewayUrl);
+    // Download from IPFS via server
+    const serverUrl = getServerUrl();
+    const response = await fetch(`${serverUrl}/api/ipfs/download/${cid}`);
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch from IPFS: ${response.statusText}`);
+      const error = await response.json();
+      throw new Error(error.error || 'Download failed');
     }
 
-    const encryptedData = await response.text();
+    const result = await response.json();
+
+    if (!result.success || !result.data) {
+      throw new Error('Download failed: No data returned from server');
+    }
+
+    const encryptedData = result.data;
 
     // Decrypt the data
     const syncData = decryptData(encryptedData, passphrase);
@@ -119,20 +136,28 @@ export const downloadFromIPFS = async (
 };
 
 /**
- * Gets the storage status from Lighthouse (file info)
+ * Gets the storage status from IPFS via self-hosted server
  */
 export const getStorageStatus = async (
   cid: string,
 ): Promise<{ size: number; status: string }> => {
   try {
-    // This is a placeholder - Lighthouse API might have different methods
-    // to check file status. For now, we'll just verify the file exists
-    const gatewayUrl = `https://gateway.lighthouse.storage/ipfs/${cid}`;
-    const response = await fetch(gatewayUrl, { method: 'HEAD' });
+    const serverUrl = getServerUrl();
+    const response = await fetch(`${serverUrl}/api/ipfs/status/${cid}`);
+
+    if (!response.ok) {
+      return { size: 0, status: 'unavailable' };
+    }
+
+    const result = await response.json();
+
+    if (!result.success || !result.data) {
+      return { size: 0, status: 'unavailable' };
+    }
 
     return {
-      size: parseInt(response.headers.get('content-length') || '0'),
-      status: response.ok ? 'active' : 'unavailable',
+      size: result.data.size,
+      status: result.data.exists ? 'active' : 'unavailable',
     };
   } catch (error) {
     console.error('Error checking storage status:', error);
