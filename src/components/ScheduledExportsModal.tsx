@@ -941,99 +941,158 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
         )}
 
         {view === 'detail' && selectedSchedule && (
-          <div className="flex-1 overflow-y-auto space-y-4">
+          <div className="flex-1 overflow-y-auto">
             <button
               onClick={() => setView('list')}
-              className="text-indigo-600 hover:text-indigo-700 text-sm flex items-center gap-1"
+              className="text-indigo-600 hover:text-indigo-700 text-sm flex items-center gap-1 mb-4 transition-colors"
             >
               ← Back to list
             </button>
 
-            <div className="border-b pb-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-xl font-bold text-gray-800">{selectedSchedule.name}</h3>
-                  <p className={`text-sm text-gray-600 mt-1 font-mono ${!selectedSchedule.executed && isUrgent(selectedSchedule.execution_time) ? 'urgent-countdown' : ''}`}>
-                    {selectedSchedule.executed ? `Executed on ${formatDate(selectedSchedule.execution_time)}` : formatCountdown(selectedSchedule.execution_time)}
-                  </p>
-                </div>
-                <span className={`px-3 py-1 text-sm rounded-full ${selectedSchedule.executed ? 'bg-gray-100 text-gray-600' : 'bg-green-100 text-green-700'}`}>
-                  {selectedSchedule.executed ? 'Executed' : 'Pending'}
-                </span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Entry Selection</p>
-                <p className="text-gray-800">{selectedSchedule.entry_selection_type}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">Recipients</p>
-                <p className="text-gray-800">{selectedSchedule.recipients.length} configured</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">Scheduled For</p>
-                <p className="text-gray-800">{formatDate(selectedSchedule.execution_time)}</p>
-              </div>
-              {selectedSchedule.original_duration_ms && (
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Original Duration</p>
-                  <p className="text-gray-800">{formatDuration(selectedSchedule.original_duration_ms)}</p>
-                </div>
-              )}
-              {selectedSchedule.executed_at && (
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Executed At</p>
-                  <p className="text-gray-800">{formatDate(selectedSchedule.executed_at)}</p>
-                </div>
-              )}
-            </div>
-
-            <div>
-              <h4 className="font-semibold text-gray-800 mb-2">Recipients</h4>
-              <div className="space-y-1">
-                {selectedSchedule.recipients.map((recipient) => (
-                  <div key={recipient.id} className="flex items-center gap-2 text-sm">
-                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs">
-                      {recipient.type}
+            {/* Header Card */}
+            <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-lg p-4 mb-4 border-2 border-indigo-200">
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <ClockIcon className="w-5 h-5 text-indigo-600" />
+                    <h3 className="text-lg font-bold text-gray-900">{selectedSchedule.name}</h3>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${selectedSchedule.executed ? 'bg-gray-100 text-gray-700' : 'bg-green-100 text-green-700'}`}>
+                      {selectedSchedule.executed ? '✓ Executed' : '⏳ Pending'}
                     </span>
-                    <span className="text-gray-700">{recipient.value}</span>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Countdown/Execution Display */}
+              <div className="bg-white/60 backdrop-blur-sm rounded-lg p-3 mt-3">
+                <p className="text-[10px] font-medium text-gray-600 uppercase tracking-wide mb-1">
+                  {selectedSchedule.executed ? 'Execution Time' : 'Time Remaining'}
+                </p>
+                <p className={`text-lg font-bold font-mono ${!selectedSchedule.executed && isUrgent(selectedSchedule.execution_time) ? 'urgent-countdown' : 'text-gray-900'}`}>
+                  {selectedSchedule.executed ? formatDate(selectedSchedule.execution_time) : formatCountdown(selectedSchedule.execution_time)}
+                </p>
+                {selectedSchedule.original_duration_ms && !selectedSchedule.executed && (
+                  <p className="text-[10px] text-gray-600 mt-1">
+                    Original duration: {formatDuration(selectedSchedule.original_duration_ms)}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Details Grid - Responsive Tiles */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
+              {/* Entry Selection Tile */}
+              <div className="bg-white border-2 border-gray-300 rounded-lg p-3 hover:border-indigo-300 transition-colors">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-7 h-7 bg-indigo-100 rounded-md flex items-center justify-center shrink-0">
+                    <span className="text-sm">📄</span>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wide">Entry Selection</p>
+                    <p className="text-sm font-semibold text-gray-900 capitalize truncate">{selectedSchedule.entry_selection_type.replace('_', ' ')}</p>
+                  </div>
+                </div>
+                {selectedSchedule.entry_count !== undefined && (
+                  <p className="text-xs text-gray-600 ml-9">
+                    {selectedSchedule.entry_count} {selectedSchedule.entry_count === 1 ? 'entry' : 'entries'}
+                  </p>
+                )}
+              </div>
+
+              {/* Recipients Tile */}
+              <div className="bg-white border-2 border-gray-300 rounded-lg p-3 hover:border-indigo-300 transition-colors">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 bg-purple-100 rounded-md flex items-center justify-center shrink-0">
+                    <span className="text-sm">📧</span>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wide">Recipients</p>
+                    <p className="text-sm font-semibold text-gray-900">{selectedSchedule.recipients.length} configured</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Scheduled For Tile */}
+              <div className="bg-white border-2 border-gray-300 rounded-lg p-3 hover:border-indigo-300 transition-colors">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 bg-blue-100 rounded-md flex items-center justify-center shrink-0">
+                    <span className="text-sm">📅</span>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wide">Scheduled For</p>
+                    <p className="text-xs font-medium text-gray-900 truncate">{formatDate(selectedSchedule.execution_time)}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Executed At Tile (if applicable) */}
+              {selectedSchedule.executed_at && (
+                <div className="bg-white border-2 border-gray-300 rounded-lg p-3 hover:border-indigo-300 transition-colors">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 bg-green-100 rounded-md flex items-center justify-center shrink-0">
+                      <span className="text-sm">✓</span>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wide">Executed At</p>
+                      <p className="text-xs font-medium text-gray-900 truncate">{formatDate(selectedSchedule.executed_at)}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Recipients List Tile */}
+            <div className="bg-white border-2 border-gray-300 rounded-lg p-3 mb-4">
+              <h4 className="text-xs font-semibold text-gray-900 uppercase tracking-wide mb-3">Recipients</h4>
+              <div className="space-y-2">
+                {selectedSchedule.recipients.map((recipient) => (
+                  <div key={recipient.id} className="flex items-center gap-2 p-2 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors">
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${recipient.type === 'email' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}`}>
+                      {recipient.type === 'email' ? '📧' : '📱'}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[10px] font-medium text-gray-500 uppercase">{recipient.type}</p>
+                      <p className="text-xs font-medium text-gray-900 truncate">{recipient.value}</p>
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
 
+            {/* Execution History Tile */}
             {selectedSchedule.logs && selectedSchedule.logs.length > 0 && (
-              <div>
-                <h4 className="font-semibold text-gray-800 mb-2">Execution History</h4>
+              <div className="bg-white border-2 border-gray-300 rounded-lg p-3 mb-4">
+                <h4 className="text-xs font-semibold text-gray-900 uppercase tracking-wide mb-3">Execution History</h4>
                 <div className="space-y-2">
                   {selectedSchedule.logs.map((log) => (
-                    <div key={log.id} className="p-3 border rounded-lg">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium ${getStatusColor(log.status)}`}>
+                    <div key={log.id} className="p-3 bg-gray-50 rounded-md border border-gray-200 hover:border-gray-300 transition-colors">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wide ${getStatusColor(log.status)}`}>
                             {getStatusIcon(log.status)}
                             {log.status}
                           </span>
-                          <span className="text-sm text-gray-600">
+                          <span className="text-xs text-gray-600">
                             {formatDate(log.started_at)}
                           </span>
                         </div>
                         {log.completed_at && (
-                          <span className="text-xs text-gray-500">
-                            Duration: {Math.round((log.completed_at - log.started_at) / 1000)}s
+                          <span className="text-[10px] font-medium text-gray-500 bg-white px-1.5 py-0.5 rounded whitespace-nowrap">
+                            ⏱ {Math.round((log.completed_at - log.started_at) / 1000)}s
                           </span>
                         )}
                       </div>
                       {log.status === 'success' && (
-                        <div className="mt-2 text-sm text-gray-600">
-                          Sent {log.entry_count} entries to {log.recipients_sent} recipients
+                        <div className="flex items-center gap-3 text-xs text-gray-700">
+                          <span>📄 {log.entry_count}</span>
+                          <span>📧 {log.recipients_sent}</span>
                         </div>
                       )}
                       {log.error_message && (
-                        <div className="mt-2 text-sm text-red-600">
-                          Error: {log.error_message}
+                        <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-md">
+                          <p className="text-xs text-red-700 font-medium">⚠️ {log.error_message}</p>
                         </div>
                       )}
                     </div>
@@ -1042,37 +1101,40 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
               </div>
             )}
 
-            <div className="flex gap-2 pt-4 border-t">
-              {!selectedSchedule.executed && (
-                <>
-                  <button
-                    onClick={() => executeSchedule(selectedSchedule.id)}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-                    disabled={isLoading}
-                  >
-                    <PlayIcon width={18} />
-                    Execute Now
-                  </button>
-                  {selectedSchedule.original_duration_ms && (
+            {/* Action Buttons */}
+            <div className="sticky bottom-0 bg-white pt-3 pb-2 border-t-2 border-gray-300">
+              <div className="flex gap-2">
+                {!selectedSchedule.executed && (
+                  <>
                     <button
-                      onClick={() => resetTimer(selectedSchedule.id, selectedSchedule.original_duration_ms!)}
-                      className="flex items-center justify-center gap-2 px-4 py-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                      onClick={() => executeSchedule(selectedSchedule.id)}
+                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all shadow-sm hover:shadow-md text-sm font-medium"
                       disabled={isLoading}
-                      title={`Reset timer to ${formatDuration(selectedSchedule.original_duration_ms)}`}
                     >
-                      <ArrowUturnLeftIcon width={18} />
-                      Reset Timer
+                      <PlayIcon width={16} />
+                      Execute Now
                     </button>
-                  )}
-                </>
-              )}
-              <button
-                onClick={() => deleteSchedule(selectedSchedule.id)}
-                className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                disabled={isLoading}
-              >
-                <TrashIcon width={20} />
-              </button>
+                    {selectedSchedule.original_duration_ms && (
+                      <button
+                        onClick={() => resetTimer(selectedSchedule.id, selectedSchedule.original_duration_ms!)}
+                        className="flex items-center justify-center gap-2 px-3 py-2 text-purple-600 bg-purple-50 hover:bg-purple-100 rounded-lg transition-all shadow-sm hover:shadow-md text-sm font-medium"
+                        disabled={isLoading}
+                        title={`Reset timer to ${formatDuration(selectedSchedule.original_duration_ms)}`}
+                      >
+                        <ArrowUturnLeftIcon width={16} />
+                        Reset
+                      </button>
+                    )}
+                  </>
+                )}
+                <button
+                  onClick={() => deleteSchedule(selectedSchedule.id)}
+                  className="px-3 py-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-all shadow-sm hover:shadow-md text-sm font-medium"
+                  disabled={isLoading}
+                >
+                  <TrashIcon width={16} />
+                </button>
+              </div>
             </div>
           </div>
         )}
