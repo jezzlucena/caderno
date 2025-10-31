@@ -8,22 +8,25 @@ import {
   Cog6ToothIcon,
   CheckCircleIcon,
   ExclamationCircleIcon,
-  ArrowPathIcon
+  ArrowPathIcon,
+  PencilIcon,
+  ArrowUturnLeftIcon
 } from '@heroicons/react/24/outline';
 import { useJournalStore, useSettingsStore } from '../store/useStore';
 
 interface Schedule {
   id: string;
   name: string;
-  cron_expression: string;
-  enabled: boolean;
+  execution_time: number;
+  executed: boolean;
+  original_duration_ms?: number;
   entry_selection_type: 'all' | 'specific' | 'date_range';
   entry_ids?: string[];
   date_range_start?: number;
   date_range_end?: number;
   recipients: Recipient[];
-  last_run?: number;
-  next_run?: number;
+  executed_at?: number;
+  entry_count?: number;
   logs?: ExecutionLog[];
 }
 
@@ -52,7 +55,8 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
   const { entries } = useJournalStore();
   const { scheduledExports } = useSettingsStore();
   const [isClosing, setIsClosing] = useState(false);
-  const [view, setView] = useState<'instructional' | 'list' | 'create' | 'detail'>('instructional');
+  const [view, setView] = useState<'instructional' | 'list' | 'create' | 'edit' | 'detail'>('instructional');
+  const [editingScheduleId, setEditingScheduleId] = useState<string | null>(null);
   
   // Server configuration from settings
   const serverUrl = scheduledExports.serverUrl;
@@ -64,13 +68,19 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [countdownTrigger, setCountdownTrigger] = useState(0); // Used to trigger countdown re-renders
   
   // Ref for modal container to enable auto-scroll to messages
   const modalRef = useRef<HTMLDivElement>(null);
   
   // Create schedule form
   const [scheduleName, setScheduleName] = useState('');
-  const [cronExpression, setCronExpression] = useState('0 9 * * 1');
+  const [durationYears, setDurationYears] = useState(0);
+  const [durationMonths, setDurationMonths] = useState(0);
+  const [durationWeeks, setDurationWeeks] = useState(0);
+  const [durationDays, setDurationDays] = useState(0);
+  const [durationHours, setDurationHours] = useState(0);
+  const [durationMinutes, setDurationMinutes] = useState(1);
   const [selectionType, setSelectionType] = useState<'all' | 'specific' | 'date_range'>('all');
   const [dateRangeStart, setDateRangeStart] = useState('');
   const [dateRangeEnd, setDateRangeEnd] = useState('');
@@ -105,6 +115,36 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
       modalRef.current.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }, [error, successMessage]);
+
+  // Update countdown every second
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCountdownTrigger(prev => prev + 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Sync with server every 30 seconds
+  useEffect(() => {
+    if (view === 'list' && serverUrl && apiKey) {
+      const syncInterval = setInterval(() => {
+        // Silent reload without showing loading state
+        fetch(`${serverUrl}/api/schedules`, {
+          headers: { 'X-API-Key': apiKey }
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              setSchedules(data.data || []);
+            }
+          })
+          .catch(err => console.error('Background sync failed:', err));
+      }, 30000); // 30 seconds
+
+      return () => clearInterval(syncInterval);
+    }
+  }, [view, serverUrl, apiKey]);
 
   const testConnection = async () => {
     try {
@@ -154,6 +194,23 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
     }
   };
 
+  const countEntries = (selectionType: 'all' | 'specific' | 'date_range', dateStart?: string, dateEnd?: string) => {
+    if (selectionType === 'all') {
+      return entries.length;
+    }
+    
+    if (selectionType === 'date_range' && dateStart && dateEnd) {
+      const startTimestamp = new Date(dateStart).getTime();
+      const endTimestamp = new Date(dateEnd).getTime();
+      return entries.filter(entry => {
+        const entryTime = entry.createdAt;
+        return entryTime >= startTimestamp && entryTime <= endTimestamp;
+      }).length;
+    }
+    
+    return 0;
+  };
+
   const loadScheduleDetails = async (scheduleId: string) => {
     setIsLoading(true);
     setError(null);
@@ -193,9 +250,36 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
       return;
     }
 
+    // Check that at least one duration field is set
+    const totalDuration = durationYears + durationMonths + durationWeeks + durationDays + durationHours + durationMinutes;
+    if (totalDuration === 0) {
+      setError('Please set at least one duration field greater than 0');
+      return;
+    }
+
     const validRecipients = recipients.filter(r => r.value.trim());
     if (validRecipients.length === 0) {
       setError('At least one recipient is required');
+      return;
+    }
+
+    // Calculate execution time from duration
+    const now = Date.now();
+    const originalDurationMs = 
+      (durationYears * 365 * 24 * 60 * 60 * 1000) +
+      (durationMonths * 30 * 24 * 60 * 60 * 1000) +
+      (durationWeeks * 7 * 24 * 60 * 60 * 1000) +
+      (durationDays * 24 * 60 * 60 * 1000) +
+      (durationHours * 60 * 60 * 1000) +
+      (durationMinutes * 60 * 1000);
+    
+    const executionTime = now + originalDurationMs;
+
+    // Calculate entry count
+    const entryCount = countEntries(selectionType, dateRangeStart, dateRangeEnd);
+    
+    if (entryCount === 0) {
+      setError('No entries match the selection criteria. Please adjust your selection.');
       return;
     }
 
@@ -205,10 +289,12 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
     try {
       const scheduleData = {
         name: scheduleName,
-        cron_expression: cronExpression,
+        execution_time: executionTime,
+        original_duration_ms: originalDurationMs,
         entry_selection_type: selectionType,
         date_range_start: selectionType === 'date_range' && dateRangeStart ? new Date(dateRangeStart).getTime() : undefined,
         date_range_end: selectionType === 'date_range' && dateRangeEnd ? new Date(dateRangeEnd).getTime() : undefined,
+        entry_count: entryCount,
         recipients: validRecipients,
         entries_data: entries,
         passphrase: passphrase
@@ -226,7 +312,7 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
       const data = await response.json();
 
       if (response.ok && data.success) {
-        setSuccessMessage('Schedule created successfully!');
+        setSuccessMessage(`Schedule created successfully! ${entryCount} ${entryCount === 1 ? 'entry' : 'entries'} will be included in this export.`);
         await loadSchedules();
         resetForm();
       } else {
@@ -235,6 +321,96 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
     } catch (error) {
       console.error('Failed to create schedule:', error);
       setError('Network error. Failed to create schedule.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const updateSchedule = async () => {
+    if (!editingScheduleId) return;
+    
+    if (!scheduleName.trim()) {
+      setError('Schedule name is required');
+      return;
+    }
+
+    if (!passphrase.trim()) {
+      setError('Encryption passphrase is required');
+      return;
+    }
+
+    // Check that at least one duration field is set
+    const totalDuration = durationYears + durationMonths + durationWeeks + durationDays + durationHours + durationMinutes;
+    if (totalDuration === 0) {
+      setError('Please set at least one duration field greater than 0');
+      return;
+    }
+
+    const validRecipients = recipients.filter(r => r.value.trim());
+    if (validRecipients.length === 0) {
+      setError('At least one recipient is required');
+      return;
+    }
+
+    // Calculate execution time from duration
+    const now = Date.now();
+    const originalDurationMs = 
+      (durationYears * 365 * 24 * 60 * 60 * 1000) +
+      (durationMonths * 30 * 24 * 60 * 60 * 1000) +
+      (durationWeeks * 7 * 24 * 60 * 60 * 1000) +
+      (durationDays * 24 * 60 * 60 * 1000) +
+      (durationHours * 60 * 60 * 1000) +
+      (durationMinutes * 60 * 1000);
+    
+    const executionTime = now + originalDurationMs;
+
+    // Calculate entry count
+    const entryCount = countEntries(selectionType, dateRangeStart, dateRangeEnd);
+    
+    if (entryCount === 0) {
+      setError('No entries match the selection criteria. Please adjust your selection.');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const scheduleData = {
+        name: scheduleName,
+        execution_time: executionTime,
+        original_duration_ms: originalDurationMs,
+        entry_selection_type: selectionType,
+        date_range_start: selectionType === 'date_range' && dateRangeStart ? new Date(dateRangeStart).getTime() : undefined,
+        date_range_end: selectionType === 'date_range' && dateRangeEnd ? new Date(dateRangeEnd).getTime() : undefined,
+        entry_count: entryCount,
+        recipients: validRecipients,
+        entries_data: entries,
+        passphrase: passphrase
+      };
+
+      const response = await fetch(`${serverUrl}/api/schedules/${editingScheduleId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-Key': apiKey
+        },
+        body: JSON.stringify(scheduleData)
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setSuccessMessage(`Schedule updated successfully! ${entryCount} ${entryCount === 1 ? 'entry' : 'entries'} will be included in this export.`);
+        await loadSchedules();
+        resetForm();
+        setEditingScheduleId(null);
+      } else {
+        setError(data.error || 'Failed to update schedule');
+      }
+    } catch (error) {
+      console.error('Failed to update schedule:', error);
+      setError('Network error. Failed to update schedule.');
     } finally {
       setIsLoading(false);
     }
@@ -301,39 +477,15 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
     }
   };
 
-  const toggleScheduleEnabled = async (id: string, enabled: boolean) => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch(`${serverUrl}/api/schedules/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-Key': apiKey
-        },
-        body: JSON.stringify({ enabled })
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        setSuccessMessage(`Schedule ${enabled ? 'enabled' : 'disabled'} successfully`);
-        await loadSchedules();
-      } else {
-        setError(data.error || 'Failed to update schedule');
-      }
-    } catch (error) {
-      console.error('Failed to update schedule:', error);
-      setError('Network error. Failed to update schedule.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const resetForm = () => {
     setScheduleName('');
-    setCronExpression('0 9 * * 1');
+    setDurationYears(0);
+    setDurationMonths(0);
+    setDurationWeeks(0);
+    setDurationDays(0);
+    setDurationHours(0);
+    setDurationMinutes(1);
     setSelectionType('all');
     setDateRangeStart('');
     setDateRangeEnd('');
@@ -347,18 +499,134 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
     setTimeout(onClose, 300);
   };
 
-  const formatCronExpression = (cron: string) => {
-    const presets: Record<string, string> = {
-      '0 9 * * 1': 'Every Monday at 9 AM',
-      '0 0 1 * *': 'First day of each month',
-      '0 12 * * *': 'Every day at noon',
-      '0 */6 * * *': 'Every 6 hours'
-    };
-    return presets[cron] || cron;
+  const formatCountdown = (executionTime: number) => {
+    // Force re-render every second by referencing countdownTrigger
+    void countdownTrigger;
+    const now = Date.now();
+    const diff = executionTime - now;
+    
+    if (diff < 0) {
+      return 'Execution time passed';
+    }
+    
+    // Calculate time units
+    let remainingMs = diff;
+    
+    const years = Math.floor(remainingMs / (365 * 24 * 60 * 60 * 1000));
+    remainingMs -= years * 365 * 24 * 60 * 60 * 1000;
+    
+    const months = Math.floor(remainingMs / (30 * 24 * 60 * 60 * 1000));
+    remainingMs -= months * 30 * 24 * 60 * 60 * 1000;
+    
+    const days = Math.floor(remainingMs / (24 * 60 * 60 * 1000));
+    remainingMs -= days * 24 * 60 * 60 * 1000;
+    
+    const hours = Math.floor(remainingMs / (60 * 60 * 1000));
+    remainingMs -= hours * 60 * 60 * 1000;
+    
+    const minutes = Math.floor(remainingMs / (60 * 1000));
+    remainingMs -= minutes * 60 * 1000;
+    
+    const seconds = Math.floor(remainingMs / 1000);
+    
+    // Build countdown string
+    const parts = [];
+    
+    if (years > 0) {
+      parts.push(`${years} yr${years !== 1 ? 's' : ''}`);
+    }
+    if (months > 0) {
+      parts.push(`${months} mo`);
+    }
+    if (days > 0) {
+      parts.push(`${days} day${days !== 1 ? 's' : ''}`);
+    }
+    
+    // Always show hours:minutes:seconds if there are no years/months/days, or if we're close
+    const timeString = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    
+    if (parts.length > 0) {
+      parts.push(timeString);
+      return parts.join(', ');
+    } else {
+      return timeString;
+    }
   };
 
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleString();
+  };
+
+  const isUrgent = (executionTime: number) => {
+    const now = Date.now();
+    const diff = executionTime - now;
+    return diff > 0 && diff < 60000; // Less than 60 seconds
+  };
+
+  const formatDuration = (durationMs: number) => {
+    let remaining = durationMs;
+    
+    const years = Math.floor(remaining / (365 * 24 * 60 * 60 * 1000));
+    remaining -= years * 365 * 24 * 60 * 60 * 1000;
+    
+    const months = Math.floor(remaining / (30 * 24 * 60 * 60 * 1000));
+    remaining -= months * 30 * 24 * 60 * 60 * 1000;
+    
+    const weeks = Math.floor(remaining / (7 * 24 * 60 * 60 * 1000));
+    remaining -= weeks * 7 * 24 * 60 * 60 * 1000;
+    
+    const days = Math.floor(remaining / (24 * 60 * 60 * 1000));
+    remaining -= days * 24 * 60 * 60 * 1000;
+    
+    const hours = Math.floor(remaining / (60 * 60 * 1000));
+    remaining -= hours * 60 * 60 * 1000;
+    
+    const minutes = Math.floor(remaining / (60 * 1000));
+    
+    const parts = [];
+    if (years > 0) parts.push(`${years} yr${years !== 1 ? 's' : ''}`);
+    if (months > 0) parts.push(`${months} mo`);
+    if (weeks > 0) parts.push(`${weeks} wk${weeks !== 1 ? 's' : ''}`);
+    if (days > 0) parts.push(`${days} day${days !== 1 ? 's' : ''}`);
+    if (hours > 0) parts.push(`${hours} hr${hours !== 1 ? 's' : ''}`);
+    if (minutes > 0) parts.push(`${minutes} min`);
+    
+    return parts.length > 0 ? parts.join(', ') : '0 min';
+  };
+
+  const resetTimer = async (scheduleId: string, originalDurationMs: number) => {
+    if (!confirm('Reset this schedule\'s timer to the original duration?')) return;
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const now = Date.now();
+      const newExecutionTime = now + originalDurationMs;
+
+      const response = await fetch(`${serverUrl}/api/schedules/${scheduleId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-Key': apiKey
+        },
+        body: JSON.stringify({ execution_time: newExecutionTime })
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setSuccessMessage('Timer reset successfully!');
+        await loadSchedules();
+      } else {
+        setError(data.error || 'Failed to reset timer');
+      }
+    } catch (error) {
+      console.error('Failed to reset timer:', error);
+      setError('Network error. Failed to reset timer.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -388,19 +656,30 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
   };
 
   return (
-    <div
-      className={`fixed inset-0 bg-black/30 flex items-center justify-center p-4 z-50 ${
-        isClosing ? 'animate-fadeOut' : 'animate-fadeIn'
-      }`}
-      onClick={handleClose}
-    >
+    <>
+      <style>{`
+        @keyframes flashRed {
+          0% { color: #000000; }
+          5% { color: #dc2626; }
+          100% { color: #000000; }
+        }
+        .urgent-countdown {
+          animation: flashRed 1s ease-in-out infinite;
+        }
+      `}</style>
       <div
-        ref={modalRef}
-        className={`bg-white rounded-xl shadow-2xl p-6 w-full max-w-4xl max-h-[90vh] flex flex-col ${
-          isClosing ? 'animate-slideDown' : 'animate-slideUp'
+        className={`fixed inset-0 bg-black/30 flex items-center justify-center p-4 z-50 ${
+          isClosing ? 'animate-fadeOut' : 'animate-fadeIn'
         }`}
-        onClick={(e) => e.stopPropagation()}
+        onClick={handleClose}
       >
+        <div
+          ref={modalRef}
+          className={`bg-white rounded-xl shadow-2xl p-6 w-full max-w-4xl max-h-[90vh] flex flex-col ${
+            isClosing ? 'animate-slideDown' : 'animate-slideUp'
+          }`}
+          onClick={(e) => e.stopPropagation()}
+        >
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-bold text-gray-800">
             <ClockIcon className="inline-block w-6 h-6 mr-2" />
@@ -564,36 +843,86 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <h3 className="font-semibold text-gray-800">{schedule.name}</h3>
-                          <span className={`px-2 py-0.5 text-xs rounded-full ${schedule.enabled ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
-                            {schedule.enabled ? 'Active' : 'Disabled'}
+                          <span className={`px-2 py-0.5 text-xs rounded-full ${schedule.executed ? 'bg-gray-100 text-gray-600' : 'bg-green-100 text-green-700'}`}>
+                            {schedule.executed ? 'Executed' : 'Pending'}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-600 mt-1">
-                          {formatCronExpression(schedule.cron_expression)}
+                        <p className={`text-sm text-gray-600 mt-1 font-mono ${!schedule.executed && isUrgent(schedule.execution_time) ? 'urgent-countdown' : ''}`}>
+                          {schedule.executed ? `Executed on ${formatDate(schedule.execution_time)}` : formatCountdown(schedule.execution_time)}
                         </p>
                         <div className="flex gap-4 text-xs text-gray-500 mt-2">
                           <span>📧 {schedule.recipients.length} recipient{schedule.recipients.length !== 1 ? 's' : ''}</span>
-                          <span>📝 {schedule.entry_selection_type}</span>
-                          {schedule.last_run && <span>Last run: {formatDate(schedule.last_run)}</span>}
+                          <span>📄 {schedule.entry_count || 0} {schedule.entry_count === 1 ? 'entry' : 'entries'}</span>
+                          {schedule.original_duration_ms && <span>⏱️ Original: {formatDuration(schedule.original_duration_ms)}</span>}
+                          {schedule.executed_at && <span>Executed: {formatDate(schedule.executed_at)}</span>}
                         </div>
                       </div>
                       <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
-                        <button
-                          onClick={() => toggleScheduleEnabled(schedule.id, !schedule.enabled)}
-                          className={`p-2 rounded transition-colors ${schedule.enabled ? 'text-gray-600 hover:bg-gray-100' : 'text-green-600 hover:bg-green-50'}`}
-                          title={schedule.enabled ? 'Disable' : 'Enable'}
-                          disabled={isLoading}
-                        >
-                          <ClockIcon width={18} />
-                        </button>
-                        <button
-                          onClick={() => executeSchedule(schedule.id)}
-                          className="p-2 text-indigo-600 hover:bg-indigo-50 rounded transition-colors"
-                          title="Run now"
-                          disabled={isLoading}
-                        >
-                          <PlayIcon width={18} />
-                        </button>
+                        {!schedule.executed && (
+                          <>
+                            <button
+                              onClick={() => {
+                                setEditingScheduleId(schedule.id);
+                                // Pre-fill form with schedule data
+                                setScheduleName(schedule.name);
+                                setSelectionType(schedule.entry_selection_type);
+                                if (schedule.date_range_start) setDateRangeStart(new Date(schedule.date_range_start).toISOString().split('T')[0]);
+                                if (schedule.date_range_end) setDateRangeEnd(new Date(schedule.date_range_end).toISOString().split('T')[0]);
+                                setRecipients(schedule.recipients.map(r => ({ type: r.type, value: r.value })));
+                                
+                                // Calculate duration from execution time
+                                const now = Date.now();
+                                const diff = schedule.execution_time - now;
+                                if (diff > 0) {
+                                  let remainingMs = diff;
+                                  const years = Math.floor(remainingMs / (365 * 24 * 60 * 60 * 1000));
+                                  remainingMs -= years * 365 * 24 * 60 * 60 * 1000;
+                                  const months = Math.floor(remainingMs / (30 * 24 * 60 * 60 * 1000));
+                                  remainingMs -= months * 30 * 24 * 60 * 60 * 1000;
+                                  const weeks = Math.floor(remainingMs / (7 * 24 * 60 * 60 * 1000));
+                                  remainingMs -= weeks * 7 * 24 * 60 * 60 * 1000;
+                                  const days = Math.floor(remainingMs / (24 * 60 * 60 * 1000));
+                                  remainingMs -= days * 24 * 60 * 60 * 1000;
+                                  const hours = Math.floor(remainingMs / (60 * 60 * 1000));
+                                  remainingMs -= hours * 60 * 60 * 1000;
+                                  const minutes = Math.floor(remainingMs / (60 * 1000));
+                                  
+                                  setDurationYears(years);
+                                  setDurationMonths(months);
+                                  setDurationWeeks(weeks);
+                                  setDurationDays(days);
+                                  setDurationHours(hours);
+                                  setDurationMinutes(Math.max(1, minutes));
+                                }
+                                
+                                setView('edit');
+                              }}
+                              className="p-2 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                              title="Edit"
+                              disabled={isLoading}
+                            >
+                              <PencilIcon width={18} />
+                            </button>
+                            {schedule.original_duration_ms && (
+                              <button
+                                onClick={() => resetTimer(schedule.id, schedule.original_duration_ms!)}
+                                className="p-2 text-purple-600 hover:bg-purple-50 rounded transition-colors"
+                                title={`Reset timer to ${formatDuration(schedule.original_duration_ms)}`}
+                                disabled={isLoading}
+                              >
+                                <ArrowUturnLeftIcon width={18} />
+                              </button>
+                            )}
+                            <button
+                              onClick={() => executeSchedule(schedule.id)}
+                              className="p-2 text-indigo-600 hover:bg-indigo-50 rounded transition-colors"
+                              title="Run now"
+                              disabled={isLoading}
+                            >
+                              <PlayIcon width={18} />
+                            </button>
+                          </>
+                        )}
                         <button
                           onClick={() => deleteSchedule(schedule.id)}
                           className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
@@ -624,12 +953,12 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-xl font-bold text-gray-800">{selectedSchedule.name}</h3>
-                  <p className="text-sm text-gray-600 mt-1">
-                    {formatCronExpression(selectedSchedule.cron_expression)}
+                  <p className={`text-sm text-gray-600 mt-1 font-mono ${!selectedSchedule.executed && isUrgent(selectedSchedule.execution_time) ? 'urgent-countdown' : ''}`}>
+                    {selectedSchedule.executed ? `Executed on ${formatDate(selectedSchedule.execution_time)}` : formatCountdown(selectedSchedule.execution_time)}
                   </p>
                 </div>
-                <span className={`px-3 py-1 text-sm rounded-full ${selectedSchedule.enabled ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
-                  {selectedSchedule.enabled ? 'Active' : 'Disabled'}
+                <span className={`px-3 py-1 text-sm rounded-full ${selectedSchedule.executed ? 'bg-gray-100 text-gray-600' : 'bg-green-100 text-green-700'}`}>
+                  {selectedSchedule.executed ? 'Executed' : 'Pending'}
                 </span>
               </div>
             </div>
@@ -643,16 +972,20 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
                 <p className="text-sm font-medium text-gray-600">Recipients</p>
                 <p className="text-gray-800">{selectedSchedule.recipients.length} configured</p>
               </div>
-              {selectedSchedule.last_run && (
+              <div>
+                <p className="text-sm font-medium text-gray-600">Scheduled For</p>
+                <p className="text-gray-800">{formatDate(selectedSchedule.execution_time)}</p>
+              </div>
+              {selectedSchedule.original_duration_ms && (
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Last Run</p>
-                  <p className="text-gray-800">{formatDate(selectedSchedule.last_run)}</p>
+                  <p className="text-sm font-medium text-gray-600">Original Duration</p>
+                  <p className="text-gray-800">{formatDuration(selectedSchedule.original_duration_ms)}</p>
                 </div>
               )}
-              {selectedSchedule.next_run && (
+              {selectedSchedule.executed_at && (
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Next Run</p>
-                  <p className="text-gray-800">{formatDate(selectedSchedule.next_run)}</p>
+                  <p className="text-sm font-medium text-gray-600">Executed At</p>
+                  <p className="text-gray-800">{formatDate(selectedSchedule.executed_at)}</p>
                 </div>
               )}
             </div>
@@ -710,21 +1043,29 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
             )}
 
             <div className="flex gap-2 pt-4 border-t">
-              <button
-                onClick={() => executeSchedule(selectedSchedule.id)}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-                disabled={isLoading}
-              >
-                <PlayIcon width={18} />
-                Execute Now
-              </button>
-              <button
-                onClick={() => toggleScheduleEnabled(selectedSchedule.id, !selectedSchedule.enabled)}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                disabled={isLoading}
-              >
-                {selectedSchedule.enabled ? 'Disable' : 'Enable'}
-              </button>
+              {!selectedSchedule.executed && (
+                <>
+                  <button
+                    onClick={() => executeSchedule(selectedSchedule.id)}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                    disabled={isLoading}
+                  >
+                    <PlayIcon width={18} />
+                    Execute Now
+                  </button>
+                  {selectedSchedule.original_duration_ms && (
+                    <button
+                      onClick={() => resetTimer(selectedSchedule.id, selectedSchedule.original_duration_ms!)}
+                      className="flex items-center justify-center gap-2 px-4 py-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                      disabled={isLoading}
+                      title={`Reset timer to ${formatDuration(selectedSchedule.original_duration_ms)}`}
+                    >
+                      <ArrowUturnLeftIcon width={18} />
+                      Reset Timer
+                    </button>
+                  )}
+                </>
+              )}
               <button
                 onClick={() => deleteSchedule(selectedSchedule.id)}
                 className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
@@ -759,19 +1100,80 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Frequency
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                When should this export run?
               </label>
-              <select
-                value={cronExpression}
-                onChange={(e) => setCronExpression(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              >
-                <option value="0 9 * * 1">Every Monday at 9 AM</option>
-                <option value="0 0 1 * *">First day of each month</option>
-                <option value="0 12 * * *">Every day at noon</option>
-                <option value="0 */6 * * *">Every 6 hours</option>
-              </select>
+              <p className="text-xs text-gray-500 mb-3">
+                Set a duration from now when the export will be executed once
+              </p>
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Years (0-100)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={durationYears}
+                    onChange={(e) => setDurationYears(Math.max(0, Math.min(100, parseInt(e.target.value) || 0)))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Months (0-12)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="12"
+                    value={durationMonths}
+                    onChange={(e) => setDurationMonths(Math.max(0, Math.min(12, parseInt(e.target.value) || 0)))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Weeks (0-4)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="4"
+                    value={durationWeeks}
+                    onChange={(e) => setDurationWeeks(Math.max(0, Math.min(4, parseInt(e.target.value) || 0)))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Days (0-7)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="7"
+                    value={durationDays}
+                    onChange={(e) => setDurationDays(Math.max(0, Math.min(7, parseInt(e.target.value) || 0)))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Hours (0-23)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="23"
+                    value={durationHours}
+                    onChange={(e) => setDurationHours(Math.max(0, Math.min(23, parseInt(e.target.value) || 0)))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Minutes (1-59)</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="59"
+                    value={durationMinutes}
+                    onChange={(e) => setDurationMinutes(Math.max(1, Math.min(59, parseInt(e.target.value) || 1)))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
             </div>
 
             <div>
@@ -888,7 +1290,232 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
             </button>
           </div>
         )}
+
+        {view === 'edit' && (
+          <div className="flex-1 overflow-y-auto space-y-4">
+            <button
+              onClick={() => {
+                resetForm();
+                setEditingScheduleId(null);
+                setView('list');
+              }}
+              className="text-indigo-600 hover:text-indigo-700 text-sm flex items-center gap-1"
+            >
+              ← Back to list
+            </button>
+
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+              <p className="text-sm text-blue-800">
+                <strong>Editing schedule:</strong> Make your changes below and click "Update Schedule" to save.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Schedule Name
+              </label>
+              <input
+                type="text"
+                value={scheduleName}
+                onChange={(e) => setScheduleName(e.target.value)}
+                placeholder="Weekly Export"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                When should this export run?
+              </label>
+              <p className="text-xs text-gray-500 mb-3">
+                Set a duration from now when the export will be executed once
+              </p>
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Years (0-100)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={durationYears}
+                    onChange={(e) => setDurationYears(Math.max(0, Math.min(100, parseInt(e.target.value) || 0)))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Months (0-12)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="12"
+                    value={durationMonths}
+                    onChange={(e) => setDurationMonths(Math.max(0, Math.min(12, parseInt(e.target.value) || 0)))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Weeks (0-4)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="4"
+                    value={durationWeeks}
+                    onChange={(e) => setDurationWeeks(Math.max(0, Math.min(4, parseInt(e.target.value) || 0)))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Days (0-7)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="7"
+                    value={durationDays}
+                    onChange={(e) => setDurationDays(Math.max(0, Math.min(7, parseInt(e.target.value) || 0)))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Hours (0-23)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="23"
+                    value={durationHours}
+                    onChange={(e) => setDurationHours(Math.max(0, Math.min(23, parseInt(e.target.value) || 0)))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Minutes (1-59)</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="59"
+                    value={durationMinutes}
+                    onChange={(e) => setDurationMinutes(Math.max(1, Math.min(59, parseInt(e.target.value) || 1)))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Entry Selection
+              </label>
+              <select
+                value={selectionType}
+                onChange={(e) => setSelectionType(e.target.value as 'all' | 'specific' | 'date_range')}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              >
+                <option value="all">All entries</option>
+                <option value="date_range">Date range</option>
+              </select>
+            </div>
+
+            {selectionType === 'date_range' && (
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Start Date
+                  </label>
+                  <input
+                    type="date"
+                    value={dateRangeStart}
+                    onChange={(e) => setDateRangeStart(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    End Date
+                  </label>
+                  <input
+                    type="date"
+                    value={dateRangeEnd}
+                    onChange={(e) => setDateRangeEnd(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+            )}
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Encryption Passphrase
+              </label>
+              <input
+                type="password"
+                value={passphrase}
+                onChange={(e) => setPassphrase(e.target.value)}
+                placeholder="Enter a secure passphrase"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Changing the passphrase will re-encrypt your journal entries with the new passphrase.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Recipients
+              </label>
+              {recipients.map((recipient, index) => (
+                <div key={index} className="flex gap-2 mb-2">
+                  <select
+                    value={recipient.type}
+                    onChange={(e) => {
+                      const newRecipients = [...recipients];
+                      newRecipients[index].type = e.target.value as 'email' | 'sms';
+                      setRecipients(newRecipients);
+                    }}
+                    className="w-32 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  >
+                    <option value="email">Email</option>
+                    <option value="sms">SMS</option>
+                  </select>
+                  <input
+                    type={recipient.type === 'email' ? 'email' : 'tel'}
+                    value={recipient.value}
+                    onChange={(e) => {
+                      const newRecipients = [...recipients];
+                      newRecipients[index].value = e.target.value;
+                      setRecipients(newRecipients);
+                    }}
+                    placeholder={recipient.type === 'email' ? 'user@example.com' : '+1234567890'}
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  />
+                  {recipients.length > 1 && (
+                    <button
+                      onClick={() => setRecipients(recipients.filter((_, i) => i !== index))}
+                      className="px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    >
+                      <TrashIcon width={18} />
+                    </button>
+                  )}
+                </div>
+              ))}
+              <button
+                onClick={() => setRecipients([...recipients, { type: 'email', value: '' }])}
+                className="text-sm text-indigo-600 hover:text-indigo-700 flex items-center gap-1"
+              >
+                <PlusIcon width={16} />
+                Add recipient
+              </button>
+            </div>
+
+            <button
+              onClick={updateSchedule}
+              disabled={!scheduleName.trim() || recipients.filter(r => r.value.trim()).length === 0 || isLoading}
+              className="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isLoading ? 'Updating...' : 'Update Schedule'}
+            </button>
+          </div>
+        )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
