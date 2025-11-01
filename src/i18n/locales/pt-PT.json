@@ -113,7 +113,18 @@
     "saved": "Definições guardadas com sucesso!",
     "cancel": "Cancelar",
     "save": "Guardar",
-    "settings": "Definições"
+    "settings": "Definições",
+    "cloudSync": {
+      "title": "Sincronização na Nuvem (IPFS Blockchain)",
+      "description": "Sincronize as suas entradas do diário com armazenamento IPFS descentralizado com encriptação de nível militar. Os seus dados são armazenados em vários nós para máxima redundância.",
+      "passphrase": "Palavra-passe de Sincronização",
+      "passphrasePlaceholder": "Digite uma palavra-passe forte para encriptação",
+      "passphraseNote": "Esta palavra-passe encripta os seus dados antes do envio. Mantenha-a segura - precisará dela para desencriptar os seus dados!",
+      "autoSync": "Activar sincronização automática",
+      "autoSyncDescription": "Sincronizar automaticamente as suas entradas para IPFS após cada alteração",
+      "clearSettings": "Limpar definições de sincronização na nuvem",
+      "storageNote": "A sua palavra-passe é armazenada localmente e nunca enviada para os nossos servidores."
+    }
   },
   "autocomplete": {
     "loading": "A obter sugestões...",
@@ -122,6 +133,22 @@
     "pressEsc": "Pressione Esc para dispensar",
     "noApiKey": "Configure o autocompletar com IA nas Definições",
     "trigger": "Pressione Shift+Espaço para sugestões de IA"
+  },
+  "backup": {
+    "title": "Cópia de Segurança e Restauro",
+    "description": "Exporte o seu diário para um ficheiro ou importe de uma cópia de segurança anterior.",
+    "export": {
+      "title": "Exportar Cópia de Segurança",
+      "description": "Descarregue todas as suas entradas do diário para um ficheiro de cópia de segurança.",
+      "button": "Exportar Cópia de Segurança",
+      "success": "Cópia de segurança exportada com sucesso"
+    },
+    "import": {
+      "title": "Importar Cópia de Segurança",
+      "description": "Restaure as suas entradas do diário de um ficheiro de cópia de segurança.",
+      "button": "Importar Cópia de Segurança",
+      "success": "{{count}} entradas do diário importadas com sucesso"
+    }
   },
   "exportPDF": {
     "title": "Exportar para PDF",
@@ -132,5 +159,61 @@
     "exporting": "A exportar para PDF...",
     "pleaseWait": "Por favor, aguarde enquanto geramos o seu PDF",
     "error": "Falha ao exportar PDF. Por favor, tente novamente."
+  },
+  "cloudSync": {
+    "title": "Sincronização na Nuvem",
+    "description": "Sincronize as suas entradas do diário com armazenamento descentralizado (IPFS) com encriptação de ponta a ponta.",
+    "notConfigured": "A sincronização na nuvem não está configurada. Por favor, configure a sua chave de API Lighthouse e palavra-passe nas Definições primeiro.",
+    "lastSync": "Última sincronização: {{date}}",
+    "close": "Fechar",
+    "upload": {
+      "title": "Enviar para a Nuvem",
+      "description": "Enviar {{count}} entradas para armazenamento blockchain IPFS",
+      "button": "Enviar para IPFS",
+      "uploading": "A enviar para IPFS..."
+    },
+    "download": {
+      "title": "Descarregar da Nuvem",
+      "description": "Descarregue as suas entradas encriptadas do diário do IPFS.",
+      "button": "Descarregar do IPFS",
+      "downloading": "A descarregar do IPFS...",
+      "merge": "Mesclar com entradas existentes",
+      "mergeDescription": "Se desmarcado, as suas entradas actuais serão substituídas"
+    },
+    "success": {
+      "uploaded": "{{count}} entradas enviadas com sucesso! CID: {{cid}}",
+      "downloaded": "{{count}} entradas descarregadas com sucesso do IPFS!"
+    },
+    "errors": {
+      "noApiKey": "Por favor, configure a sua chave de API Lighthouse nas Definições primeiro.",
+      "noPassphrase": "Por favor, configure a sua palavra-passe de sincronização nas Definições primeiro.",
+      "noEntries": "Nenhuma entrada para enviar.",
+      "noCid": "Nenhuma cópia de segurança encontrada. Por favor, envie as suas entradas primeiro.",
+      "uploadFailed": "Falha no envio: {{error}}",
+      "downloadFailed": "Falha no descarregamento: {{error}}"
+    }
+  },
+  "scheduledExports": {
+    "title": "Exportações Agendadas",
+    "description": "Configurar servidor de exportações PDF automatizadas"
+  },
+  "about": {
+    "title": "Sobre o Caderno",
+    "tagline": "Diário com privacidade em primeiro lugar para contadores de verdades",
+    "tabs": {
+      "mission": "Missão",
+      "vision": "Visão",
+      "ethos": "Ética",
+      "privacy": "Privacidade",
+      "security": "Segurança",
+      "sustainability": "Sustentabilidade",
+      "techStack": "Tecnologias",
+      "downloads": "Transferências"
+    }
+  },
+  "auth": {
+    "signIn": "Iniciar Sessão",
+    "signOut": "Terminar Sessão",
+    "plan": "Plano"
   }
 }

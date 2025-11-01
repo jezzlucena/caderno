@@ -113,7 +113,18 @@
     "saved": "Configurações salvas com sucesso!",
     "cancel": "Cancelar",
     "save": "Salvar",
-    "settings": "Configurações"
+    "settings": "Configurações",
+    "cloudSync": {
+      "title": "Sincronização na Nuvem (IPFS Blockchain)",
+      "description": "Sincronize suas entradas do diário com armazenamento IPFS descentralizado com criptografia de nível militar. Seus dados são armazenados em vários nós para máxima redundância.",
+      "passphrase": "Senha de Sincronização",
+      "passphrasePlaceholder": "Digite uma senha forte para criptografia",
+      "passphraseNote": "Esta senha criptografa seus dados antes do upload. Mantenha-a segura - você precisará dela para descriptografar seus dados!",
+      "autoSync": "Ativar sincronização automática",
+      "autoSyncDescription": "Sincronizar automaticamente suas entradas para IPFS após cada alteração",
+      "clearSettings": "Limpar configurações de sincronização na nuvem",
+      "storageNote": "Sua senha é armazenada localmente e nunca enviada para nossos servidores."
+    }
   },
   "autocomplete": {
     "loading": "Obtendo sugestões...",
@@ -122,6 +133,22 @@
     "pressEsc": "Pressione Esc para dispensar",
     "noApiKey": "Configure o autocompletar com IA nas Configurações",
     "trigger": "Pressione Shift+Espaço para sugestões de IA"
+  },
+  "backup": {
+    "title": "Backup e Restauração",
+    "description": "Exporte seu diário para um arquivo ou importe de um backup anterior.",
+    "export": {
+      "title": "Exportar Backup",
+      "description": "Baixe todas as suas entradas do diário para um arquivo de backup seguro.",
+      "button": "Exportar Backup",
+      "success": "Backup exportado com sucesso"
+    },
+    "import": {
+      "title": "Importar Backup",
+      "description": "Restaure suas entradas do diário de um arquivo de backup.",
+      "button": "Importar Backup",
+      "success": "{{count}} entradas do diário importadas com sucesso"
+    }
   },
   "exportPDF": {
     "title": "Exportar para PDF",
@@ -132,5 +159,61 @@
     "exporting": "Exportando para PDF...",
     "pleaseWait": "Por favor, aguarde enquanto geramos seu PDF",
     "error": "Falha ao exportar PDF. Por favor, tente novamente."
+  },
+  "cloudSync": {
+    "title": "Sincronização na Nuvem",
+    "description": "Sincronize suas entradas do diário com armazenamento descentralizado (IPFS) com criptografia de ponta a ponta.",
+    "notConfigured": "A sincronização na nuvem não está configurada. Por favor, configure sua chave de API Lighthouse e senha nas Configurações primeiro.",
+    "lastSync": "Última sincronização: {{date}}",
+    "close": "Fechar",
+    "upload": {
+      "title": "Enviar para a Nuvem",
+      "description": "Enviar {{count}} entradas para armazenamento blockchain IPFS",
+      "button": "Enviar para IPFS",
+      "uploading": "Enviando para IPFS..."
+    },
+    "download": {
+      "title": "Baixar da Nuvem",
+      "description": "Baixe suas entradas criptografadas do diário do IPFS.",
+      "button": "Baixar do IPFS",
+      "downloading": "Baixando do IPFS...",
+      "merge": "Mesclar com entradas existentes",
+      "mergeDescription": "Se desmarcado, suas entradas atuais serão substituídas"
+    },
+    "success": {
+      "uploaded": "{{count}} entradas enviadas com sucesso! CID: {{cid}}",
+      "downloaded": "{{count}} entradas baixadas com sucesso do IPFS!"
+    },
+    "errors": {
+      "noApiKey": "Por favor, configure sua chave de API Lighthouse nas Configurações primeiro.",
+      "noPassphrase": "Por favor, configure sua senha de sincronização nas Configurações primeiro.",
+      "noEntries": "Nenhuma entrada para enviar.",
+      "noCid": "Nenhum backup encontrado. Por favor, envie suas entradas primeiro.",
+      "uploadFailed": "Falha no envio: {{error}}",
+      "downloadFailed": "Falha no download: {{error}}"
+    }
+  },
+  "scheduledExports": {
+    "title": "Exportações Agendadas",
+    "description": "Configurar servidor de exportações PDF automatizadas"
+  },
+  "about": {
+    "title": "Sobre o Caderno",
+    "tagline": "Diário com privacidade em primeiro lugar para contadores de verdades",
+    "tabs": {
+      "mission": "Missão",
+      "vision": "Visão",
+      "ethos": "Ética",
+      "privacy": "Privacidade",
+      "security": "Segurança",
+      "sustainability": "Sustentabilidade",
+      "techStack": "Tecnologias",
+      "downloads": "Downloads"
+    }
+  },
+  "auth": {
+    "signIn": "Entrar",
+    "signOut": "Sair",
+    "plan": "Plano"
   }
 }

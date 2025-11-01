@@ -117,20 +117,13 @@
     "cloudSync": {
       "title": "Cloud Sync (IPFS Blockchain)",
       "description": "Sync your journal entries to decentralized IPFS storage with military-grade encryption. Your data is stored across multiple nodes for maximum redundancy.",
-      "howToGetKey": "How to get your free Lighthouse API key:",
-      "step1": "Visit files.lighthouse.storage and sign in",
-      "step2": "Go to API Key section",
-      "step3": "Create a new API key and paste it below",
-      "getKeyLink": "Get your free Lighthouse API key",
-      "apiKey": "Lighthouse API Key",
-      "apiKeyPlaceholder": "Paste your Lighthouse API key here",
       "passphrase": "Sync Passphrase",
       "passphrasePlaceholder": "Enter a strong passphrase for encryption",
       "passphraseNote": "This passphrase encrypts your data before uploading. Keep it safe - you'll need it to decrypt your data!",
       "autoSync": "Enable automatic sync",
       "autoSyncDescription": "Automatically sync your entries to IPFS after every change",
       "clearSettings": "Clear cloud sync settings",
-      "storageNote": "Your API key and passphrase are stored locally and never sent to our servers."
+      "storageNote": "Your passphrase is stored locally and never sent to our servers."
     }
   },
   "autocomplete": {
@@ -140,6 +133,22 @@
     "pressEsc": "Press Esc to dismiss",
     "noApiKey": "Set up AI autocomplete in Settings",
     "trigger": "Press Shift+Space for AI suggestions"
+  },
+  "backup": {
+    "title": "Backup & Restore",
+    "description": "Export your journal to a file or import from a previous backup.",
+    "export": {
+      "title": "Export Backup",
+      "description": "Download all your journal entries to a secure backup file.",
+      "button": "Export Backup",
+      "success": "Backup exported successfully"
+    },
+    "import": {
+      "title": "Import Backup",
+      "description": "Restore your journal entries from a backup file.",
+      "button": "Import Backup",
+      "success": "Successfully imported {{count}} journal entries"
+    }
   },
   "exportPDF": {
     "title": "Export to PDF",
@@ -183,5 +192,169 @@
       "uploadFailed": "Upload failed: {{error}}",
       "downloadFailed": "Download failed: {{error}}"
     }
+  },
+  "scheduledExports": {
+    "title": "Scheduled Exports",
+    "description": "Configure automated PDF exports server"
+  },
+  "about": {
+    "title": "About Caderno",
+    "tagline": "Privacy-first journaling for truth tellers",
+    "tabs": {
+      "mission": "Mission",
+      "vision": "Vision",
+      "ethos": "Ethos",
+      "privacy": "Privacy",
+      "security": "Security",
+      "sustainability": "Sustainability",
+      "techStack": "Tech Stack",
+      "downloads": "Downloads"
+    },
+    "mission": {
+      "title": "Mission",
+      "description": "Caderno is a privacy-first, decentralized journaling platform dedicated to protecting personal truths and empowering those who speak truth to power.",
+      "corePurpose": "Core Purpose",
+      "corePurposeDesc": "Provide journalists, whistleblowers, survivors, and activists with a secure digital space to document experiences without fear of censorship or surveillance.",
+      "keyFeatures": "Key Features:",
+      "feature1": "Encrypted Storage: Journal entries in encrypted \"pantries\" on decentralized cloud you control",
+      "feature2": "Safety Mechanism: Optional timed alarm (dead man's switch) delivers entries to trusted contacts",
+      "feature3": "Federated Infrastructure: Self-hostable, putting control in the hands of the people",
+      "feature4": "Evidence Preservation: Safeguards protecting users from those who might silence them"
+    },
+    "vision": {
+      "title": "Vision",
+      "description": "A world where personal narratives and critical truths are preserved securely, transparently, and resiliently — beyond the reach of any authority.",
+      "sanctuary": "Ethical Sanctuary",
+      "sanctuaryDesc": "An ethical digital sanctuary fostering transparency and resilience against oppression.",
+      "empowerment": "Empowerment",
+      "empowermentDesc": "Empowered individuals speak truth to power, ensuring voices cannot be erased.",
+      "federation": "Federation",
+      "federationDesc": "User-operated servers worldwide form a censorship-resistant network.",
+      "standard": "New Standard",
+      "standardDesc": "Normalizing E2E encryption, decentralization, and user autonomy as defaults."
+    },
+    "ethos": {
+      "title": "Ethos",
+      "description": "Grounded in transparency, resilience, and empowerment, guided by privacy, security, and social accountability.",
+      "transparency": "Transparency",
+      "transparencyDesc": "Fully open-source with no hidden backdoors. Anyone can inspect and contribute to the code.",
+      "privacy": "Privacy",
+      "privacyDesc": "Built on E2E encryption. We don't collect or monetize personal data—period.",
+      "security": "Security & Resilience",
+      "securityDesc": "Decentralized architecture with no single point of failure. Robust against outages and censorship.",
+      "empowerment": "Empowerment & Advocacy",
+      "empowermentDesc": "Self-hosting capability returns power to the people. We stand with whistleblowers and activists.",
+      "accountability": "Accountability & Integrity",
+      "accountabilityDesc": "Create immutable records that serve as evidence, ensuring truth finds a way out."
+    },
+    "privacyTab": {
+      "title": "Privacy",
+      "description": "Privacy is paramount and the foundation of our platform.",
+      "e2ee": "End-to-End Encryption",
+      "e2eeDesc": "All entries are E2EE by default. Only you (and your intended recipients) can decrypt them—not us, not anyone.",
+      "federated": "Federated Storage",
+      "federatedDesc": "Choose your own server or a trusted host. No centralized data silos vulnerable to mass surveillance.",
+      "noTracking": "No Tracking",
+      "noTrackingDesc": "We don't track, profile, or monetize your data. No advertising, no data mining—your data serves only you.",
+      "userControl": "User Control",
+      "userControlDesc": "Export, delete, or manage your data anytime. Offline-first with optional sync. You're always in control."
+    },
+    "security": {
+      "title": "Cybersecurity",
+      "description": "Defense-in-depth strategy to protect high-risk users.",
+      "encryption": "State-of-the-Art Encryption",
+      "encryptionDesc": "AES-256, E2EE for journal content, TLS 1.3 for network. Data protected at rest and in transit.",
+      "federatedSecurity": "Federated Security",
+      "federatedSecurityDesc": "Each server operates independently. Breach of one doesn't affect others—no single honeypot.",
+      "userFeatures": "User Security Features",
+      "userFeaturesDesc": "Multi-factor authentication, app lock, panic mode, and anti-tampering detection.",
+      "auditing": "Security Auditing",
+      "auditingDesc": "Open-source for community review. Third-party audits. Responsible disclosure program.",
+      "deadManSwitch": "Dead Man's Switch",
+      "deadManSwitchDesc": "Encrypted package released to trusted contacts if user is unable to check in. Deters coercion.",
+      "improvement": "Continuous Improvement",
+      "improvementDesc": "Regular updates, incident response plans, and ongoing threat monitoring."
+    },
+    "sustainability": {
+      "title": "Sustainability",
+      "description": "Sustainable funding that aligns with our values—never compromising user trust.",
+      "saas": "Open-Source SaaS",
+      "saasDesc": "Optional managed hosting for users who prefer convenience. Software remains free and self-hostable.",
+      "enterprise": "Enterprise Support",
+      "enterpriseDesc": "Custom solutions, priority support, and consulting for organizations like NGOs and journalism outlets.",
+      "donations": "Donations & Sponsorships",
+      "donationsDesc": "Community funding through platforms like Open Collective. Grants from digital rights foundations.",
+      "never": "Never",
+      "neverDesc": "No advertisements. No data sales. No user analytics for profit. No paywalls that hinder basic access.",
+      "transparentFinance": "Transparent Finance:",
+      "transparentFinanceDesc": "Open accounting of how the project is funded. Profits reinvested into the mission."
+    },
+    "techStack": {
+      "title": "Tech Stack",
+      "description": "Modern, secure, and open-source technologies powering Caderno.",
+      "frontend": "Frontend",
+      "frontendItems": [
+        "React 18 with TypeScript",
+        "Vite for build tooling",
+        "TailwindCSS for styling",
+        "Zustand for state management",
+        "TipTap for rich text editing",
+        "i18next for internationalization"
+      ],
+      "storage": "Storage",
+      "storageItems": [
+        "IndexedDB (local-first)",
+        "LocalStorage for settings",
+        "No cookies, no tracking",
+        "Offline-capable by default"
+      ],
+      "backend": "Backend",
+      "backendItems": [
+        "Node.js with Express",
+        "SQLite for persistence",
+        "JWT authentication",
+        "RESTful API design",
+        "Puppeteer for PDF generation"
+      ],
+      "security": "Security",
+      "securityItems": [
+        "Web Crypto API for E2EE",
+        "AES-256-GCM encryption",
+        "PBKDF2 key derivation",
+        "TLS 1.3 for transport"
+      ],
+      "deployment": "Deployment",
+      "deploymentItems": [
+        "Federated, self-hostable",
+        "Progressive Web App (PWA)",
+        "Open source (MIT License)",
+        "Docker support for deployment",
+        "IPFS for decentralized storage"
+      ],
+      "aiIntegration": "AI Integration",
+      "aiIntegrationItems": [
+        "OpenAI / Anthropic API support",
+        "HuggingFace model integration",
+        "AI-powered autocomplete suggestions",
+        "Automatic entry summarization"
+      ]
+    },
+    "downloads": {
+      "title": "Download Mission & Vision Document",
+      "description": "Download the complete Caderno Mission and Vision Document in your preferred format:",
+      "markdown": "Markdown (.md)",
+      "markdownDesc": "Plain text format, great for developers and version control",
+      "pdf": "PDF (.pdf)",
+      "pdfDesc": "Formatted document, easy to read and share",
+      "word": "Word (.docx)",
+      "wordDesc": "Editable document for Microsoft Word and compatible applications",
+      "note": "Note:",
+      "noteDesc": "These documents contain the full, detailed explanation of Caderno's mission, vision, ethos, and technical approach. The tabs above provide a summarized, practical overview."
+    }
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "plan": "Plan"
   }
 }

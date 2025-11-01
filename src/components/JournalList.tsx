@@ -1,6 +1,6 @@
 import { PlusIcon, DocumentTextIcon, TrashIcon, ClockIcon, SparklesIcon, CalendarIcon } from '@heroicons/react/24/outline';
 import { useJournalStore } from '../store/useStore';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getStoredApiKey } from '../services/aiCompletion';
 
@@ -11,8 +11,25 @@ export default function JournalList() {
   const [isClosingNewEntry, setIsClosingNewEntry] = useState(false);
   const [newEntryTitle, setNewEntryTitle] = useState('');
 
+  // Watch for #new-entry hash to open modal
+  useEffect(() => {
+    const handleHashChange = () => {
+      if (window.location.hash === '#new-entry') {
+        setShowNewEntryModal(true);
+      } else if (showNewEntryModal) {
+        handleCloseNewEntry();
+      }
+    };
+
+    handleHashChange(); // Check on mount
+    window.addEventListener('hashchange', handleHashChange);
+    
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, [showNewEntryModal]);
+
   const handleCloseNewEntry = () => {
     setIsClosingNewEntry(true);
+    window.location.hash = '';
     setTimeout(() => {
       setShowNewEntryModal(false);
       setIsClosingNewEntry(false);
@@ -85,7 +102,7 @@ export default function JournalList() {
               <h2 className="text-xl font-semibold text-gray-700 mb-2">{t('journalList.noEntries')}</h2>
               <p className="text-gray-500 mb-6">{t('journalList.noEntriesDescription')}</p>
               <button
-                onClick={() => setShowNewEntryModal(true)}
+                onClick={() => window.location.hash = '#new-entry'}
                 className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
               >
                 {t('journalList.createEntry')}
@@ -160,7 +177,7 @@ export default function JournalList() {
 
       {/* Floating Action Button - Create Entry */}
       <button
-        onClick={() => setShowNewEntryModal(true)}
+        onClick={() => window.location.hash = '#new-entry'}
         className="fixed bottom-8 right-8 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold p-4 rounded-full transition-all duration-200 shadow-2xl hover:shadow-3xl hover:scale-110 z-50"
         title={t('journalList.newEntry')}
         style={{

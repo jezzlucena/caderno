@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { XMarkIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 import AboutMission from './about/AboutMission';
 import AboutVision from './about/AboutVision';
@@ -11,13 +12,15 @@ import AboutDownloads from './about/AboutDownloads';
 
 interface AboutModalProps {
   onClose: () => void;
+  initialTab?: TabId;
 }
 
 type TabId = 'mission' | 'vision' | 'ethos' | 'privacy' | 'security' | 'monetization' | 'tech' | 'downloads';
 
-export default function AboutModal({ onClose }: AboutModalProps) {
+export default function AboutModal({ onClose, initialTab = 'mission' }: AboutModalProps) {
+  const { t } = useTranslation();
   const [isClosing, setIsClosing] = useState(false);
-  const [activeTab, setActiveTab] = useState<TabId>('mission');
+  const [activeTab, setActiveTab] = useState<TabId>(initialTab);
   const [contentHeight, setContentHeight] = useState<number>(0);
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -26,24 +29,66 @@ export default function AboutModal({ onClose }: AboutModalProps) {
     if (contentRef.current) {
       const height = contentRef.current.scrollHeight;
       setContentHeight(height + 74);
-      console.log('height', height + 200);
     }
   }, [activeTab]);
+
+  // Watch for initialTab changes (from URL navigation)
+  useEffect(() => {
+    if (initialTab !== activeTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
+
+  // Read initial URL on mount
+  useEffect(() => {
+    const hash = window.location.hash;
+    const hashToTab: Record<string, TabId> = {
+      '#about': 'mission',
+      '#about/vision': 'vision',
+      '#about/ethos': 'ethos',
+      '#about/privacy': 'privacy',
+      '#about/security': 'security',
+      '#about/monetization': 'monetization',
+      '#about/tech': 'tech',
+      '#about/downloads': 'downloads',
+    };
+    
+    const tabFromUrl = hashToTab[hash];
+    if (tabFromUrl && tabFromUrl !== initialTab) {
+      setActiveTab(tabFromUrl);
+    }
+  }, []);
 
   const handleClose = () => {
     setIsClosing(true);
     setTimeout(onClose, 300);
   };
 
+  const handleTabClick = (tabId: TabId) => {
+    // Update URL when tab is clicked
+    const tabToHash: Record<TabId, string> = {
+      mission: '#about',
+      vision: '#about/vision',
+      ethos: '#about/ethos',
+      privacy: '#about/privacy',
+      security: '#about/security',
+      monetization: '#about/monetization',
+      tech: '#about/tech',
+      downloads: '#about/downloads',
+    };
+    window.location.hash = tabToHash[tabId];
+    setActiveTab(tabId);
+  };
+
   const tabs = [
-    { id: 'mission' as const, label: 'Mission', icon: '🎯' },
-    { id: 'vision' as const, label: 'Vision', icon: '🔭' },
-    { id: 'ethos' as const, label: 'Ethos', icon: '⚖️' },
-    { id: 'privacy' as const, label: 'Privacy', icon: '🔒' },
-    { id: 'security' as const, label: 'Security', icon: '🛡️' },
-    { id: 'monetization' as const, label: 'Sustainability', icon: '💰' },
-    { id: 'tech' as const, label: 'Tech Stack', icon: '⚙️' },
-    { id: 'downloads' as const, label: 'Downloads', icon: '📥' },
+    { id: 'mission' as const, label: t('about.tabs.mission'), icon: '🎯' },
+    { id: 'vision' as const, label: t('about.tabs.vision'), icon: '🔭' },
+    { id: 'ethos' as const, label: t('about.tabs.ethos'), icon: '⚖️' },
+    { id: 'privacy' as const, label: t('about.tabs.privacy'), icon: '🔒' },
+    { id: 'security' as const, label: t('about.tabs.security'), icon: '🛡️' },
+    { id: 'monetization' as const, label: t('about.tabs.sustainability'), icon: '💰' },
+    { id: 'tech' as const, label: t('about.tabs.techStack'), icon: '⚙️' },
+    { id: 'downloads' as const, label: t('about.tabs.downloads'), icon: '📥' },
   ];
 
   const renderContent = () => {
@@ -90,8 +135,8 @@ export default function AboutModal({ onClose }: AboutModalProps) {
           <div className="flex items-center gap-3">
             <InformationCircleIcon className="w-8 h-8 text-indigo-600" />
             <div>
-              <h2 className="text-2xl font-bold text-gray-800">About Caderno</h2>
-              <p className="text-sm text-gray-600">Privacy-first journaling for truth tellers</p>
+              <h2 className="text-2xl font-bold text-gray-800">{t('about.title')}</h2>
+              <p className="text-sm text-gray-600">{t('about.tagline')}</p>
             </div>
           </div>
           <button
@@ -107,7 +152,7 @@ export default function AboutModal({ onClose }: AboutModalProps) {
           {tabs.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => handleTabClick(tab.id)}
               className={`h-12 pl-4 pr-6 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors border-2 rounded-b-none border-indigo-200 bg-indigo-50 z-10 ${
                 activeTab === tab.id
                   ? 'bg-white border-b-0'

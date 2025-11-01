@@ -113,7 +113,18 @@
     "saved": "設定が正常に保存されました！",
     "cancel": "キャンセル",
     "save": "保存",
-    "settings": "設定"
+    "settings": "設定",
+    "cloudSync": {
+      "title": "クラウド同期（IPFSブロックチェーン）",
+      "description": "軍用グレードの暗号化で日記エントリを分散型IPFSストレージに同期します。データは最大限の冗長性のために複数のノードに保存されます。",
+      "passphrase": "同期パスフレーズ",
+      "passphrasePlaceholder": "暗号化用の強力なパスフレーズを入力してください",
+      "passphraseNote": "このパスフレーズはアップロード前にデータを暗号化します。安全に保管してください - データの復号化に必要です！",
+      "autoSync": "自動同期を有効にする",
+      "autoSyncDescription": "変更後に自動的にエントリをIPFSに同期する",
+      "clearSettings": "クラウド同期設定をクリア",
+      "storageNote": "パスフレーズはローカルに保存され、当社のサーバーに送信されることはありません。"
+    }
   },
   "autocomplete": {
     "loading": "提案を取得中...",
@@ -122,6 +133,22 @@
     "pressEsc": "Escキーで閉じる",
     "noApiKey": "設定でAI自動補完を設定してください",
     "trigger": "Shift+スペースキーでAI提案を表示"
+  },
+  "backup": {
+    "title": "バックアップと復元",
+    "description": "日記をファイルにエクスポートするか、以前のバックアップからインポートします。",
+    "export": {
+      "title": "バックアップのエクスポート",
+      "description": "すべての日記エントリを安全なバックアップファイルにダウンロードします。",
+      "button": "バックアップをエクスポート",
+      "success": "バックアップのエクスポートに成功しました"
+    },
+    "import": {
+      "title": "バックアップのインポート",
+      "description": "バックアップファイルから日記エントリを復元します。",
+      "button": "バックアップをインポート",
+      "success": "{{count}}個の日記エントリのインポートに成功しました"
+    }
   },
   "exportPDF": {
     "title": "PDFにエクスポート",
@@ -132,5 +159,61 @@
     "exporting": "PDFにエクスポート中...",
     "pleaseWait": "PDFを生成していますので、しばらくお待ちください",
     "error": "PDFのエクスポートに失敗しました。もう一度お試しください。"
+  },
+  "cloudSync": {
+    "title": "クラウド同期",
+    "description": "エンドツーエンド暗号化を使用して、日記エントリを分散型トレージ（IPFS）に同期します。",
+    "notConfigured": "クラウド同期が設定されていません。まず設定でLighthouse APIキーとパスフレーズを設定してください。",
+    "lastSync": "最終同期：{{date}}",
+    "close": "閉じる",
+    "upload": {
+      "title": "クラウドにアップロード",
+      "description": "{{count}}個のエントリをIPFSブロックチェーンストレージにアップロード",
+      "button": "IPFSにアップロード",
+      "uploading": "IPFSにアップロード中..."
+    },
+    "download": {
+      "title": "クラウドからダウンロード",
+      "description": "IPFSから暗号化された日記エントリをダウンロードします。",
+      "button": "IPFSからダウンロード",
+      "downloading": "IPFSからダウンロード中...",
+      "merge": "既存のエントリとマージ",
+      "mergeDescription": "チェックを外すと、現在のエントリが置き換えられます"
+    },
+    "success": {
+      "uploaded": "{{count}}個のエントリのアップロードに成功しました！CID：{{cid}}",
+      "downloaded": "IPFSから{{count}}個のエントリのダウンロードに成功しました！"
+    },
+    "errors": {
+      "noApiKey": "まず設定でLighthouse APIキーを設定してください。",
+      "noPassphrase": "まず設定で同期パスフレーズを設定してください。",
+      "noEntries": "アップロードするエントリがありません。",
+      "noCid": "バックアップが見つかりません。まずエントリをアップロードしてください。",
+      "uploadFailed": "アップロード失敗：{{error}}",
+      "downloadFailed": "ダウンロード失敗：{{error}}"
+    }
+  },
+  "scheduledExports": {
+    "title": "スケジュールされたエクスポート",
+    "description": "自動化されたPDFエクスポートサーバーを設定"
+  },
+  "about": {
+    "title": "アジェンダについて",
+    "tagline": "真実を語る人のためのプライバシー第一の日記",
+    "tabs": {
+      "mission": "ミッション",
+      "vision": "ビジョン",
+      "ethos": "理念",
+      "privacy": "プライバシー",
+      "security": "セキュリティ",
+      "sustainability": "持続可能性",
+      "techStack": "技術スタック",
+      "downloads": "ダウンロード"
+    }
+  },
+  "auth": {
+    "signIn": "サインイン",
+    "signOut": "サインアウト",
+    "plan": "プラン"
   }
 }

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './styles/toastify-custom.css';
@@ -15,6 +16,7 @@ type ViewState = 'list' | 'editor' | 'transitioning';
 type AnimationDirection = 'toEditor' | 'toList' | null;
 
 function App() {
+  const { t } = useTranslation();
   const { currentEntryId } = useJournalStore();
   const { isAuthenticated, user, clearAuth } = useAuthStore();
   const [viewState, setViewState] = useState<ViewState>('list');
@@ -75,27 +77,27 @@ function App() {
               <p className="text-sm font-medium text-gray-700">{user?.email}</p>
               {user?.subscription && user.subscription.planId !== 'free' && (
                 <p className="text-xs text-indigo-600 font-semibold">
-                  {user.subscription.planId.charAt(0).toUpperCase() + user.subscription.planId.slice(1)} Plan
+                  {user.subscription.planId.charAt(0).toUpperCase() + user.subscription.planId.slice(1)} {t('auth.plan')}
                 </p>
               )}
             </div>
             <button
               onClick={handleSignOut}
               className="flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-semibold py-2 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg border border-gray-300"
-              title="Sign Out"
+              title={t('auth.signOut')}
             >
               <ArrowRightOnRectangleIcon width={20} />
-              <span className="text-sm">Sign Out</span>
+              <span className="text-sm">{t('auth.signOut')}</span>
             </button>
           </div>
         ) : (
           <button
             onClick={() => setShowLoginModal(true)}
             className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
-            title="Sign In"
+            title={t('auth.signIn')}
           >
             <UserCircleIcon width={20} />
-            <span className="text-sm">Sign In</span>
+            <span className="text-sm">{t('auth.signIn')}</span>
           </button>
         )}
         <HamburgerMenu />

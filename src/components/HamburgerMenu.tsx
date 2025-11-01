@@ -1,17 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
   Bars3Icon, 
   XMarkIcon, 
   Cog6ToothIcon, 
   FolderPlusIcon, 
-  ArrowDownTrayIcon, 
   DocumentArrowDownIcon, 
   CloudIcon, 
   ClockIcon 
 } from '@heroicons/react/24/outline';
-import ExportModal from './ExportModal';
-import ImportModal from './ImportModal';
+import BackupModal from './BackupModal';
 import SettingsModal from './SettingsModal';
 import ExportPDFModal from './ExportPDFModal';
 import CloudSyncModal from './CloudSyncModal';
@@ -22,14 +20,133 @@ export default function HamburgerMenu() {
   const { t } = useTranslation();
   const [showMenu, setShowMenu] = useState(false);
   const [isClosingMenu, setIsClosingMenu] = useState(false);
-  const [showExportModal, setShowExportModal] = useState(false);
-  const [showImportModal, setShowImportModal] = useState(false);
+  const [showBackupModal, setShowBackupModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [settingsInitialScreen, setSettingsInitialScreen] = useState<'main' | 'language' | 'ai' | 'cloudSync' | 'scheduledExports'>('main');
   const [showExportPDFModal, setShowExportPDFModal] = useState(false);
   const [showCloudSyncModal, setShowCloudSyncModal] = useState(false);
   const [showScheduledExportsModal, setShowScheduledExportsModal] = useState(false);
   const [showAboutModal, setShowAboutModal] = useState(false);
+  const [aboutInitialTab, setAboutInitialTab] = useState<'mission' | 'vision' | 'ethos' | 'privacy' | 'security' | 'monetization' | 'tech' | 'downloads'>('mission');
+
+  // Handle URL hash changes
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      
+      // Check for settings modal
+      if (hash.startsWith('#settings')) {
+        const hashToScreen: Record<string, 'main' | 'language' | 'ai' | 'cloudSync' | 'scheduledExports'> = {
+          '#settings': 'main',
+          '#settings/language': 'language',
+          '#settings/ai': 'ai',
+          '#settings/cloudSync': 'cloudSync',
+          '#settings/scheduledExports': 'scheduledExports',
+        };
+        
+        const screen = hashToScreen[hash] || 'main';
+        
+        // If settings modal is already open, just update the screen
+        // Otherwise, close other modals and open settings
+        if (showSettingsModal) {
+          setSettingsInitialScreen(screen);
+        } else {
+          // Close all other modals
+          setShowBackupModal(false);
+          setShowExportPDFModal(false);
+          setShowCloudSyncModal(false);
+          setShowScheduledExportsModal(false);
+          setShowAboutModal(false);
+          
+          setSettingsInitialScreen(screen);
+          setShowSettingsModal(true);
+        }
+      }
+      // Check for about modal
+      else if (hash.startsWith('#about')) {
+        const hashToTab: Record<string, 'mission' | 'vision' | 'ethos' | 'privacy' | 'security' | 'monetization' | 'tech' | 'downloads'> = {
+          '#about': 'mission',
+          '#about/vision': 'vision',
+          '#about/ethos': 'ethos',
+          '#about/privacy': 'privacy',
+          '#about/security': 'security',
+          '#about/monetization': 'monetization',
+          '#about/tech': 'tech',
+          '#about/downloads': 'downloads',
+        };
+        
+        const tab = hashToTab[hash] || 'mission';
+        
+        // If about modal is already open, just update the tab
+        // Otherwise, close other modals and open about
+        if (showAboutModal) {
+          setAboutInitialTab(tab);
+        } else {
+          // Close all other modals
+          setShowBackupModal(false);
+          setShowSettingsModal(false);
+          setShowExportPDFModal(false);
+          setShowCloudSyncModal(false);
+          setShowScheduledExportsModal(false);
+          
+          setAboutInitialTab(tab);
+          setShowAboutModal(true);
+        }
+      }
+      // Check for other modals
+      else if (hash === '#backup') {
+        setShowSettingsModal(false);
+        setShowExportPDFModal(false);
+        setShowCloudSyncModal(false);
+        setShowScheduledExportsModal(false);
+        setShowAboutModal(false);
+        setShowBackupModal(true);
+      }
+      else if (hash === '#export-pdf') {
+        setShowBackupModal(false);
+        setShowSettingsModal(false);
+        setShowCloudSyncModal(false);
+        setShowScheduledExportsModal(false);
+        setShowAboutModal(false);
+        setShowExportPDFModal(true);
+      }
+      else if (hash === '#cloud-sync') {
+        setShowBackupModal(false);
+        setShowSettingsModal(false);
+        setShowExportPDFModal(false);
+        setShowScheduledExportsModal(false);
+        setShowAboutModal(false);
+        setShowCloudSyncModal(true);
+      }
+      else if (hash === '#scheduledExports') {
+        setShowBackupModal(false);
+        setShowSettingsModal(false);
+        setShowExportPDFModal(false);
+        setShowCloudSyncModal(false);
+        setShowAboutModal(false);
+        setShowScheduledExportsModal(true);
+      }
+      // Close all modals for #new-entry or no hash (handled by JournalList)
+      else if (hash === '#new-entry' || !hash || hash === '#') {
+        setShowBackupModal(false);
+        setShowSettingsModal(false);
+        setShowExportPDFModal(false);
+        setShowCloudSyncModal(false);
+        setShowScheduledExportsModal(false);
+        setShowAboutModal(false);
+      }
+    };
+
+    // Call once on mount
+    handleHashChange();
+
+    // Listen for hash changes
+    window.addEventListener('hashchange', handleHashChange);
+    
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+    };
+  }, [showSettingsModal, showAboutModal]);
 
   const handleCloseMenu = () => {
     setIsClosingMenu(true);
@@ -86,8 +203,7 @@ export default function HamburgerMenu() {
             <div className="space-y-2">
               <button
                 onClick={() => {
-                  setSettingsInitialScreen('main');
-                  setShowSettingsModal(true);
+                  window.location.hash = '#settings';
                   handleCloseMenu();
                 }}
                 className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
@@ -100,29 +216,18 @@ export default function HamburgerMenu() {
 
               <button
                 onClick={() => {
-                  setShowImportModal(true);
+                  window.location.hash = '#backup';
                   handleCloseMenu();
                 }}
                 className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
               >
                 <FolderPlusIcon width={20} />
-                <span className="font-medium">{t('journalList.import')}</span>
+                <span className="font-medium">{t('backup.title')}</span>
               </button>
 
               <button
                 onClick={() => {
-                  setShowExportModal(true);
-                  handleCloseMenu();
-                }}
-                className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
-              >
-                <ArrowDownTrayIcon width={20} />
-                <span className="font-medium">{t('journalList.export')}</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  setShowExportPDFModal(true);
+                  window.location.hash = '#export-pdf';
                   handleCloseMenu();
                 }}
                 className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
@@ -133,7 +238,7 @@ export default function HamburgerMenu() {
 
               <button
                 onClick={() => {
-                  setShowCloudSyncModal(true);
+                  window.location.hash = '#cloud-sync';
                   handleCloseMenu();
                 }}
                 className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
@@ -144,20 +249,20 @@ export default function HamburgerMenu() {
 
               <button
                 onClick={() => {
-                  setShowScheduledExportsModal(true);
+                  window.location.hash = '#scheduledExports';
                   handleCloseMenu();
                 }}
                 className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
               >
                 <ClockIcon width={20} />
-                <span className="font-medium">Scheduled Exports</span>
+                <span className="font-medium">{t('scheduledExports.title')}</span>
               </button>
 
               <div className="border-t border-gray-200 my-2"></div>
 
               <button
                 onClick={() => {
-                  setShowAboutModal(true);
+                  window.location.hash = '#about';
                   handleCloseMenu();
                 }}
                 className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
@@ -165,7 +270,7 @@ export default function HamburgerMenu() {
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" width={20} height={20}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
                 </svg>
-                <span className="font-medium">About</span>
+                <span className="font-medium">{t('about.title')}</span>
               </button>
             </div>
           </div>
@@ -187,36 +292,57 @@ export default function HamburgerMenu() {
       {showSettingsModal && (
         <SettingsModal 
           onClose={() => {
+            window.location.hash = '';
             setShowSettingsModal(false);
             setSettingsInitialScreen('main');
           }}
           initialScreen={settingsInitialScreen}
         />
       )}
-      {showExportModal && <ExportModal onClose={() => setShowExportModal(false)} />}
-      {showImportModal && <ImportModal onClose={() => setShowImportModal(false)} />}
-      {showExportPDFModal && <ExportPDFModal onClose={() => setShowExportPDFModal(false)} />}
+      {showBackupModal && <BackupModal onClose={() => {
+        window.location.hash = '';
+        setShowBackupModal(false);
+      }} />}
+      {showExportPDFModal && <ExportPDFModal onClose={() => {
+        window.location.hash = '';
+        setShowExportPDFModal(false);
+      }} />}
       {showCloudSyncModal && (
         <CloudSyncModal 
-          onClose={() => setShowCloudSyncModal(false)}
+          onClose={() => {
+            window.location.hash = '';
+            setShowCloudSyncModal(false);
+          }}
           onOpenSettings={(screen) => {
             setShowCloudSyncModal(false);
             setSettingsInitialScreen(screen);
-            setShowSettingsModal(true);
+            window.location.hash = `#settings/${screen}`;
           }}
         />
       )}
       {showScheduledExportsModal && (
         <ScheduledExportsModal 
-          onClose={() => setShowScheduledExportsModal(false)}
+          onClose={() => {
+            window.location.hash = '';
+            setShowScheduledExportsModal(false);
+          }}
           onOpenSettings={(screen) => {
             setShowScheduledExportsModal(false);
             setSettingsInitialScreen(screen);
-            setShowSettingsModal(true);
+            window.location.hash = `#settings/${screen}`;
           }}
         />
       )}
-      {showAboutModal && <AboutModal onClose={() => setShowAboutModal(false)} />}
+      {showAboutModal && (
+        <AboutModal 
+          onClose={() => {
+            window.location.hash = '';
+            setShowAboutModal(false);
+            setAboutInitialTab('mission');
+          }}
+          initialTab={aboutInitialTab}
+        />
+      )}
 
       <style>{`
         @keyframes fadeIn {

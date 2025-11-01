@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import reactLogo from '../../assets/react-logo.svg';
 import typescriptLogo from '../../assets/typescript-logo.svg';
 import nodejsLogo from '../../assets/nodejs-logo.svg';
@@ -6,6 +7,8 @@ import tailwindLogo from '../../assets/tailwind-logo.svg';
 import dockerLogo from '../../assets/docker-logo.svg';
 
 export default function AboutTech() {
+  const { t } = useTranslation();
+  
   const TechCard = ({ 
     title, 
     children,
@@ -27,8 +30,8 @@ export default function AboutTech() {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-xl font-bold text-gray-800">Tech Stack</h3>
-      <p className="text-gray-700 leading-relaxed">Modern, secure, and open-source technologies powering Caderno.</p>
+      <h3 className="text-xl font-bold text-gray-800">{t('about.techStack.title')}</h3>
+      <p className="text-gray-700 leading-relaxed">{t('about.techStack.description')}</p>
       
       {/* Logo Wall */}
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4 p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg border border-gray-200">
@@ -61,71 +64,61 @@ export default function AboutTech() {
       {/* Tech Cards - Masonry Layout */}
       <div className="columns-1 md:columns-2 lg:columns-3 gap-4">
         <div className="break-inside-avoid mb-4">
-          <TechCard title="Frontend" bgColor="bg-blue-50" borderColor="border-blue-200">
+          <TechCard title={t('about.techStack.frontend')} bgColor="bg-blue-50" borderColor="border-blue-200">
             <ul className="text-sm text-gray-700 space-y-2">
-              <li>• <strong>React 18</strong> with <strong>TypeScript</strong></li>
-              <li>• <strong>Vite</strong> for build tooling</li>
-              <li>• <strong>TailwindCSS</strong> for styling</li>
-              <li>• <strong>Zustand</strong> for state management</li>
-              <li>• <strong>TipTap</strong> for rich text editing</li>
-              <li>• <strong>i18next</strong> for internationalization</li>
+              {(t('about.techStack.frontendItems', { returnObjects: true }) as string[]).map((item, i) => (
+                <li key={i} dangerouslySetInnerHTML={{ __html: `• ${item}` }} />
+              ))}
             </ul>
           </TechCard>
         </div>
 
         <div className="break-inside-avoid mb-4">
-          <TechCard title="Storage" bgColor="bg-green-50" borderColor="border-green-200">
+          <TechCard title={t('about.techStack.storage')} bgColor="bg-green-50" borderColor="border-green-200">
             <ul className="text-sm text-gray-700 space-y-2">
-              <li>• <strong>IndexedDB</strong> (local-first)</li>
-              <li>• <strong>LocalStorage</strong> for settings</li>
-              <li>• No cookies, no tracking</li>
-              <li>• Offline-capable by default</li>
+              {(t('about.techStack.storageItems', { returnObjects: true }) as string[]).map((item, i) => (
+                <li key={i}>• {item}</li>
+              ))}
             </ul>
           </TechCard>
         </div>
 
         <div className="break-inside-avoid mb-4">
-          <TechCard title="Backend" bgColor="bg-purple-50" borderColor="border-purple-200">
+          <TechCard title={t('about.techStack.backend')} bgColor="bg-purple-50" borderColor="border-purple-200">
             <ul className="text-sm text-gray-700 space-y-2">
-              <li>• <strong>Node.js</strong> with <strong>Express</strong></li>
-              <li>• <strong>SQLite</strong> for persistence</li>
-              <li>• <strong>JWT</strong> authentication</li>
-              <li>• <strong>RESTful API</strong> design</li>
-              <li>• <strong>Puppeteer</strong> for PDF generation</li>
+              {(t('about.techStack.backendItems', { returnObjects: true }) as string[]).map((item, i) => (
+                <li key={i} dangerouslySetInnerHTML={{ __html: `• ${item}` }} />
+              ))}
             </ul>
           </TechCard>
         </div>
 
         <div className="break-inside-avoid mb-4">
-          <TechCard title="Security" bgColor="bg-red-50" borderColor="border-red-200">
+          <TechCard title={t('about.techStack.security')} bgColor="bg-red-50" borderColor="border-red-200">
             <ul className="text-sm text-gray-700 space-y-2">
-              <li>• <strong>Web Crypto API</strong> for E2EE</li>
-              <li>• <strong>AES-256-GCM</strong> encryption</li>
-              <li>• <strong>PBKDF2</strong> key derivation</li>
-              <li>• <strong>TLS 1.3</strong> for transport</li>
+              {(t('about.techStack.securityItems', { returnObjects: true }) as string[]).map((item, i) => (
+                <li key={i} dangerouslySetInnerHTML={{ __html: `• ${item}` }} />
+              ))}
             </ul>
           </TechCard>
         </div>
 
         <div className="break-inside-avoid mb-4">
-          <TechCard title="Deployment" bgColor="bg-amber-50" borderColor="border-amber-200">
+          <TechCard title={t('about.techStack.deployment')} bgColor="bg-amber-50" borderColor="border-amber-200">
             <ul className="text-sm text-gray-700 space-y-2">
-              <li>• Federated, self-hostable architecture</li>
-              <li>• <strong>Progressive Web App (PWA)</strong> support</li>
-              <li>• Open source (<strong>MIT License</strong>)</li>
-              <li>• <strong>Docker</strong> support for easy deployment</li>
-              <li>• <strong>IPFS</strong> integration for decentralized storage</li>
+              {(t('about.techStack.deploymentItems', { returnObjects: true }) as string[]).map((item, i) => (
+                <li key={i} dangerouslySetInnerHTML={{ __html: `• ${item}` }} />
+              ))}
             </ul>
           </TechCard>
         </div>
 
         <div className="break-inside-avoid mb-4">
-          <TechCard title="AI Integration" bgColor="bg-indigo-50" borderColor="border-indigo-200">
+          <TechCard title={t('about.techStack.aiIntegration')} bgColor="bg-indigo-50" borderColor="border-indigo-200">
             <ul className="text-sm text-gray-700 space-y-2">
-              <li>• <strong>OpenAI</strong> / <strong>Anthropic</strong> API support</li>
-              <li>• <strong>HuggingFace</strong> model integration</li>
-              <li>• AI-powered autocomplete suggestions</li>
-              <li>• Automatic entry summarization</li>
+              {(t('about.techStack.aiIntegrationItems', { returnObjects: true }) as string[]).map((item, i) => (
+                <li key={i} dangerouslySetInnerHTML={{ __html: `• ${item}` }} />
+              ))}
             </ul>
           </TechCard>
         </div>

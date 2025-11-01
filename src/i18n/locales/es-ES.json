@@ -113,7 +113,18 @@
     "saved": "¡Configuración guardada con éxito!",
     "cancel": "Cancelar",
     "save": "Guardar",
-    "settings": "Configuración"
+    "settings": "Configuración",
+    "cloudSync": {
+      "title": "Sincronización en la Nube (IPFS Blockchain)",
+      "description": "Sincroniza tus entradas del diario con almacenamiento IPFS descentralizado con cifrado de grado militar. Tus datos se almacenan en múltiples nodos para máxima redundancia.",
+      "passphrase": "Contraseña de Sincronización",
+      "passphrasePlaceholder": "Introduce una contraseña fuerte para cifrado",
+      "passphraseNote": "Esta contraseña cifra tus datos antes de subirlos. Manténla segura - ¡la necesitarás para descifrar tus datos!",
+      "autoSync": "Activar sincronización automática",
+      "autoSyncDescription": "Sincronizar automáticamente tus entradas a IPFS después de cada cambio",
+      "clearSettings": "Limpiar configuración de sincronización en la nube",
+      "storageNote": "Tu contraseña se almacena localmente y nunca se envía a nuestros servidores."
+    }
   },
   "autocomplete": {
     "loading": "Obteniendo sugerencias...",
@@ -122,6 +133,22 @@
     "pressEsc": "Pulsa Esc para descartar",
     "noApiKey": "Configura el autocompletar con IA en Configuración",
     "trigger": "Pulsa Shift+Espacio para sugerencias de IA"
+  },
+  "backup": {
+    "title": "Copia de Seguridad y Restauración",
+    "description": "Exporta tu diario a un fichero o importa desde una copia de seguridad anterior.",
+    "export": {
+      "title": "Exportar Copia de Seguridad",
+      "description": "Descarga todas tus entradas del diario a un fichero de copia de seguridad seguro.",
+      "button": "Exportar Copia de Seguridad",
+      "success": "Copia de seguridad exportada con éxito"
+    },
+    "import": {
+      "title": "Importar Copia de Seguridad",
+      "description": "Restaura tus entradas del diario desde un fichero de copia de seguridad.",
+      "button": "Importar Copia de Seguridad",
+      "success": "{{count}} entradas del diario importadas con éxito"
+    }
   },
   "exportPDF": {
     "title": "Exportar a PDF",
@@ -132,5 +159,61 @@
     "exporting": "Exportando a PDF...",
     "pleaseWait": "Por favor, espera mientras generamos tu PDF",
     "error": "Error al exportar PDF. Por favor, inténtalo de nuevo."
+  },
+  "cloudSync": {
+    "title": "Sincronización en la Nube",
+    "description": "Sincroniza tus entradas del diario con almacenamiento descentralizado (IPFS) con cifrado de extremo a extremo.",
+    "notConfigured": "La sincronización en la nube no está configurada. Por favor, configura tu clave de API de Lighthouse y contraseña en Configuración primero.",
+    "lastSync": "Última sincronización: {{date}}",
+    "close": "Cerrar",
+    "upload": {
+      "title": "Subir a la Nube",
+      "description": "Subir {{count}} entradas al almacenamiento blockchain IPFS",
+      "button": "Subir a IPFS",
+      "uploading": "Subiendo a IPFS..."
+    },
+    "download": {
+      "title": "Descargar de la Nube",
+      "description": "Descarga tus entradas cifradas del diario desde IPFS.",
+      "button": "Descargar de IPFS",
+      "downloading": "Descargando de IPFS...",
+      "merge": "Combinar con entradas existentes",
+      "mergeDescription": "Si no está marcado, tus entradas actuales serán reemplazadas"
+    },
+    "success": {
+      "uploaded": "¡{{count}} entradas subidas con éxito! CID: {{cid}}",
+      "downloaded": "¡{{count}} entradas descargadas con éxito de IPFS!"
+    },
+    "errors": {
+      "noApiKey": "Por favor, configura tu clave de API de Lighthouse en Configuración primero.",
+      "noPassphrase": "Por favor, configura tu contraseña de sincronización en Configuración primero.",
+      "noEntries": "No hay entradas para subir.",
+      "noCid": "No se encontró copia de seguridad. Por favor, sube tus entradas primero.",
+      "uploadFailed": "Error al subir: {{error}}",
+      "downloadFailed": "Error al descargar: {{error}}"
+    }
+  },
+  "scheduledExports": {
+    "title": "Exportaciones Programadas",
+    "description": "Configurar servidor de exportaciones PDF automatizadas"
+  },
+  "about": {
+    "title": "Acerca de Caderno",
+    "tagline": "Diario con privacidad primero para contadores de verdades",
+    "tabs": {
+      "mission": "Misión",
+      "vision": "Visión",
+      "ethos": "Ética",
+      "privacy": "Privacidad",
+      "security": "Seguridad",
+      "sustainability": "Sostenibilidad",
+      "techStack": "Tecnologías",
+      "downloads": "Descargas"
+    }
+  },
+  "auth": {
+    "signIn": "Iniciar Sesión",
+    "signOut": "Cerrar Sesión",
+    "plan": "Plan"
   }
 }

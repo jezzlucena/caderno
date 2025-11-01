@@ -1,24 +1,28 @@
+import { useTranslation } from 'react-i18next';
+
 export default function AboutPrivacy() {
+  const { t } = useTranslation();
+  
   return (
     <div className="space-y-4">
-      <h3 className="text-xl font-bold text-gray-800">Privacy</h3>
-      <p className="text-gray-700 leading-relaxed">Privacy is paramount and the foundation of our platform.</p>
+      <h3 className="text-xl font-bold text-gray-800">{t('about.privacyTab.title')}</h3>
+      <p className="text-gray-700 leading-relaxed">{t('about.privacyTab.description')}</p>
       <div className="space-y-3">
         <div className="bg-gray-50 rounded-lg p-4">
-          <h4 className="font-semibold text-gray-800 mb-2">🔐 End-to-End Encryption</h4>
-          <p className="text-sm text-gray-700">All entries are E2EE by default. Only you (and your intended recipients) can decrypt them—not us, not anyone.</p>
+          <h4 className="font-semibold text-gray-800 mb-2">🔐 {t('about.privacyTab.e2ee')}</h4>
+          <p className="text-sm text-gray-700">{t('about.privacyTab.e2eeDesc')}</p>
         </div>
         <div className="bg-gray-50 rounded-lg p-4">
-          <h4 className="font-semibold text-gray-800 mb-2">🌐 Federated Storage</h4>
-          <p className="text-sm text-gray-700">Choose your own server or a trusted host. No centralized data silos vulnerable to mass surveillance.</p>
+          <h4 className="font-semibold text-gray-800 mb-2">🌐 {t('about.privacyTab.federated')}</h4>
+          <p className="text-sm text-gray-700">{t('about.privacyTab.federatedDesc')}</p>
         </div>
         <div className="bg-gray-50 rounded-lg p-4">
-          <h4 className="font-semibold text-gray-800 mb-2">🚫 No Tracking</h4>
-          <p className="text-sm text-gray-700">We don't track, profile, or monetize your data. No advertising, no data mining—your data serves only you.</p>
+          <h4 className="font-semibold text-gray-800 mb-2">🚫 {t('about.privacyTab.noTracking')}</h4>
+          <p className="text-sm text-gray-700">{t('about.privacyTab.noTrackingDesc')}</p>
         </div>
         <div className="bg-gray-50 rounded-lg p-4">
-          <h4 className="font-semibold text-gray-800 mb-2">👤 User Control</h4>
-          <p className="text-sm text-gray-700">Export, delete, or manage your data anytime. Offline-first with optional sync. You're always in control.</p>
+          <h4 className="font-semibold text-gray-800 mb-2">👤 {t('about.privacyTab.userControl')}</h4>
+          <p className="text-sm text-gray-700">{t('about.privacyTab.userControlDesc')}</p>
         </div>
       </div>
     </div>

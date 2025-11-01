@@ -115,87 +115,84 @@ export default function SettingsScheduledExports({ onBack, onSave, onShowApiKeyC
       </div>
 
       <div className="space-y-4">
-        {/* Server URL and API Key - Side by Side */}
-        <div className="flex gap-4 flex-wrap lg:flex-nowrap">
-          {/* Server URL */}
-          <div className="flex-1 min-w-[250px]">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Server URL
-            </label>
-            <input
-              type="url"
-              value={scheduledExportsServerUrl}
-              onChange={(e) => setScheduledExportsServerUrlLocal(e.target.value)}
-              placeholder="http://localhost:3002"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              The URL where your Caderno Server is running
-            </p>
-          </div>
+        {/* Server URL */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Server URL
+          </label>
+          <input
+            type="url"
+            value={scheduledExportsServerUrl}
+            onChange={(e) => setScheduledExportsServerUrlLocal(e.target.value)}
+            placeholder="http://localhost:3002"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            The URL where your Caderno Server is running
+          </p>
+        </div>
 
-          {/* API Key */}
-          <div className="flex-1 min-w-[250px]">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              <div className="flex items-center gap-2">
-                <KeyIcon width={16} />
-                API Key
-              </div>
-            </label>
-            <div className="relative">
-              <textarea
-                value={showScheduledExportsApiKey ? scheduledExportsApiKey : scheduledExportsApiKey.replace(/./g, '•')}
-                onChange={(e) => {
-                  // If showing, update directly; if hidden, need to track actual value
-                  if (showScheduledExportsApiKey) {
-                    setScheduledExportsApiKeyLocal(e.target.value);
-                  } else {
-                    // When hidden, we need to figure out what was typed
-                    // This is complex, so let's auto-show when user starts typing
-                    setShowScheduledExportsApiKey(true);
-                    setScheduledExportsApiKeyLocal(e.target.value);
-                  }
-                }}
-                placeholder="Enter your API key"
-                rows={2}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-24 resize-none font-mono text-sm"
-                style={{
-                  minHeight: '3.5rem',
-                  maxHeight: '12rem',
-                  overflow: 'auto'
-                }}
-              />
-              <button
-                type="button"
-                onClick={() => setShowScheduledExportsApiKey(!showScheduledExportsApiKey)}
-                className="absolute right-2 top-3 text-xs text-gray-500 hover:text-gray-700 px-3 py-1 rounded bg-gray-100 hover:bg-gray-200"
-              >
-                {showScheduledExportsApiKey ? t('settings.hide') : t('settings.show')}
-              </button>
+        {/* API Key */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="flex items-center gap-2">
+              <KeyIcon width={16} />
+              API Key
             </div>
-            <div className="flex items-center gap-2 mt-1">
-              <p className="text-xs text-gray-500 flex-1">
-                Generate by POSTing to /api/auth/register
-              </p>
-              <div className="relative group">
-                <button
-                  onClick={handleGenerateApiKeyClick}
-                  disabled={isGeneratingApiKey || !scheduledExportsServerUrl.trim()}
-                  className="text-xs px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-                >
-                  {isGeneratingApiKey ? 'Generating...' : 'Generate'}
-                </button>
-                {!scheduledExportsServerUrl.trim() && !isGeneratingApiKey && (
-                  <div className="absolute bottom-full right-0 mb-2 hidden group-hover:block z-10">
-                    <div className="bg-gray-900 text-white text-xs rounded-lg py-2 px-3 whitespace-nowrap shadow-xl">
-                      Server URL is required and must be valid
-                      <div className="absolute top-full right-4 -mt-1">
-                        <div className="border-4 border-transparent border-t-gray-900"></div>
-                      </div>
+          </label>
+          <div className="relative">
+            <textarea
+              value={showScheduledExportsApiKey ? scheduledExportsApiKey : scheduledExportsApiKey.replace(/./g, '•')}
+              onChange={(e) => {
+                // If showing, update directly; if hidden, need to track actual value
+                if (showScheduledExportsApiKey) {
+                  setScheduledExportsApiKeyLocal(e.target.value);
+                } else {
+                  // When hidden, we need to figure out what was typed
+                  // This is complex, so let's auto-show when user starts typing
+                  setShowScheduledExportsApiKey(true);
+                  setScheduledExportsApiKeyLocal(e.target.value);
+                }
+              }}
+              placeholder="Enter your API key"
+              rows={2}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-24 resize-none font-mono text-sm"
+              style={{
+                minHeight: '3.5rem',
+                maxHeight: '12rem',
+                overflow: 'auto'
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => setShowScheduledExportsApiKey(!showScheduledExportsApiKey)}
+              className="absolute right-2 top-3 text-xs text-gray-500 hover:text-gray-700 px-3 py-1 rounded bg-gray-100 hover:bg-gray-200"
+            >
+              {showScheduledExportsApiKey ? t('settings.hide') : t('settings.show')}
+            </button>
+          </div>
+          <div className="flex items-center gap-2 mt-1">
+            <p className="text-xs text-gray-500 flex-1">
+              Generate by POSTing to /api/auth/register
+            </p>
+            <div className="relative group">
+              <button
+                onClick={handleGenerateApiKeyClick}
+                disabled={isGeneratingApiKey || !scheduledExportsServerUrl.trim()}
+                className="text-xs px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+              >
+                {isGeneratingApiKey ? 'Generating...' : 'Generate'}
+              </button>
+              {!scheduledExportsServerUrl.trim() && !isGeneratingApiKey && (
+                <div className="absolute bottom-full right-0 mb-2 hidden group-hover:block z-10">
+                  <div className="bg-gray-900 text-white text-xs rounded-lg py-2 px-3 whitespace-nowrap shadow-xl">
+                    Server URL is required and must be valid
+                    <div className="absolute top-full right-4 -mt-1">
+                      <div className="border-4 border-transparent border-t-gray-900"></div>
                     </div>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

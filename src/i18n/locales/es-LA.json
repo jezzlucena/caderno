@@ -113,7 +113,18 @@
     "saved": "¡Configuración guardada exitosamente!",
     "cancel": "Cancelar",
     "save": "Guardar",
-    "settings": "Configuración"
+    "settings": "Configuración",
+    "cloudSync": {
+      "title": "Sincronización en la Nube (IPFS Blockchain)",
+      "description": "Sincroniza tus entradas del diario con almacenamiento IPFS descentralizado con encriptación de grado militar. Tus datos se almacenan en múltiples nodos para máxima redundancia.",
+      "passphrase": "Contraseña de Sincronización",
+      "passphrasePlaceholder": "Ingresa una contraseña fuerte para encriptación",
+      "passphraseNote": "Esta contraseña encripta tus datos antes de subirlos. Manténla segura - ¡la necesitarás para desencriptar tus datos!",
+      "autoSync": "Activar sincronización automática",
+      "autoSyncDescription": "Sincronizar automáticamente tus entradas a IPFS después de cada cambio",
+      "clearSettings": "Limpiar configuraciones de sincronización en la nube",
+      "storageNote": "Tu contraseña se almacena localmente y nunca se envía a nuestros servidores."
+    }
   },
   "autocomplete": {
     "loading": "Obteniendo sugerencias...",
@@ -122,6 +133,22 @@
     "pressEsc": "Presiona Esc para descartar",
     "noApiKey": "Configura el autocompletar con IA en Configuración",
     "trigger": "Presiona Shift+Espacio para sugerencias de IA"
+  },
+  "backup": {
+    "title": "Respaldo y Restauración",
+    "description": "Exporta tu diario a un archivo o importa desde un respaldo anterior.",
+    "export": {
+      "title": "Exportar Respaldo",
+      "description": "Descarga todas tus entradas del diario a un archivo de respaldo seguro.",
+      "button": "Exportar Respaldo",
+      "success": "Respaldo exportado exitosamente"
+    },
+    "import": {
+      "title": "Importar Respaldo",
+      "description": "Restaura tus entradas del diario desde un archivo de respaldo.",
+      "button": "Importar Respaldo",
+      "success": "{{count}} entradas del diario importadas exitosamente"
+    }
   },
   "exportPDF": {
     "title": "Exportar a PDF",
@@ -132,5 +159,61 @@
     "exporting": "Exportando a PDF...",
     "pleaseWait": "Por favor, espera mientras generamos tu PDF",
     "error": "Error al exportar PDF. Por favor, intenta nuevamente."
+  },
+  "cloudSync": {
+    "title": "Sincronización en la Nube",
+    "description": "Sincroniza tus entradas del diario con almacenamiento descentralizado (IPFS) con encriptación de extremo a extremo.",
+    "notConfigured": "La sincronización en la nube no está configurada. Por favor, configura tu clave de API de Lighthouse y contraseña en Configuración primero.",
+    "lastSync": "Última sincronización: {{date}}",
+    "close": "Cerrar",
+    "upload": {
+      "title": "Subir a la Nube",
+      "description": "Subir {{count}} entradas al almacenamiento blockchain IPFS",
+      "button": "Subir a IPFS",
+      "uploading": "Subiendo a IPFS..."
+    },
+    "download": {
+      "title": "Descargar de la Nube",
+      "description": "Descarga tus entradas encriptadas del diario desde IPFS.",
+      "button": "Descargar de IPFS",
+      "downloading": "Descargando de IPFS...",
+      "merge": "Combinar con entradas existentes",
+      "mergeDescription": "Si no está marcado, tus entradas actuales serán reemplazadas"
+    },
+    "success": {
+      "uploaded": "¡{{count}} entradas subidas exitosamente! CID: {{cid}}",
+      "downloaded": "¡{{count}} entradas descargadas exitosamente de IPFS!"
+    },
+    "errors": {
+      "noApiKey": "Por favor, configura tu clave de API de Lighthouse en Configuración primero.",
+      "noPassphrase": "Por favor, configura tu contraseña de sincronización en Configuración primero.",
+      "noEntries": "No hay entradas para subir.",
+      "noCid": "No se encontró respaldo. Por favor, sube tus entradas primero.",
+      "uploadFailed": "Error al subir: {{error}}",
+      "downloadFailed": "Error al descargar: {{error}}"
+    }
+  },
+  "scheduledExports": {
+    "title": "Exportaciones Programadas",
+    "description": "Configurar servidor de exportaciones PDF automatizadas"
+  },
+  "about": {
+    "title": "Acerca de Caderno",
+    "tagline": "Diario con privacidad primero para contadores de verdades",
+    "tabs": {
+      "mission": "Misión",
+      "vision": "Visión",
+      "ethos": "Ética",
+      "privacy": "Privacidad",
+      "security": "Seguridad",
+      "sustainability": "Sostenibilidad",
+      "techStack": "Tecnologías",
+      "downloads": "Descargas"
+    }
+  },
+  "auth": {
+    "signIn": "Iniciar Sesión",
+    "signOut": "Cerrar Sesión",
+    "plan": "Plan"
   }
 }
