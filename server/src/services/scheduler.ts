@@ -1,4 +1,3 @@
-import cron from 'node-cron';
 import { ScheduleModel, RecipientModel, ExecutionLogModel } from '../models/schedule.js';
 import { PDFGenerator, JournalEntry } from './pdfGenerator.js';
 import { EmailService } from './emailService.js';
@@ -33,7 +32,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 interface ScheduledTask {
   scheduleId: string;
-  cronTask: cron.ScheduledTask;
+  timeout: NodeJS.Timeout;
   retryCount: number;
   lastError?: string;
 }
@@ -89,8 +88,8 @@ export class Scheduler {
       // Validate configuration
       this.validateConfiguration();
       
-      // Load all enabled schedules from database
-      const schedules = ScheduleModel.findEnabled();
+      // Load all pending schedules from database
+      const schedules = ScheduleModel.findPending();
       
       let successCount = 0;
       let failureCount = 0;
@@ -168,16 +167,20 @@ export class Scheduler {
         return false;
       }
 
-      if (!schedule.enabled) {
-        logger.info('Schedule is disabled, not adding', { scheduleId, name: schedule.name });
+      if (schedule.executed) {
+        logger.info('Schedule already executed, not adding', { scheduleId, name: schedule.name });
         return false;
       }
 
-      // Validate cron expression
-      if (!cron.validate(schedule.cron_expression)) {
-        logger.error('Invalid cron expression', {
+      // Check if execution time is in the past
+      const now = Date.now();
+      const delay = schedule.execution_time - now;
+
+      if (delay < 0) {
+        logger.warn('Execution time is in the past, not scheduling', {
           scheduleId,
-          cronExpression: schedule.cron_expression,
+          executionTime: schedule.execution_time,
+          now,
         });
         return false;
       }
@@ -185,7 +188,13 @@ export class Scheduler {
       // Remove existing task if any
       this.removeSchedule(scheduleId);
 
-      const cronTask = cron.schedule(schedule.cron_expression, async () => {
+      // Use setTimeout for one-time execution
+      // Note: setTimeout has a max delay of ~24.8 days (2^31-1 ms)
+      // For longer delays, we'll need to check periodically
+      const MAX_TIMEOUT = 2147483647; // Maximum safe timeout value
+      const actualDelay = Math.min(delay, MAX_TIMEOUT);
+
+      const timeout = setTimeout(async () => {
         if (this.isShuttingDown) {
           logger.warn('Skipping execution, scheduler is shutting down', { scheduleId });
           return;
@@ -199,12 +208,23 @@ export class Scheduler {
           return;
         }
 
+        // If this was a partial delay (> MAX_TIMEOUT), reschedule for the remaining time
+        if (delay > MAX_TIMEOUT) {
+          logger.info('Rescheduling for remaining time', {
+            scheduleId,
+            remainingDelay: delay - MAX_TIMEOUT,
+          });
+          this.removeSchedule(scheduleId);
+          this.addSchedule(scheduleId);
+          return;
+        }
+
         await this.executeScheduleWithRetry(scheduleId);
-      });
+      }, actualDelay);
 
       this.tasks.set(scheduleId, {
         scheduleId,
-        cronTask,
+        timeout,
         retryCount: 0,
       });
       
@@ -213,7 +233,8 @@ export class Scheduler {
       logger.info('Schedule added successfully', {
         scheduleId,
         name: schedule.name,
-        cronExpression: schedule.cron_expression,
+        executionTime: schedule.execution_time,
+        delay: actualDelay,
       });
       
       return true;
@@ -231,7 +252,7 @@ export class Scheduler {
     const task = this.tasks.get(scheduleId);
     
     if (task) {
-      task.cronTask.stop();
+      clearTimeout(task.timeout);
       this.tasks.delete(scheduleId);
       
       logger.info('Schedule removed', { scheduleId });
@@ -303,8 +324,8 @@ export class Scheduler {
       
       const schedule = ScheduleModel.findById(scheduleId);
       
-      if (!schedule || !schedule.enabled) {
-        logger.warn('Schedule not found or disabled during execution', { scheduleId });
+      if (!schedule || schedule.executed) {
+        logger.warn('Schedule not found or already executed', { scheduleId });
         return;
       }
 
@@ -427,9 +448,10 @@ export class Scheduler {
         });
       }
 
-      // Update schedule
+      // Mark schedule as executed
       ScheduleModel.update(scheduleId, {
-        last_run: Date.now(),
+        executed: true,
+        executed_at: Date.now(),
       });
 
       // Update execution log
@@ -439,6 +461,9 @@ export class Scheduler {
         entry_count: selectedEntries.length,
         recipients_sent: sentCount,
       });
+
+      // Remove schedule from active tasks
+      this.removeSchedule(scheduleId);
 
       logger.info('Schedule execution successful', {
         scheduleId,
@@ -576,7 +601,7 @@ export class Scheduler {
     // Stop all scheduled tasks
     for (const [scheduleId, task] of this.tasks.entries()) {
       try {
-        task.cronTask.stop();
+        clearTimeout(task.timeout);
         logger.debug('Stopped schedule', { scheduleId });
       } catch (error) {
         logger.error('Error stopping schedule', {

@@ -5,17 +5,18 @@ export interface Schedule {
   id: string;
   user_id: string;
   name: string;
-  cron_expression: string;
-  enabled: boolean;
+  execution_time: number;
+  executed: boolean;
+  original_duration_ms?: number;
   entry_selection_type: 'all' | 'specific' | 'date_range';
   entry_ids?: string[];
   date_range_start?: number;
   date_range_end?: number;
+  entry_count?: number;
   passphrase: string;
   created_at: number;
   updated_at: number;
-  last_run?: number;
-  next_run?: number;
+  executed_at?: number;
 }
 
 export interface Recipient {
@@ -46,46 +47,52 @@ export class ScheduleModel {
       throw new Error('Passphrase is required');
     }
 
+    if (!data.execution_time) {
+      throw new Error('Execution time is required');
+    }
+
     const schedule: Schedule = {
       id,
       user_id: userId,
       name: data.name || 'Untitled Schedule',
-      cron_expression: data.cron_expression || '0 9 * * 1',
-      enabled: data.enabled !== undefined ? data.enabled : true,
+      execution_time: data.execution_time,
+      executed: false,
+      original_duration_ms: data.original_duration_ms,
       entry_selection_type: data.entry_selection_type || 'all',
       entry_ids: data.entry_ids,
       date_range_start: data.date_range_start,
       date_range_end: data.date_range_end,
+      entry_count: data.entry_count,
       passphrase: data.passphrase,
       created_at: now,
       updated_at: now,
-      last_run: data.last_run,
-      next_run: data.next_run,
+      executed_at: undefined,
     };
 
     const stmt = db.prepare(`
       INSERT INTO schedules (
-        id, user_id, name, cron_expression, enabled, entry_selection_type,
-        entry_ids, date_range_start, date_range_end, passphrase, created_at, updated_at,
-        last_run, next_run
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        id, user_id, name, execution_time, executed, original_duration_ms, entry_selection_type,
+        entry_ids, date_range_start, date_range_end, entry_count, passphrase, created_at, updated_at,
+        executed_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     stmt.run(
       schedule.id,
       schedule.user_id,
       schedule.name,
-      schedule.cron_expression,
-      schedule.enabled ? 1 : 0,
+      schedule.execution_time,
+      schedule.executed ? 1 : 0,
+      schedule.original_duration_ms || null,
       schedule.entry_selection_type,
       schedule.entry_ids ? JSON.stringify(schedule.entry_ids) : null,
       schedule.date_range_start || null,
       schedule.date_range_end || null,
+      schedule.entry_count || null,
       schedule.passphrase,
       schedule.created_at,
       schedule.updated_at,
-      schedule.last_run || null,
-      schedule.next_run || null
+      schedule.executed_at || null
     );
 
     return schedule;
@@ -103,8 +110,8 @@ export class ScheduleModel {
     return rows.map(row => this.rowToSchedule(row));
   }
 
-  static findEnabled(): Schedule[] {
-    const stmt = db.prepare('SELECT * FROM schedules WHERE enabled = 1');
+  static findPending(): Schedule[] {
+    const stmt = db.prepare('SELECT * FROM schedules WHERE executed = 0');
     const rows = stmt.all() as any[];
     return rows.map(row => this.rowToSchedule(row));
   }
@@ -117,13 +124,17 @@ export class ScheduleModel {
       updates.push('name = ?');
       values.push(data.name);
     }
-    if (data.cron_expression !== undefined) {
-      updates.push('cron_expression = ?');
-      values.push(data.cron_expression);
+    if (data.execution_time !== undefined) {
+      updates.push('execution_time = ?');
+      values.push(data.execution_time);
     }
-    if (data.enabled !== undefined) {
-      updates.push('enabled = ?');
-      values.push(data.enabled ? 1 : 0);
+    if (data.executed !== undefined) {
+      updates.push('executed = ?');
+      values.push(data.executed ? 1 : 0);
+    }
+    if (data.original_duration_ms !== undefined) {
+      updates.push('original_duration_ms = ?');
+      values.push(data.original_duration_ms || null);
     }
     if (data.entry_selection_type !== undefined) {
       updates.push('entry_selection_type = ?');
@@ -141,13 +152,13 @@ export class ScheduleModel {
       updates.push('date_range_end = ?');
       values.push(data.date_range_end || null);
     }
-    if (data.last_run !== undefined) {
-      updates.push('last_run = ?');
-      values.push(data.last_run);
+    if (data.entry_count !== undefined) {
+      updates.push('entry_count = ?');
+      values.push(data.entry_count || null);
     }
-    if (data.next_run !== undefined) {
-      updates.push('next_run = ?');
-      values.push(data.next_run);
+    if (data.executed_at !== undefined) {
+      updates.push('executed_at = ?');
+      values.push(data.executed_at);
     }
 
     updates.push('updated_at = ?');
@@ -171,17 +182,18 @@ export class ScheduleModel {
       id: row.id,
       user_id: row.user_id,
       name: row.name,
-      cron_expression: row.cron_expression,
-      enabled: row.enabled === 1,
+      execution_time: row.execution_time,
+      executed: row.executed === 1,
+      original_duration_ms: row.original_duration_ms || undefined,
       entry_selection_type: row.entry_selection_type,
       entry_ids: row.entry_ids ? JSON.parse(row.entry_ids) : undefined,
       date_range_start: row.date_range_start || undefined,
       date_range_end: row.date_range_end || undefined,
+      entry_count: row.entry_count || undefined,
       passphrase: row.passphrase,
       created_at: row.created_at,
       updated_at: row.updated_at,
-      last_run: row.last_run || undefined,
-      next_run: row.next_run || undefined,
+      executed_at: row.executed_at || undefined,
     };
   }
 }

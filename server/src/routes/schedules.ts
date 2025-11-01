@@ -16,12 +16,12 @@ router.use(authenticate);
  */
 router.post('/', async (req: AuthRequest, res) => {
   try {
-    const { name, cron_expression, entry_selection_type, entry_ids, date_range_start, date_range_end, recipients, entries_data, passphrase } = req.body;
+    const { name, execution_time, original_duration_ms, entry_selection_type, entry_ids, date_range_start, date_range_end, entry_count, recipients, entries_data, passphrase } = req.body;
 
-    if (!name || !cron_expression) {
+    if (!name || !execution_time) {
       return res.status(400).json({
         success: false,
-        error: 'Name and cron expression are required',
+        error: 'Name and execution time are required',
       });
     }
 
@@ -52,11 +52,13 @@ router.post('/', async (req: AuthRequest, res) => {
 
     const schedule = ScheduleModel.create(req.user!.id, {
       name,
-      cron_expression,
+      execution_time,
+      original_duration_ms,
       entry_selection_type: entry_selection_type || 'all',
       entry_ids,
       date_range_start,
       date_range_end,
+      entry_count,
       passphrase,
     });
 
@@ -176,16 +178,36 @@ router.put('/:id', async (req: AuthRequest, res) => {
       });
     }
 
-    const { name, cron_expression, enabled, entry_selection_type, entry_ids, date_range_start, date_range_end, recipients } = req.body;
+    const { name, execution_time, original_duration_ms, executed, entry_selection_type, entry_ids, date_range_start, date_range_end, entry_count, recipients, entries_data, passphrase } = req.body;
+
+    // Update encrypted entries if passphrase and entries_data provided
+    if (entries_data && passphrase && req.user) {
+      const encrypted = CryptoJS.AES.encrypt(JSON.stringify(entries_data), passphrase).toString();
+      
+      const stmt = db.prepare(`
+        INSERT OR REPLACE INTO encrypted_entries (id, user_id, encrypted_data, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?)
+      `);
+      
+      stmt.run(
+        req.user.id,
+        req.user.id,
+        encrypted,
+        Date.now(),
+        Date.now()
+      );
+    }
 
     const updated = ScheduleModel.update(req.params.id, {
       name,
-      cron_expression,
-      enabled,
+      execution_time,
+      original_duration_ms,
+      executed,
       entry_selection_type,
       entry_ids,
       date_range_start,
       date_range_end,
+      entry_count,
     });
 
     if (!updated) {
@@ -209,9 +231,8 @@ router.put('/:id', async (req: AuthRequest, res) => {
     }
 
     // Update scheduler
-    if (enabled === false) {
-      scheduler.removeSchedule(req.params.id);
-    } else {
+    scheduler.removeSchedule(req.params.id);
+    if (!executed) {
       scheduler.addSchedule(req.params.id);
     }
 
