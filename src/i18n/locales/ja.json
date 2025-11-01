@@ -162,7 +162,7 @@
   },
   "cloudSync": {
     "title": "クラウド同期",
-    "description": "エンドツーエンド暗号化を使用して、日記エントリを分散型トレージ（IPFS）に同期します。",
+    "description": "エンドツーエンド暗号化を使用して、日記エントリを分散型ストレージ（IPFS）に同期します。",
     "notConfigured": "クラウド同期が設定されていません。まず設定でLighthouse APIキーとパスフレーズを設定してください。",
     "lastSync": "最終同期：{{date}}",
     "close": "閉じる",
@@ -209,6 +209,147 @@
       "sustainability": "持続可能性",
       "techStack": "技術スタック",
       "downloads": "ダウンロード"
+    },
+    "mission": {
+      "title": "ミッション",
+      "description": "アジェンダは<strong>分散型でプライバシー第一の日記プラットフォーム</strong>であり、個人の真実を保護し、権力に真実を語る人々を支援することに専念しています。",
+      "corePurpose": "中核的目的",
+      "corePurposeDesc": "ジャーナリスト、内部告発者、サバイバー、活動家に、検閲や監視を恐れずに経験を記録できる安全なデジタル空間を提供します。",
+      "keyFeatures": "主な機能：",
+      "feature1": "暗号化ストレージ：あなたが制御する分散型クラウドの暗号化された「保管庫」に日記エントリを保存",
+      "feature2": "安全メカニズム：オプションのタイマー警報（デッドマンスイッチ）が信頼できる連絡先にエントリを配信",
+      "feature3": "連合型インフラ：自己ホスティング可能で、制御を人々の手に委ねます",
+      "feature4": "証拠の保存：沈黙させようとする者からユーザーを保護するセーフガード"
+    },
+    "vision": {
+      "title": "ビジョン",
+      "description": "<strong>個人の物語と重要な真実が安全に、透明に、そして回復力を持って保存される</strong>世界 — あらゆる権威の手の届かないところに。",
+      "sanctuary": "倫理的聖域",
+      "sanctuaryDesc": "透明性と抑圧に対する回復力を促進する倫理的なデジタル聖域。",
+      "empowerment": "エンパワーメント",
+      "empowermentDesc": "力を与えられた個人が権力に真実を語り、声が消されないことを保証します。",
+      "federation": "連合",
+      "federationDesc": "世界中のユーザー運営サーバーが検閲に強いネットワークを形成します。",
+      "standard": "新しい標準",
+      "standardDesc": "エンドツーエンド暗号化、分散化、ユーザー自治をデフォルトとして標準化します。"
+    },
+    "ethos": {
+      "title": "理念",
+      "description": "<strong>透明性、回復力、エンパワーメント</strong>に基づき、プライバシー、セキュリティ、社会的責任に導かれています。",
+      "transparency": "透明性",
+      "transparencyDesc": "隠されたバックドアのない完全なオープンソース。誰でもコードを検査し貢献できます。",
+      "privacy": "プライバシー",
+      "privacyDesc": "エンドツーエンド暗号化の上に構築されています。個人データを収集したり収益化したりしません—絶対に。",
+      "security": "セキュリティと回復力",
+      "securityDesc": "単一障害点のない分散型アーキテクチャ。中断や検閲に対して堅牢です。",
+      "empowerment": "エンパワーメントと擁護",
+      "empowermentDesc": "自己ホスティング能力が人々に権力を返します。内部告発者と活動家を支援します。",
+      "accountability": "責任と誠実性",
+      "accountabilityDesc": "証拠として機能する不変の記録を作成し、真実が出口を見つけることを保証します。"
+    },
+    "privacyTab": {
+      "title": "プライバシー",
+      "description": "プライバシーは最も重要で、私たちのプラットフォームの基盤です。",
+      "e2ee": "エンドツーエンド暗号化",
+      "e2eeDesc": "すべてのエントリはデフォルトでエンドツーエンド暗号化されています。あなた（と意図した受信者）だけが復号化できます—私たちも、誰も復号化できません。",
+      "federated": "連合型ストレージ",
+      "federatedDesc": "自分のサーバーまたは信頼できるホストを選択してください。大規模監視に弱い中央集権型データサイロはありません。",
+      "noTracking": "トラッキングなし",
+      "noTrackingDesc": "データを追跡、プロファイリング、収益化しません。広告なし、データマイニングなし—あなたのデータはあなただけに奉仕します。",
+      "userControl": "ユーザーコントロール",
+      "userControlDesc": "いつでもデータをエクスポート、削除、管理できます。オフライン優先でオプションの同期。常にあなたがコントロールします。"
+    },
+    "security": {
+      "title": "サイバーセキュリティ",
+      "description": "高リスクユーザーを保護するための多層防御戦略。",
+      "encryption": "最先進の暗号化",
+      "encryptionDesc": "AES-256、日記コンテンツのエンドツーエンド暗号化、ネットワークのTLS 1.3。データは保存中も転送中も保護されています。",
+      "federatedSecurity": "連合型セキュリティ",
+      "federatedSecurityDesc": "各サーバーは独立して運営されます。1つが侵害されても他に影響しません—単一のハニーポットはありません。",
+      "userFeatures": "ユーザーセキュリティ機能",
+      "userFeaturesDesc": "多要素認証、アプリロック、パニックモード、改ざん防止検出。",
+      "auditing": "セキュリティ監査",
+      "auditingDesc": "コミュニティレビュー用のオープンソース。第三者監査。責任ある開示プログラム。",
+      "deadManSwitch": "デッドマンスイッチ",
+      "deadManSwitchDesc": "ユーザーがチェックインできない場合、暗号化されたパッケージが信頼できる連絡先にリリースされます。強制を抑止します。",
+      "improvement": "継続的改善",
+      "improvementDesc": "定期的な更新、インシデント対応計画、継続的な脅威監視。"
+    },
+    "sustainability": {
+      "title": "持続可能性",
+      "description": "<strong>私たちの価値観に沿った</strong>持続可能な資金調達—ユーザーの信頼を決して損ないません。",
+      "saas": "オープンソースSaaS",
+      "saasDesc": "利便性を好むユーザー向けのオプションのマネージドホスティング。ソフトウェアは無料で自己ホスティング可能なままです。",
+      "enterprise": "エンタープライズサポート",
+      "enterpriseDesc": "NGOやジャーナリズム組織などの組織向けのカスタマイズされたソリューション、優先サポート、コンサルティング。",
+      "donations": "寄付とスポンサーシップ",
+      "donationsDesc": "Open Collectiveなどのプラットフォームを通じたコミュニティ資金調達。デジタル権利財団からの助成金。",
+      "never": "決して",
+      "neverDesc": "広告なし。データ販売なし。利益のためのユーザー分析なし。基本的なアクセスを妨げるペイウォールなし。",
+      "transparentFinance": "透明な財務：",
+      "transparentFinanceDesc": "プロジェクトの資金調達方法の公開会計。利益はミッションに再投資されます。"
+    },
+    "techStack": {
+      "title": "技術スタック",
+      "description": "アジェンダを支える最新の安全なオープンソース技術。",
+      "frontend": "フロントエンド",
+      "frontendItems": [
+        "<strong>React 18</strong>と<strong>TypeScript</strong>",
+        "ビルドツール用の<strong>Vite</strong>",
+        "スタイリング用の<strong>TailwindCSS</strong>",
+        "状態管理用の<strong>Zustand</strong>",
+        "リッチテキスト編集用の<strong>TipTap</strong>",
+        "国際化用の<strong>i18next</strong>"
+      ],
+      "storage": "ストレージ",
+      "storageItems": [
+        "<strong>IndexedDB</strong>（ローカル優先）",
+        "設定用の<strong>LocalStorage</strong>",
+        "Cookie なし、トラッキングなし",
+        "デフォルトでオフライン動作可能"
+      ],
+      "backend": "バックエンド",
+      "backendItems": [
+        "<strong>Express</strong>を使用した<strong>Node.js</strong>",
+        "永続化用の<strong>SQLite</strong>",
+        "<strong>JWT</strong>認証",
+        "<strong>RESTful API</strong>設計",
+        "PDF生成用の<strong>Puppeteer</strong>"
+      ],
+      "security": "セキュリティ",
+      "securityItems": [
+        "エンドツーエンド暗号化用の<strong>Web Crypto API</strong>",
+        "<strong>AES-256-GCM</strong>暗号化",
+        "<strong>PBKDF2</strong>鍵導出",
+        "転送用の<strong>TLS 1.3</strong>"
+      ],
+      "deployment": "デプロイ",
+      "deploymentItems": [
+        "連合型、自己ホスティング可能",
+        "<strong>Progressive Web App</strong>（PWA）",
+        "オープンソース（<strong>MITライセンス</strong>）",
+        "デプロイ用の<strong>Docker</strong>サポート",
+        "分散型ストレージ用の<strong>IPFS</strong>"
+      ],
+      "aiIntegration": "AI統合",
+      "aiIntegrationItems": [
+        "<strong>OpenAI</strong>/<strong>Anthropic</strong> APIサポート",
+        "<strong>HuggingFace</strong>モデル統合",
+        "<strong>AI駆動の</strong>自動補完提案",
+        "自動エントリ要約"
+      ]
+    },
+    "downloads": {
+      "title": "ミッションとビジョンドキュメントのダウンロード",
+      "description": "アジェンダの完全なミッションとビジョンドキュメントをお好みの形式でダウンロード：",
+      "markdown": "Markdown (.md)",
+      "markdownDesc": "プレーンテキスト形式、開発者やバージョン管理に最適",
+      "pdf": "PDF (.pdf)",
+      "pdfDesc": "フォーマット済みドキュメント、読みやすく共有しやすい",
+      "word": "Word (.docx)",
+      "wordDesc": "Microsoft Wordおよび互換アプリケーション用の編集可能なドキュメント",
+      "note": "注意：",
+      "noteDesc": "これらのドキュメントには、アジェンダのミッション、ビジョン、理念、技術的アプローチの完全な詳細説明が含まれています。上記のタブは簡略化された実用的な概要を提供します。"
     }
   },
   "auth": {

@@ -209,6 +209,147 @@
       "sustainability": "Sustentabilidade",
       "techStack": "Tecnologias",
       "downloads": "Downloads"
+    },
+    "mission": {
+      "title": "Missão",
+      "description": "Caderno é uma <strong>plataforma de diário descentralizada e com privacidade em primeiro lugar</strong> dedicada a proteger verdades pessoais e empoderar aqueles que falam a verdade ao poder.",
+      "corePurpose": "Propósito Central",
+      "corePurposeDesc": "Fornecer a jornalistas, denunciantes, sobreviventes e ativistas um espaço digital seguro para documentar experiências sem medo de censura ou vigilância.",
+      "keyFeatures": "Recursos Principais:",
+      "feature1": "Armazenamento Criptografado: Entradas do diário em \"despensas\" criptografadas na nuvem descentralizada que você controla",
+      "feature2": "Mecanismo de Segurança: Alarme cronometrado opcional (interruptor de homem morto) entrega entradas a contatos confiáveis",
+      "feature3": "Infraestrutura Federada: Auto-hospedável, colocando o controle nas mãos das pessoas",
+      "feature4": "Preservação de Evidências: Salvaguardas protegendo usuários daqueles que possam silenciá-los"
+    },
+    "vision": {
+      "title": "Visão",
+      "description": "Um mundo onde <strong>narrativas pessoais e verdades críticas são preservadas de forma segura, transparente e resiliente</strong> — além do alcance de qualquer autoridade.",
+      "sanctuary": "Santuário Ético",
+      "sanctuaryDesc": "Um santuário digital ético promovendo transparência e resiliência contra a opressão.",
+      "empowerment": "Empoderamento",
+      "empowermentDesc": "Indivíduos empoderados falam a verdade ao poder, garantindo que vozes não possam ser apagadas.",
+      "federation": "Federação",
+      "federationDesc": "Servidores operados por usuários em todo o mundo formam uma rede resistente à censura.",
+      "standard": "Novo Padrão",
+      "standardDesc": "Normalizando criptografia E2E, descentralização e autonomia do usuário como padrões."
+    },
+    "ethos": {
+      "title": "Ética",
+      "description": "Fundamentado em <strong>transparência, resiliência e empoderamento</strong>, guiado por privacidade, segurança e responsabilidade social.",
+      "transparency": "Transparência",
+      "transparencyDesc": "Totalmente código aberto sem backdoors ocultos. Qualquer um pode inspecionar e contribuir com o código.",
+      "privacy": "Privacidade",
+      "privacyDesc": "Construído em criptografia E2E. Não coletamos ou monetizamos dados pessoais—ponto final.",
+      "security": "Segurança e Resiliência",
+      "securityDesc": "Arquitetura descentralizada sem ponto único de falha. Robusto contra interrupções e censura.",
+      "empowerment": "Empoderamento e Defesa",
+      "empowermentDesc": "Capacidade de auto-hospedagem devolve o poder ao povo. Apoiamos denunciantes e ativistas.",
+      "accountability": "Responsabilidade e Integridade",
+      "accountabilityDesc": "Crie registros imutáveis que servem como evidência, garantindo que a verdade encontre um caminho."
+    },
+    "privacyTab": {
+      "title": "Privacidade",
+      "description": "A privacidade é primordial e a base da nossa plataforma.",
+      "e2ee": "Criptografia de Ponta a Ponta",
+      "e2eeDesc": "Todas as entradas são E2EE por padrão. Apenas você (e seus destinatários pretendidos) podem descriptografá-las—não nós, nem ninguém.",
+      "federated": "Armazenamento Federado",
+      "federatedDesc": "Escolha seu próprio servidor ou um host confiável. Sem silos de dados centralizados vulneráveis à vigilância em massa.",
+      "noTracking": "Sem Rastreamento",
+      "noTrackingDesc": "Não rastreamos, perfilamos ou monetizamos seus dados. Sem publicidade, sem mineração de dados—seus dados servem apenas a você.",
+      "userControl": "Controle do Usuário",
+      "userControlDesc": "Exporte, exclua ou gerencie seus dados a qualquer momento. Offline primeiro com sincronização opcional. Você está sempre no controle."
+    },
+    "security": {
+      "title": "Cibersegurança",
+      "description": "Estratégia de defesa em profundidade para proteger usuários de alto risco.",
+      "encryption": "Criptografia de Última Geração",
+      "encryptionDesc": "AES-256, E2EE para conteúdo do diário, TLS 1.3 para rede. Dados protegidos em repouso e em trânsito.",
+      "federatedSecurity": "Segurança Federada",
+      "federatedSecurityDesc": "Cada servidor opera independentemente. Violação de um não afeta os outros—sem pote de mel único.",
+      "userFeatures": "Recursos de Segurança do Usuário",
+      "userFeaturesDesc": "Autenticação multifator, bloqueio de aplicativo, modo pânico e detecção anti-adulteração.",
+      "auditing": "Auditoria de Segurança",
+      "auditingDesc": "Código aberto para revisão da comunidade. Auditorias de terceiros. Programa de divulgação responsável.",
+      "deadManSwitch": "Interruptor de Homem Morto",
+      "deadManSwitchDesc": "Pacote criptografado liberado para contatos confiáveis se o usuário não puder fazer check-in. Desincentiva coerção.",
+      "improvement": "Melhoria Contínua",
+      "improvementDesc": "Atualizações regulares, planos de resposta a incidentes e monitoramento contínuo de ameaças."
+    },
+    "sustainability": {
+      "title": "Sustentabilidade",
+      "description": "Financiamento sustentável que <strong>alinha com nossos valores</strong>—nunca comprometendo a confiança do usuário.",
+      "saas": "SaaS de Código Aberto",
+      "saasDesc": "Hospedagem gerenciada opcional para usuários que preferem conveniência. O software permanece gratuito e auto-hospedável.",
+      "enterprise": "Suporte Empresarial",
+      "enterpriseDesc": "Soluções personalizadas, suporte prioritário e consultoria para organizações como ONGs e veículos de jornalismo.",
+      "donations": "Doações e Patrocínios",
+      "donationsDesc": "Financiamento comunitário através de plataformas como Open Collective. Subsídios de fundações de direitos digitais.",
+      "never": "Nunca",
+      "neverDesc": "Sem anúncios. Sem venda de dados. Sem análise de usuários para lucro. Sem paywalls que dificultam o acesso básico.",
+      "transparentFinance": "Finanças Transparentes:",
+      "transparentFinanceDesc": "Contabilidade aberta de como o projeto é financiado. Lucros reinvestidos na missão."
+    },
+    "techStack": {
+      "title": "Stack Tecnológico",
+      "description": "Tecnologias modernas, seguras e de código aberto alimentando o Caderno.",
+      "frontend": "Frontend",
+      "frontendItems": [
+        "<strong>React 18</strong> com <strong>TypeScript</strong>",
+        "<strong>Vite</strong> para ferramentas de construção",
+        "<strong>TailwindCSS</strong> para estilização",
+        "<strong>Zustand</strong> para gerenciamento de estado",
+        "<strong>TipTap</strong> para edição de texto rico",
+        "<strong>i18next</strong> para internacionalização"
+      ],
+      "storage": "Armazenamento",
+      "storageItems": [
+        "<strong>IndexedDB</strong> (local primeiro)",
+        "<strong>LocalStorage</strong> para configurações",
+        "Sem cookies, sem rastreamento",
+        "Capaz de funcionar offline por padrão"
+      ],
+      "backend": "Backend",
+      "backendItems": [
+        "<strong>Node.js</strong> com <strong>Express</strong>",
+        "<strong>SQLite</strong> para persistência",
+        "Autenticação <strong>JWT</strong>",
+        "Design de <strong>API RESTful</strong>",
+        "<strong>Puppeteer</strong> para geração de PDF"
+      ],
+      "security": "Segurança",
+      "securityItems": [
+        "<strong>API Web Crypto</strong> para E2EE",
+        "Criptografia <strong>AES-256-GCM</strong>",
+        "Derivação de chave <strong>PBKDF2</strong>",
+        "<strong>TLS 1.3</strong> para transporte"
+      ],
+      "deployment": "Implantação",
+      "deploymentItems": [
+        "Federado, auto-hospedável",
+        "<strong>Progressive Web App</strong> (PWA)",
+        "Código aberto (<strong>Licença MIT</strong>)",
+        "Suporte <strong>Docker</strong> para implantação",
+        "<strong>IPFS</strong> para armazenamento descentralizado"
+      ],
+      "aiIntegration": "Integração de IA",
+      "aiIntegrationItems": [
+        "Suporte a API <strong>OpenAI</strong> / <strong>Anthropic</strong>",
+        "Integração com modelo <strong>HuggingFace</strong>",
+        "Sugestões de autocompletar <strong>alimentadas por IA</strong>",
+        "Resumo automático de entradas"
+      ]
+    },
+    "downloads": {
+      "title": "Baixar Documento de Missão e Visão",
+      "description": "Baixe o documento completo de Missão e Visão do Caderno no formato de sua preferência:",
+      "markdown": "Markdown (.md)",
+      "markdownDesc": "Formato de texto simples, ótimo para desenvolvedores e controle de versão",
+      "pdf": "PDF (.pdf)",
+      "pdfDesc": "Documento formatado, fácil de ler e compartilhar",
+      "word": "Word (.docx)",
+      "wordDesc": "Documento editável para Microsoft Word e aplicativos compatíveis",
+      "note": "Nota:",
+      "noteDesc": "Estes documentos contêm a explicação completa e detalhada da missão, visão, ética e abordagem técnica do Caderno. As abas acima fornecem uma visão geral resumida e prática."
     }
   },
   "auth": {

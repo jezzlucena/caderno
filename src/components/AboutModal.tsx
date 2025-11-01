@@ -23,12 +23,29 @@ export default function AboutModal({ onClose, initialTab = 'mission' }: AboutMod
   const [activeTab, setActiveTab] = useState<TabId>(initialTab);
   const [contentHeight, setContentHeight] = useState<number>(0);
   const contentRef = useRef<HTMLDivElement>(null);
+  const tabsContainerRef = useRef<HTMLDivElement>(null);
+  const tabRefs = useRef<Record<TabId, HTMLButtonElement | null>>({} as Record<TabId, HTMLButtonElement | null>);
 
   // Measure content height whenever activeTab changes
   useEffect(() => {
     if (contentRef.current) {
       const height = contentRef.current.scrollHeight;
       setContentHeight(height + 74);
+    }
+  }, [activeTab]);
+
+  // Scroll to active tab when it changes
+  useEffect(() => {
+    const tabElement = tabRefs.current[activeTab];
+    const container = tabsContainerRef.current;
+    
+    if (tabElement && container) {
+      // Use scrollIntoView with smooth behavior and inline center alignment
+      tabElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'center'
+      });
     }
   }, [activeTab]);
 
@@ -148,10 +165,14 @@ export default function AboutModal({ onClose, initialTab = 'mission' }: AboutMod
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-0.5 px-4 pt-4 bg-indigo-100 overflow-x-auto">
+        <div 
+          ref={tabsContainerRef}
+          className="flex gap-0.5 px-4 pt-4 bg-indigo-100 overflow-x-auto scroll-smooth"
+        >
           {tabs.map((tab) => (
             <button
               key={tab.id}
+              ref={(el) => { tabRefs.current[tab.id] = el; }}
               onClick={() => handleTabClick(tab.id)}
               className={`h-12 pl-4 pr-6 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors border-2 rounded-b-none border-indigo-200 bg-indigo-50 z-10 ${
                 activeTab === tab.id

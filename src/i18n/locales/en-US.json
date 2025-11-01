@@ -294,49 +294,49 @@
       "description": "Modern, secure, and open-source technologies powering Caderno.",
       "frontend": "Frontend",
       "frontendItems": [
-        "React 18 with TypeScript",
-        "Vite for build tooling",
-        "TailwindCSS for styling",
-        "Zustand for state management",
-        "TipTap for rich text editing",
-        "i18next for internationalization"
+        "<strong>React 18</strong> with <strong>TypeScript</strong>",
+        "<strong>Vite</strong> for build tooling",
+        "<strong>TailwindCSS</strong> for styling",
+        "<strong>Zustand</strong> for state management",
+        "<strong>TipTap</strong> for rich text editing",
+        "<strong>i18next</strong> for internationalisation"
       ],
       "storage": "Storage",
       "storageItems": [
-        "IndexedDB (local-first)",
-        "LocalStorage for settings",
+        "<strong>IndexedDB</strong> (local-first)",
+        "<strong>LocalStorage</strong> for settings",
         "No cookies, no tracking",
-        "Offline-capable by default"
+        "Capable of offline operation by default"
       ],
       "backend": "Backend",
       "backendItems": [
-        "Node.js with Express",
-        "SQLite for persistence",
-        "JWT authentication",
-        "RESTful API design",
-        "Puppeteer for PDF generation"
+        "<strong>Node.js</strong> with <strong>Express</strong>",
+        "<strong>SQLite</strong> for persistence",
+        "<strong>JWT</strong> authentication",
+        "<strong>RESTful API</strong> design",
+        "<strong>Puppeteer</strong> for PDF generation"
       ],
       "security": "Security",
       "securityItems": [
-        "Web Crypto API for E2EE",
-        "AES-256-GCM encryption",
-        "PBKDF2 key derivation",
-        "TLS 1.3 for transport"
+        "<strong>Web Crypto API</strong> for E2EE",
+        "<strong>AES-256-GCM</strong> encryption",
+        "<strong>PBKDF2</strong> key derivation",
+        "<strong>TLS 1.3</strong> for transport"
       ],
       "deployment": "Deployment",
       "deploymentItems": [
         "Federated, self-hostable",
-        "Progressive Web App (PWA)",
-        "Open source (MIT License)",
-        "Docker support for deployment",
-        "IPFS for decentralized storage"
+        "<strong>Progressive Web App</strong> (PWA)",
+        "Open-source (<strong>MIT Licence</strong>)",
+        "<strong>Docker</strong> support for deployment",
+        "<strong>IPFS</strong> for decentralised storage"
       ],
       "aiIntegration": "AI Integration",
       "aiIntegrationItems": [
-        "OpenAI / Anthropic API support",
-        "HuggingFace model integration",
-        "AI-powered autocomplete suggestions",
-        "Automatic entry summarization"
+        "<strong>OpenAI</strong> / <strong>Anthropic</strong> API support",
+        "<strong>HuggingFace</strong> model integration",
+        "<strong>AI-powered</strong> autocomplete suggestions",
+        "Automatic entry summarisation"
       ]
     },
     "downloads": {

@@ -101,7 +101,7 @@
     "aiDescription": "使用HuggingFace的免费AI语言模型SmollM3启用AI驱动的文本补全。在您输入时获得智能写作建议 - 完全免费！",
     "howToGetKey": "如何获取您的免费HuggingFace API密钥：",
     "step1": "访问huggingface.co并使用Google或GitHub登录",
-    "step2": "转到密钥部���",
+    "step2": "转到密钥部分",
     "step3": "创建新密钥并粘贴到下面",
     "getKeyLink": "获取您的免费HuggingFace API密钥",
     "apiKey": "HuggingFace API密钥",
@@ -209,6 +209,147 @@
       "sustainability": "可持续性",
       "techStack": "技术栈",
       "downloads": "下载"
+    },
+    "mission": {
+      "title": "使命",
+      "description": "日程是一个<strong>去中心化、隐私优先的日记平台</strong>，致力于保护个人真相并赋能向权力说真话的人。",
+      "corePurpose": "核心目标",
+      "corePurposeDesc": "为记者、举报人、幸存者和活动人士提供一个安全的数字空间，记录经历而无需担心审查或监控。",
+      "keyFeatures": "主要特性：",
+      "feature1": "加密存储：日记条目存储在您控制的去中心化云端\"储藏室\"中",
+      "feature2": "安全机制：可选的定时警报（死人开关）将条目传递给可信联系人",
+      "feature3": "联邦基础设施：可自托管，将控制权交给人民",
+      "feature4": "证据保存：保护用户免受试图将其消音者的侵害"
+    },
+    "vision": {
+      "title": "愿景",
+      "description": "一个<strong>个人叙事和关键真相以安全、透明和有韧性的方式保存</strong>的世界 — 超越任何权威的触及范围。",
+      "sanctuary": "道德庇护所",
+      "sanctuaryDesc": "一个促进透明度和抵御压迫韧性的道德数字庇护所。",
+      "empowerment": "赋能",
+      "empowermentDesc": "被赋能的个人向权力说真话，确保声音不会被抹去。",
+      "federation": "联邦",
+      "federationDesc": "全球用户运营的服务器形成抗审查网络。",
+      "standard": "新标准",
+      "standardDesc": "将端到端加密、去中心化和用户自主权作为默认标准。"
+    },
+    "ethos": {
+      "title": "理念",
+      "description": "建立在<strong>透明、韧性和赋能</strong>的基础上，由隐私、安全和社会责任引导。",
+      "transparency": "透明",
+      "transparencyDesc": "完全开源，没有隐藏后门。任何人都可以检查和贡献代码。",
+      "privacy": "隐私",
+      "privacyDesc": "建立在端到端加密之上。我们不收集或变现个人数据——绝对不会。",
+      "security": "安全与韧性",
+      "securityDesc": "去中心化架构，无单点故障。对中断和审查具有鲁棒性。",
+      "empowerment": "赋能与倡导",
+      "empowermentDesc": "自托管能力将权力归还给人民。我们支持举报人和活动人士。",
+      "accountability": "责任与诚信",
+      "accountabilityDesc": "创建作为证据的不可变记录，确保真相找到出路。"
+    },
+    "privacyTab": {
+      "title": "隐私",
+      "description": "隐私至上，是我们平台的基础。",
+      "e2ee": "端到端加密",
+      "e2eeDesc": "所有条目默认采用端到端加密。只有您（和您的预期接收者）可以解密——我们不能，任何人都不能。",
+      "federated": "联邦存储",
+      "federatedDesc": "选择您自己的服务器或可信主机。没有易受大规模监控的中心化数据孤岛。",
+      "noTracking": "无跟踪",
+      "noTrackingDesc": "我们不跟踪、分析或变现您的数据。没有广告，没有数据挖掘——您的数据只为您服务。",
+      "userControl": "用户控制",
+      "userControlDesc": "随时导出、删除或管理您的数据。离线优先，可选同步。您始终掌控一切。"
+    },
+    "security": {
+      "title": "网络安全",
+      "description": "深度防御策略，保护高风险用户。",
+      "encryption": "最先进的加密",
+      "encryptionDesc": "AES-256、日记内容端到端加密、网络TLS 1.3。数据在静止和传输中受到保护。",
+      "federatedSecurity": "联邦安全",
+      "federatedSecurityDesc": "每个服务器独立运营。一个被破坏不会影响其他——没有单一蜜罐。",
+      "userFeatures": "用户安全功能",
+      "userFeaturesDesc": "多因素身份验证、应用锁定、紧急模式和防篡改检测。",
+      "auditing": "安全审计",
+      "auditingDesc": "开源供社区审查。第三方审计。负责任的披露计划。",
+      "deadManSwitch": "死人开关",
+      "deadManSwitchDesc": "如果用户无法检入，加密包会被释放给可信联系人。遏制胁迫。",
+      "improvement": "持续改进",
+      "improvementDesc": "定期更新、事件响应计划和持续威胁监控。"
+    },
+    "sustainability": {
+      "title": "可持续性",
+      "description": "<strong>符合我们价值观</strong>的可持续融资——绝不损害用户信任。",
+      "saas": "开源SaaS",
+      "saasDesc": "为喜欢便利的用户提供可选的托管服务。软件保持免费和可自托管。",
+      "enterprise": "企业支持",
+      "enterpriseDesc": "为NGO和新闻机构等组织提供定制解决方案、优先支持和咨询。",
+      "donations": "捐赠与赞助",
+      "donationsDesc": "通过Open Collective等平台进行社区资助。数字权利基金会的资助。",
+      "never": "绝不",
+      "neverDesc": "无广告。无数据销售。无盈利性用户分析。无妨碍基本访问的付费墙。",
+      "transparentFinance": "透明财务：",
+      "transparentFinanceDesc": "项目资金来源的开放会计。利润再投资于使命。"
+    },
+    "techStack": {
+      "title": "技术栈",
+      "description": "驱动日程的现代、安全、开源技术。",
+      "frontend": "前端",
+      "frontendItems": [
+        "<strong>React 18</strong>配合<strong>TypeScript</strong>",
+        "<strong>Vite</strong>构建工具",
+        "<strong>TailwindCSS</strong>样式设计",
+        "<strong>Zustand</strong>状态管理",
+        "<strong>TipTap</strong>富文本编辑",
+        "<strong>i18next</strong>国际化"
+      ],
+      "storage": "存储",
+      "storageItems": [
+        "<strong>IndexedDB</strong>（本地优先）",
+        "<strong>LocalStorage</strong>设置",
+        "无cookie，无跟踪",
+        "默认可离线工作"
+      ],
+      "backend": "后端",
+      "backendItems": [
+        "<strong>Node.js</strong>配合<strong>Express</strong>",
+        "<strong>SQLite</strong>持久化",
+        "<strong>JWT</strong>身份验证",
+        "<strong>RESTful API</strong>设计",
+        "<strong>Puppeteer</strong>PDF生成"
+      ],
+      "security": "安全",
+      "securityItems": [
+        "<strong>Web Crypto API</strong>实现端到端加密",
+        "<strong>AES-256-GCM</strong>加密",
+        "<strong>PBKDF2</strong>密钥派生",
+        "<strong>TLS 1.3</strong>传输"
+      ],
+      "deployment": "部署",
+      "deploymentItems": [
+        "联邦式，可自托管",
+        "<strong>渐进式Web应用</strong>（PWA）",
+        "开源（<strong>MIT许可证</strong>）",
+        "<strong>Docker</strong>部署支持",
+        "<strong>IPFS</strong>去中心化存储"
+      ],
+      "aiIntegration": "AI集成",
+      "aiIntegrationItems": [
+        "支持<strong>OpenAI</strong>/<strong>Anthropic</strong> API",
+        "<strong>HuggingFace</strong>模型集成",
+        "<strong>AI驱动的</strong>自动补全建议",
+        "自动条目摘要"
+      ]
+    },
+    "downloads": {
+      "title": "下载使命与愿景文档",
+      "description": "以您喜欢的格式下载完整的日程使命与愿景文档：",
+      "markdown": "Markdown (.md)",
+      "markdownDesc": "纯文本格式，适合开发人员和版本控制",
+      "pdf": "PDF (.pdf)",
+      "pdfDesc": "格式化文档，易于阅读和分享",
+      "word": "Word (.docx)",
+      "wordDesc": "Microsoft Word和兼容应用程序的可编辑文档",
+      "note": "注意：",
+      "noteDesc": "这些文档包含日程使命、愿景、理念和技术方法的完整详细说明。上面的标签提供简化的实用概述。"
     }
   },
   "auth": {

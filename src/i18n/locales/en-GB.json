@@ -209,6 +209,147 @@
       "sustainability": "Sustainability",
       "techStack": "Tech Stack",
       "downloads": "Downloads"
+    },
+    "mission": {
+      "title": "Mission",
+      "description": "Caderno is a <strong>decentralised, privacy-first journaling platform</strong> dedicated to safeguarding personal truths and empowering those who speak truth to power.",
+      "corePurpose": "Core Purpose",
+      "corePurposeDesc": "Provide journalists, whistleblowers, survivors, and activists a safe digital space to document experiences without fear of censorship or surveillance.",
+      "keyFeatures": "Key Features:",
+      "feature1": "Encrypted Storage: Journal entries in encrypted \"vaults\" on decentralised cloud you control",
+      "feature2": "Failsafe Mechanism: Optional timed alarm (dead man's switch) delivers entries to trusted contacts",
+      "feature3": "Federated Infrastructure: Self-hostable, putting control in the hands of the people",
+      "feature4": "Evidence Preservation: Safeguards protecting users from those who might silence them"
+    },
+    "vision": {
+      "title": "Vision",
+      "description": "A world where <strong>personal narratives and critical truths are preserved safely, transparently, and resiliently</strong> — beyond the reach of any authority.",
+      "sanctuary": "Ethical Sanctuary",
+      "sanctuaryDesc": "An ethical digital sanctuary promoting transparency and resilience against oppression.",
+      "empowerment": "Empowerment",
+      "empowermentDesc": "Empowered individuals speak truth to power, ensuring voices cannot be erased.",
+      "federation": "Federation",
+      "federationDesc": "User-run servers worldwide form a censorship-resistant network.",
+      "standard": "New Standard",
+      "standardDesc": "Normalising E2E encryption, decentralisation, and user autonomy as defaults."
+    },
+    "ethos": {
+      "title": "Ethos",
+      "description": "Grounded in <strong>transparency, resilience, and empowerment</strong>, guided by privacy, security, and social responsibility.",
+      "transparency": "Transparency",
+      "transparencyDesc": "Fully open-source with no hidden backdoors. Anyone can inspect and contribute to the code.",
+      "privacy": "Privacy",
+      "privacyDesc": "Built on E2E encryption. We don't collect or monetise personal data—full stop.",
+      "security": "Security & Resilience",
+      "securityDesc": "Decentralised architecture with no single point of failure. Robust against disruptions and censorship.",
+      "empowerment": "Empowerment & Advocacy",
+      "empowermentDesc": "Self-hosting capability returns power to the people. We support whistleblowers and activists.",
+      "accountability": "Accountability & Integrity",
+      "accountabilityDesc": "Create immutable records that serve as evidence, ensuring truth finds a way."
+    },
+    "privacyTab": {
+      "title": "Privacy",
+      "description": "Privacy is paramount and the foundation of our platform.",
+      "e2ee": "End-to-End Encryption",
+      "e2eeDesc": "All entries are E2EE by default. Only you (and your intended recipients) can decrypt them—not us, not anyone.",
+      "federated": "Federated Storage",
+      "federatedDesc": "Choose your own server or a trusted host. No centralised data silos vulnerable to mass surveillance.",
+      "noTracking": "No Tracking",
+      "noTrackingDesc": "We don't track, profile, or monetise your data. No ads, no data mining—your data serves only you.",
+      "userControl": "User Control",
+      "userControlDesc": "Export, delete, or manage your data at any time. Offline-first with optional sync. You're always in control."
+    },
+    "security": {
+      "title": "Cybersecurity",
+      "description": "Defence-in-depth strategy to protect high-risk users.",
+      "encryption": "State-of-the-Art Encryption",
+      "encryptionDesc": "AES-256, E2EE for journal content, TLS 1.3 for network. Data protected at rest and in transit.",
+      "federatedSecurity": "Federated Security",
+      "federatedSecurityDesc": "Each server operates independently. Breach of one doesn't affect others—no single honeypot.",
+      "userFeatures": "User Security Features",
+      "userFeaturesDesc": "Multi-factor authentication, app lock, panic mode, and anti-tamper detection.",
+      "auditing": "Security Auditing",
+      "auditingDesc": "Open-source for community review. Third-party audits. Responsible disclosure programme.",
+      "deadManSwitch": "Dead Man's Switch",
+      "deadManSwitchDesc": "Encrypted package released to trusted contacts if user fails to check in. Deters coercion.",
+      "improvement": "Continuous Improvement",
+      "improvementDesc": "Regular updates, incident response plans, and ongoing threat monitoring."
+    },
+    "sustainability": {
+      "title": "Sustainability",
+      "description": "Sustainable funding that <strong>aligns with our values</strong>—never compromising user trust.",
+      "saas": "Open-Source SaaS",
+      "saasDesc": "Optional managed hosting for users who prefer convenience. Software remains free and self-hostable.",
+      "enterprise": "Enterprise Support",
+      "enterpriseDesc": "Customised solutions, priority support, and consulting for organisations like NGOs and journalism outlets.",
+      "donations": "Donations & Sponsorships",
+      "donationsDesc": "Community funding through platforms like Open Collective. Grants from digital rights foundations.",
+      "never": "Never",
+      "neverDesc": "No ads. No data sales. No user analytics for profit. No paywalls that hinder basic access.",
+      "transparentFinance": "Transparent Finances:",
+      "transparentFinanceDesc": "Open accounting of how the project is funded. Profits reinvested into the mission."
+    },
+    "techStack": {
+      "title": "Tech Stack",
+      "description": "Modern, secure, and open-source technologies powering Caderno.",
+      "frontend": "Frontend",
+      "frontendItems": [
+        "<strong>React 18</strong> with <strong>TypeScript</strong>",
+        "<strong>Vite</strong> for build tooling",
+        "<strong>TailwindCSS</strong> for styling",
+        "<strong>Zustand</strong> for state management",
+        "<strong>TipTap</strong> for rich text editing",
+        "<strong>i18next</strong> for internationalisation"
+      ],
+      "storage": "Storage",
+      "storageItems": [
+        "<strong>IndexedDB</strong> (local-first)",
+        "<strong>LocalStorage</strong> for settings",
+        "No cookies, no tracking",
+        "Capable of offline operation by default"
+      ],
+      "backend": "Backend",
+      "backendItems": [
+        "<strong>Node.js</strong> with <strong>Express</strong>",
+        "<strong>SQLite</strong> for persistence",
+        "<strong>JWT</strong> authentication",
+        "<strong>RESTful API</strong> design",
+        "<strong>Puppeteer</strong> for PDF generation"
+      ],
+      "security": "Security",
+      "securityItems": [
+        "<strong>Web Crypto API</strong> for E2EE",
+        "<strong>AES-256-GCM</strong> encryption",
+        "<strong>PBKDF2</strong> key derivation",
+        "<strong>TLS 1.3</strong> for transport"
+      ],
+      "deployment": "Deployment",
+      "deploymentItems": [
+        "Federated, self-hostable",
+        "<strong>Progressive Web App</strong> (PWA)",
+        "Open-source (<strong>MIT Licence</strong>)",
+        "<strong>Docker</strong> support for deployment",
+        "<strong>IPFS</strong> for decentralised storage"
+      ],
+      "aiIntegration": "AI Integration",
+      "aiIntegrationItems": [
+        "<strong>OpenAI</strong> / <strong>Anthropic</strong> API support",
+        "<strong>HuggingFace</strong> model integration",
+        "<strong>AI-powered</strong> autocomplete suggestions",
+        "Automatic entry summarisation"
+      ]
+    },
+    "downloads": {
+      "title": "Download Mission & Vision Document",
+      "description": "Download Caderno's complete Mission and Vision document in your preferred format:",
+      "markdown": "Markdown (.md)",
+      "markdownDesc": "Plain text format, great for developers and version control",
+      "pdf": "PDF (.pdf)",
+      "pdfDesc": "Formatted document, easy to read and share",
+      "word": "Word (.docx)",
+      "wordDesc": "Editable document for Microsoft Word and compatible applications",
+      "note": "Note:",
+      "noteDesc": "These documents contain the full detailed explanation of Caderno's mission, vision, ethos, and technical approach. The tabs above provide a condensed, practical overview."
     }
   },
   "auth": {

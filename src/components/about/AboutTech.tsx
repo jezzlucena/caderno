@@ -77,7 +77,7 @@ export default function AboutTech() {
           <TechCard title={t('about.techStack.storage')} bgColor="bg-green-50" borderColor="border-green-200">
             <ul className="text-sm text-gray-700 space-y-2">
               {(t('about.techStack.storageItems', { returnObjects: true }) as string[]).map((item, i) => (
-                <li key={i}>• {item}</li>
+                <li key={i} dangerouslySetInnerHTML={{ __html: `• ${item}` }} />
               ))}
             </ul>
           </TechCard>
