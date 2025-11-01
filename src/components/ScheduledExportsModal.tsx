@@ -11,9 +11,11 @@ import {
   ExclamationCircleIcon,
   ArrowPathIcon,
   PencilIcon,
-  ArrowUturnLeftIcon
+  ArrowUturnLeftIcon,
+  KeyIcon
 } from '@heroicons/react/24/outline';
 import { useJournalStore, useSettingsStore } from '../store/useStore';
+import ApiKeyConfirmationModal from './ApiKeyConfirmationModal';
 
 interface Schedule {
   id: string;
@@ -54,10 +56,12 @@ interface ScheduledExportsModalProps {
 
 export default function ScheduledExportsModal({ onClose, onOpenSettings }: ScheduledExportsModalProps) {
   const { entries } = useJournalStore();
-  const { scheduledExports } = useSettingsStore();
+  const { scheduledExports, setScheduledExportsApiKey } = useSettingsStore();
   const [isClosing, setIsClosing] = useState(false);
   const [view, setView] = useState<'instructional' | 'list' | 'create' | 'edit' | 'detail'>('instructional');
   const [editingScheduleId, setEditingScheduleId] = useState<string | null>(null);
+  const [showApiKeyConfirmation, setShowApiKeyConfirmation] = useState(false);
+  const [isGeneratingApiKey, setIsGeneratingApiKey] = useState(false);
   
   // Server configuration from settings
   const serverUrl = scheduledExports.serverUrl;
@@ -473,6 +477,56 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
     setTimeout(onClose, 300);
   };
 
+  const handleGenerateApiKeyClick = () => {
+    // Validate server URL before showing confirmation
+    if (!serverUrl.trim()) {
+      toast.error('Server URL is required. Please configure it in Settings first.');
+      return;
+    }
+
+    // Validate URL format
+    try {
+      new URL(serverUrl.trim());
+    } catch {
+      toast.error('Invalid Server URL format');
+      return;
+    }
+
+    // Show confirmation modal
+    setShowApiKeyConfirmation(true);
+  };
+
+  const handleConfirmApiKeyGeneration = async () => {
+    setShowApiKeyConfirmation(false);
+    setIsGeneratingApiKey(true);
+
+    try {
+      // Remove trailing slash from server URL to avoid double slashes
+      const baseUrl = serverUrl.trim().replace(/\/$/, '');
+      
+      const response = await fetch(`${baseUrl}/api/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success && data.data?.api_key) {
+        setScheduledExportsApiKey(data.data.api_key);
+        toast.success('API key generated and saved successfully');
+      } else {
+        toast.error(data.message || 'Failed to generate API key');
+      }
+    } catch (error) {
+      console.error('Failed to generate API key:', error);
+      toast.error('Network error. Please check your server URL and try again.');
+    } finally {
+      setIsGeneratingApiKey(false);
+    }
+  };
+
   const formatCountdown = (executionTime: number) => {
     // Force re-render every second by referencing countdownTrigger
     void countdownTrigger;
@@ -681,39 +735,34 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
               </div>
 
               {/* Instructions */}
-              <div className="bg-linear-to-br from-indigo-50 to-blue-50 rounded-lg p-6 space-y-4">
+              <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-lg p-6 space-y-4">
                 <h4 className="font-semibold text-gray-800 flex items-center gap-2">
                   <span className="flex items-center justify-center w-6 h-6 bg-indigo-600 text-white rounded-full text-sm">1</span>
-                  Configure Server Connection
+                  Set Up Your Server
                 </h4>
                 <p className="text-sm text-gray-700 ml-8">
-                  Go to <strong>Settings → Scheduled Exports</strong> to enter your server URL and API key
+                  Start your Caderno Server (see <code className="bg-white px-1.5 py-0.5 rounded">caderno/server</code> folder)
                 </p>
 
                 <h4 className="font-semibold text-gray-800 flex items-center gap-2">
                   <span className="flex items-center justify-center w-6 h-6 bg-indigo-600 text-white rounded-full text-sm">2</span>
-                  Set Up Your Server
+                  Configure Connection
                 </h4>
-                <div className="text-sm text-gray-700 ml-8 space-y-2">
-                  <p>If you haven't set up your server yet:</p>
-                  <ul className="list-disc list-inside space-y-1 ml-2">
-                    <li>Navigate to the <code className="bg-white px-2 py-0.5 rounded">caderno/server</code> folder</li>
-                    <li>Run <code className="bg-white px-2 py-0.5 rounded">npm install</code></li>
-                    <li>Configure your <code className="bg-white px-2 py-0.5 rounded">.env</code> file with SMTP settings</li>
-                    <li>Start the server with <code className="bg-white px-2 py-0.5 rounded">npm run dev</code></li>
-                  </ul>
-                </div>
+                <p className="text-sm text-gray-700 ml-8">
+                  Go to <strong>Settings → Scheduled Exports</strong> to:
+                </p>
+                <ul className="text-sm text-gray-700 ml-8 list-disc list-inside space-y-1 mt-1">
+                  <li>Enter your server URL</li>
+                  <li>Generate an API key using the "Generate" button, or via command line</li>
+                </ul>
 
                 <h4 className="font-semibold text-gray-800 flex items-center gap-2">
                   <span className="flex items-center justify-center w-6 h-6 bg-indigo-600 text-white rounded-full text-sm">3</span>
-                  Generate API Key
+                  Create Schedules
                 </h4>
-                <div className="text-sm text-gray-700 ml-8">
-                  <p className="mb-2">Run this command to generate your API key:</p>
-                  <div className="bg-gray-900 text-gray-100 p-3 rounded-lg font-mono text-xs overflow-x-auto">
-                    curl -X POST http://localhost:3002/api/auth/register
-                  </div>
-                </div>
+                <p className="text-sm text-gray-700 ml-8">
+                  Once configured, return here to create and manage your scheduled exports
+                </p>
               </div>
 
               {/* Action Buttons */}
@@ -730,6 +779,31 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
                   <Cog6ToothIcon width={20} />
                   <span>Go to Settings to Configure</span>
                 </button>
+
+                {/* Quick Generate API Key - Only shown when Server URL is configured */}
+                {serverUrl && !apiKey && (
+                  <div className="relative group">
+                    <button
+                      onClick={handleGenerateApiKeyClick}
+                      disabled={isGeneratingApiKey || !serverUrl.trim()}
+                      className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      title={!serverUrl.trim() ? 'Server URL must be configured in Settings first' : 'Generate a new API key'}
+                    >
+                      <KeyIcon width={20} />
+                      <span>{isGeneratingApiKey ? 'Generating...' : 'Generate API Key'}</span>
+                    </button>
+                    {!serverUrl.trim() && !isGeneratingApiKey && (
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-10">
+                        <div className="bg-gray-900 text-white text-xs rounded-lg py-2 px-3 whitespace-nowrap shadow-xl">
+                          Server URL is required and must be valid
+                          <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1">
+                            <div className="border-4 border-transparent border-t-gray-900"></div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
                 
                 <button
                   onClick={handleClose}
@@ -1527,6 +1601,13 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
         )}
         </div>
       </div>
+      
+      {/* API Key Confirmation Modal */}
+      <ApiKeyConfirmationModal 
+        isOpen={showApiKeyConfirmation}
+        onClose={() => setShowApiKeyConfirmation(false)}
+        onConfirm={handleConfirmApiKeyGeneration}
+      />
     </>
   );
 }

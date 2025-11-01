@@ -411,7 +411,7 @@ export default function RichTextEditor() {
           </button>
         </div>
 
-        <div className="w-full max-w-5xl mx-auto">
+        <div className="w-full mx-auto">
           <div className="bg-white rounded-xl shadow-lg border border-gray-200">
             {/* Entry Title */}
             <div className="px-8 pt-6 pb-2">
