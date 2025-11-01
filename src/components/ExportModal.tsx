@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 import { XMarkIcon, ArrowDownTrayIcon, LockClosedIcon } from '@heroicons/react/24/outline';
 import { useJournalStore } from '../store/useStore';
 import CryptoJS from 'crypto-js';
@@ -13,7 +14,6 @@ export default function ExportModal({ onClose }: ExportModalProps) {
   const [encrypt, setEncrypt] = useState(false);
   const [passphrase, setPassphrase] = useState('');
   const [confirmPassphrase, setConfirmPassphrase] = useState('');
-  const [error, setError] = useState('');
 
   const handleClose = () => {
     setIsClosing(true);
@@ -23,20 +23,18 @@ export default function ExportModal({ onClose }: ExportModalProps) {
   };
 
   const handleExport = () => {
-    setError('');
-
     // Validate passphrase if encryption is enabled
     if (encrypt) {
       if (!passphrase) {
-        setError('Please enter a passphrase');
+        toast.error('Please enter a passphrase');
         return;
       }
       if (passphrase !== confirmPassphrase) {
-        setError('Passphrases do not match');
+        toast.error('Passphrases do not match');
         return;
       }
       if (passphrase.length < 8) {
-        setError('Passphrase must be at least 8 characters');
+        toast.error('Passphrase must be at least 8 characters');
         return;
       }
     }
@@ -80,6 +78,7 @@ export default function ExportModal({ onClose }: ExportModalProps) {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 
+    toast.success('Journal exported successfully');
     handleClose();
   };
 
@@ -153,12 +152,6 @@ export default function ExportModal({ onClose }: ExportModalProps) {
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
-          </div>
-        )}
-
-        {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-600">{error}</p>
           </div>
         )}
 

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { toast } from 'react-toastify'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { useAuthStore } from '../store/useAuthStore'
 import { api } from '../services/api'
@@ -11,14 +12,12 @@ export default function LoginModal({ onClose }: LoginModalProps) {
   const [isSignUp, setIsSignUp] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
   const { setAuth } = useAuthStore()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError('')
     setLoading(true)
 
     try {
@@ -38,9 +37,10 @@ export default function LoginModal({ onClose }: LoginModalProps) {
         console.error('Error fetching subscription:', err)
       }
 
+      toast.success(isSignUp ? 'Account created successfully!' : 'Signed in successfully!')
       onClose()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
+      toast.error(err instanceof Error ? err.message : 'An error occurred')
     } finally {
       setLoading(false)
     }
@@ -65,12 +65,6 @@ export default function LoginModal({ onClose }: LoginModalProps) {
             <XMarkIcon className="w-6 h-6" />
           </button>
         </div>
-
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm">
-            {error}
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="space-y-4 mb-6">
           <div>

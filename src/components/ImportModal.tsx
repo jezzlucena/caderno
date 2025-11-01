@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 import { XMarkIcon, ArrowUpTrayIcon, LockOpenIcon } from '@heroicons/react/24/outline';
 import { useJournalStore, type JournalEntry } from '../store/useStore';
 import CryptoJS from 'crypto-js';
@@ -13,7 +14,6 @@ export default function ImportModal({ onClose }: ImportModalProps) {
   const [file, setFile] = useState<File | null>(null);
   const [passphrase, setPassphrase] = useState('');
   const [merge, setMerge] = useState(false);
-  const [error, setError] = useState('');
   const [needsPassphrase, setNeedsPassphrase] = useState(false);
   const [fileData, setFileData] = useState<{
     entries: JournalEntry[];
@@ -32,7 +32,6 @@ export default function ImportModal({ onClose }: ImportModalProps) {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
       setFile(selectedFile);
-      setError('');
       setNeedsPassphrase(false);
       setPassphrase('');
 
@@ -46,7 +45,7 @@ export default function ImportModal({ onClose }: ImportModalProps) {
           setNeedsPassphrase(parsed.encrypted);
           setFileData(parsed);
         } catch (err) {
-          setError('Invalid file format. Please select a valid Caderno backup file.');
+          toast.error('Invalid file format. Please select a valid Caderno backup file.');
           console.error(err);
         }
       };
@@ -55,10 +54,8 @@ export default function ImportModal({ onClose }: ImportModalProps) {
   };
 
   const handleImport = () => {
-    setError('');
-
     if (!file || !fileData) {
-      setError('Please select a file to import');
+      toast.error('Please select a file to import');
       return;
     }
 
@@ -69,7 +66,7 @@ export default function ImportModal({ onClose }: ImportModalProps) {
 
       if (fileData.encrypted) {
         if (!passphrase) {
-          setError('Please enter the passphrase for this encrypted file');
+          toast.error('Please enter the passphrase for this encrypted file');
           return;
         }
 
@@ -77,13 +74,13 @@ export default function ImportModal({ onClose }: ImportModalProps) {
           const decrypted = CryptoJS.AES.decrypt(fileData.data, passphrase).toString(CryptoJS.enc.Utf8);
 
           if (!decrypted) {
-            setError('Incorrect passphrase. Please try again.');
+            toast.error('Incorrect passphrase. Please try again.');
             return;
           }
 
           dataToImport = JSON.parse(decrypted);
         } catch (err) {
-          setError('Failed to decrypt file. Please check your passphrase.');
+          toast.error('Failed to decrypt file. Please check your passphrase.');
           console.error(err);
           return;
         }
@@ -93,7 +90,7 @@ export default function ImportModal({ onClose }: ImportModalProps) {
 
       // Validate the data structure
       if (!dataToImport.entries || !Array.isArray(dataToImport.entries)) {
-        setError('Invalid backup file structure');
+        toast.error('Invalid backup file structure');
         return;
       }
 
@@ -103,7 +100,7 @@ export default function ImportModal({ onClose }: ImportModalProps) {
       );
 
       if (!isValid) {
-        setError('Backup file contains invalid entries');
+        toast.error('Backup file contains invalid entries');
         return;
       }
 
@@ -111,9 +108,10 @@ export default function ImportModal({ onClose }: ImportModalProps) {
       importEntries(dataToImport.entries as JournalEntry[], merge);
 
       // Show success and close
+      toast.success(`Successfully imported ${dataToImport.entries.length} journal entries`);
       onClose();
     } catch (err) {
-      setError('Failed to import file. Please check the file format.');
+      toast.error('Failed to import file. Please check the file format.');
       console.error(err);
     }
   };
@@ -202,12 +200,6 @@ export default function ImportModal({ onClose }: ImportModalProps) {
             </div>
           </label>
         </div>
-
-        {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-600">{error}</p>
-          </div>
-        )}
 
         <div className="flex gap-3 justify-end">
           <button

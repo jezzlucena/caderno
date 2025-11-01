@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import { XMarkIcon, DocumentArrowDownIcon } from '@heroicons/react/24/outline';
 import { useJournalStore } from '../store/useStore';
 import { useTranslation } from 'react-i18next';
@@ -213,12 +214,13 @@ export default function ExportPDFModal({ onClose }: ExportPDFModalProps) {
       pdf.save(fileName);
 
       setProgress(100);
+      toast.success(`PDF exported successfully with ${selectedEntries.length} entries`);
       setTimeout(() => {
         onClose();
       }, 500);
     } catch (error) {
       console.error('Error exporting PDF:', error);
-      alert(t('exportPDF.error'));
+      toast.error(t('exportPDF.error'));
     } finally {
       setIsExporting(false);
     }

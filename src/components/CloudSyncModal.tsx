@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { XMarkIcon, CloudArrowUpIcon, CloudArrowDownIcon, CheckCircleIcon, Cog6ToothIcon, CloudIcon } from '@heroicons/react/24/outline';
+import { toast } from 'react-toastify';
+import { XMarkIcon, CloudArrowUpIcon, CloudArrowDownIcon, Cog6ToothIcon, CloudIcon } from '@heroicons/react/24/outline';
 import { useJournalStore } from '../store/useStore';
 import { useSettingsStore } from '../store/useStore';
 import { useTranslation } from 'react-i18next';
@@ -20,8 +21,6 @@ export default function CloudSyncModal({ onClose, onOpenSettings }: CloudSyncMod
   const [isDownloading, setIsDownloading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [downloadProgress, setDownloadProgress] = useState(0);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
   const [mergeOnDownload, setMergeOnDownload] = useState(true);
 
   const handleClose = () => {
@@ -32,16 +31,13 @@ export default function CloudSyncModal({ onClose, onOpenSettings }: CloudSyncMod
   };
 
   const handleUpload = async () => {
-    setError(null);
-    setSuccess(null);
-
     if (!cloudSync.syncPassphrase) {
-      setError(t('cloudSync.errors.noPassphrase'));
+      toast.error(t('cloudSync.errors.noPassphrase'));
       return;
     }
 
     if (entries.length === 0) {
-      setError(t('cloudSync.errors.noEntries'));
+      toast.error(t('cloudSync.errors.noEntries'));
       return;
     }
 
@@ -63,7 +59,7 @@ export default function CloudSyncModal({ onClose, onOpenSettings }: CloudSyncMod
       setLastCid(metadata.cid);
 
       setUploadProgress(100);
-      setSuccess(
+      toast.success(
         t('cloudSync.success.uploaded', {
           count: entries.length,
           cid: metadata.cid.substring(0, 12) + '...',
@@ -75,7 +71,7 @@ export default function CloudSyncModal({ onClose, onOpenSettings }: CloudSyncMod
         setUploadProgress(0);
       }, 1500);
     } catch (err) {
-      setError(
+      toast.error(
         t('cloudSync.errors.uploadFailed', {
           error: err instanceof Error ? err.message : 'Unknown error',
         })
@@ -86,18 +82,15 @@ export default function CloudSyncModal({ onClose, onOpenSettings }: CloudSyncMod
   };
 
   const handleDownload = async () => {
-    setError(null);
-    setSuccess(null);
-
     if (!cloudSync.syncPassphrase) {
-      setError(t('cloudSync.errors.noPassphrase'));
+      toast.error(t('cloudSync.errors.noPassphrase'));
       return;
     }
 
     const cidToDownload = cloudSync.lastCid || lastSyncMetadata?.cid;
 
     if (!cidToDownload) {
-      setError(t('cloudSync.errors.noCid'));
+      toast.error(t('cloudSync.errors.noCid'));
       return;
     }
 
@@ -115,7 +108,7 @@ export default function CloudSyncModal({ onClose, onOpenSettings }: CloudSyncMod
       importEntries(syncData.entries, mergeOnDownload);
 
       setDownloadProgress(100);
-      setSuccess(
+      toast.success(
         t('cloudSync.success.downloaded', {
           count: syncData.entries.length,
         })
@@ -126,7 +119,7 @@ export default function CloudSyncModal({ onClose, onOpenSettings }: CloudSyncMod
         setDownloadProgress(0);
       }, 1500);
     } catch (err) {
-      setError(
+      toast.error(
         t('cloudSync.errors.downloadFailed', {
           error: err instanceof Error ? err.message : 'Unknown error',
         })
@@ -348,20 +341,6 @@ export default function CloudSyncModal({ onClose, onOpenSettings }: CloudSyncMod
               </div>
             )}
           </>
-        )}
-
-        {/* Error/Success Messages */}
-        {error && (
-          <div className="mt-4 bg-red-50 border border-red-200 rounded-lg p-3">
-            <p className="text-sm text-red-800">{error}</p>
-          </div>
-        )}
-
-        {success && (
-          <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-3 flex items-start gap-2">
-            <CheckCircleIcon width={20} className="text-green-600 flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-green-800">{success}</p>
-          </div>
         )}
 
         {/* Close Button */}

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { toast } from 'react-toastify';
 import { 
   XMarkIcon, 
   ClockIcon, 
@@ -62,10 +63,8 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   
-  // Ref for modal container to enable auto-scroll to messages
+  // Ref for modal container
   const modalRef = useRef<HTMLDivElement>(null);
   
   // Create schedule form
@@ -88,24 +87,6 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
     }
   }, [serverUrl, apiKey]);
 
-  // Auto-clear messages after 5 seconds
-  useEffect(() => {
-    if (error || successMessage) {
-      const timer = setTimeout(() => {
-        setError(null);
-        setSuccessMessage(null);
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [error, successMessage]);
-
-  // Auto-scroll to top when error or success message appears
-  useEffect(() => {
-    if ((error || successMessage) && modalRef.current) {
-      modalRef.current.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }, [error, successMessage]);
-
   const testConnection = async () => {
     try {
       const response = await fetch(`${serverUrl}/health`);
@@ -113,19 +94,18 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
       if (response.ok) {
         loadSchedules();
       } else {
-        setError('Unable to connect to server. Please check your configuration.');
+        toast.error('Unable to connect to server. Please check your configuration.');
         setView('instructional');
       }
     } catch (error) {
       console.error('Connection test failed:', error);
-      setError('Server connection failed. Make sure the server is running.');
+      toast.error('Server connection failed. Make sure the server is running.');
       setView('instructional');
     }
   };
 
   const loadSchedules = async () => {
     setIsLoading(true);
-    setError(null);
     
     try {
       const response = await fetch(`${serverUrl}/api/schedules`, {
@@ -138,17 +118,17 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
           setSchedules(data.data || []);
           setView('list');
         } else {
-          setError(data.error || 'Failed to load schedules');
+          toast.error(data.error || 'Failed to load schedules');
         }
       } else if (response.status === 401) {
-        setError('Invalid API key. Please check your settings.');
+        toast.error('Invalid API key. Please check your settings.');
         setView('instructional');
       } else {
-        setError('Failed to load schedules. Server returned an error.');
+        toast.error('Failed to load schedules. Server returned an error.');
       }
     } catch (error) {
       console.error('Failed to load schedules:', error);
-      setError('Network error. Please check your connection and server URL.');
+      toast.error('Network error. Please check your connection and server URL.');
     } finally {
       setIsLoading(false);
     }
@@ -156,7 +136,6 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
 
   const loadScheduleDetails = async (scheduleId: string) => {
     setIsLoading(true);
-    setError(null);
     
     try {
       const response = await fetch(`${serverUrl}/api/schedules/${scheduleId}`, {
@@ -169,14 +148,14 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
           setSelectedSchedule(data.data);
           setView('detail');
         } else {
-          setError(data.error || 'Failed to load schedule details');
+          toast.error(data.error || 'Failed to load schedule details');
         }
       } else {
-        setError('Failed to load schedule details');
+        toast.error('Failed to load schedule details');
       }
     } catch (error) {
       console.error('Failed to load schedule details:', error);
-      setError('Network error while loading schedule details');
+      toast.error('Network error while loading schedule details');
     } finally {
       setIsLoading(false);
     }
@@ -184,23 +163,22 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
 
   const createSchedule = async () => {
     if (!scheduleName.trim()) {
-      setError('Schedule name is required');
+      toast.error('Schedule name is required');
       return;
     }
 
     if (!passphrase.trim()) {
-      setError('Encryption passphrase is required');
+      toast.error('Encryption passphrase is required');
       return;
     }
 
     const validRecipients = recipients.filter(r => r.value.trim());
     if (validRecipients.length === 0) {
-      setError('At least one recipient is required');
+      toast.error('At least one recipient is required');
       return;
     }
 
     setIsLoading(true);
-    setError(null);
     
     try {
       const scheduleData = {
@@ -226,15 +204,15 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
       const data = await response.json();
 
       if (response.ok && data.success) {
-        setSuccessMessage('Schedule created successfully!');
+        toast.success('Schedule created successfully!');
         await loadSchedules();
         resetForm();
       } else {
-        setError(data.error || 'Failed to create schedule');
+        toast.error(data.error || 'Failed to create schedule');
       }
     } catch (error) {
       console.error('Failed to create schedule:', error);
-      setError('Network error. Failed to create schedule.');
+      toast.error('Network error. Failed to create schedule.');
     } finally {
       setIsLoading(false);
     }
@@ -244,7 +222,6 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
     if (!confirm('Are you sure you want to delete this schedule?')) return;
 
     setIsLoading(true);
-    setError(null);
 
     try {
       const response = await fetch(`${serverUrl}/api/schedules/${id}`, {
@@ -255,18 +232,18 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
       const data = await response.json();
 
       if (response.ok && data.success) {
-        setSuccessMessage('Schedule deleted successfully');
+        toast.success('Schedule deleted successfully');
         await loadSchedules();
         if (selectedSchedule?.id === id) {
           setSelectedSchedule(null);
           setView('list');
         }
       } else {
-        setError(data.error || 'Failed to delete schedule');
+        toast.error(data.error || 'Failed to delete schedule');
       }
     } catch (error) {
       console.error('Failed to delete schedule:', error);
-      setError('Network error. Failed to delete schedule.');
+      toast.error('Network error. Failed to delete schedule.');
     } finally {
       setIsLoading(false);
     }
@@ -274,7 +251,6 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
 
   const executeSchedule = async (id: string) => {
     setIsLoading(true);
-    setError(null);
 
     try {
       const response = await fetch(`${serverUrl}/api/schedules/${id}/execute`, {
@@ -285,17 +261,17 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
       const data = await response.json();
 
       if (response.ok && data.success) {
-        setSuccessMessage('Schedule execution started! Check your email shortly.');
+        toast.success('Schedule execution started! Check your email shortly.');
         // Reload schedule details if viewing details
         if (selectedSchedule?.id === id) {
           setTimeout(() => loadScheduleDetails(id), 2000);
         }
       } else {
-        setError(data.error || 'Failed to execute schedule');
+        toast.error(data.error || 'Failed to execute schedule');
       }
     } catch (error) {
       console.error('Failed to execute schedule:', error);
-      setError('Network error. Failed to execute schedule.');
+      toast.error('Network error. Failed to execute schedule.');
     } finally {
       setIsLoading(false);
     }
@@ -303,7 +279,6 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
 
   const toggleScheduleEnabled = async (id: string, enabled: boolean) => {
     setIsLoading(true);
-    setError(null);
 
     try {
       const response = await fetch(`${serverUrl}/api/schedules/${id}`, {
@@ -318,14 +293,14 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
       const data = await response.json();
 
       if (response.ok && data.success) {
-        setSuccessMessage(`Schedule ${enabled ? 'enabled' : 'disabled'} successfully`);
+        toast.success(`Schedule ${enabled ? 'enabled' : 'disabled'} successfully`);
         await loadSchedules();
       } else {
-        setError(data.error || 'Failed to update schedule');
+        toast.error(data.error || 'Failed to update schedule');
       }
     } catch (error) {
       console.error('Failed to update schedule:', error);
-      setError('Network error. Failed to update schedule.');
+      toast.error('Network error. Failed to update schedule.');
     } finally {
       setIsLoading(false);
     }
@@ -410,31 +385,6 @@ export default function ScheduledExportsModal({ onClose, onOpenSettings }: Sched
             <XMarkIcon width={24} />
           </button>
         </div>
-
-        {/* Error/Success Messages */}
-        {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2">
-            <ExclamationCircleIcon className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-            <div className="flex-1">
-              <p className="text-sm text-red-800">{error}</p>
-            </div>
-            <button onClick={() => setError(null)} className="text-red-400 hover:text-red-600">
-              <XMarkIcon className="w-4 h-4" />
-            </button>
-          </div>
-        )}
-
-        {successMessage && (
-          <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg flex items-start gap-2">
-            <CheckCircleIcon className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-            <div className="flex-1">
-              <p className="text-sm text-green-800">{successMessage}</p>
-            </div>
-            <button onClick={() => setSuccessMessage(null)} className="text-green-400 hover:text-green-600">
-              <XMarkIcon className="w-4 h-4" />
-            </button>
-          </div>
-        )}
 
         {view === 'instructional' && (
           <div className="flex-1 overflow-y-auto">

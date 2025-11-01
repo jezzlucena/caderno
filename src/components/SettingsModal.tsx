@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import { XMarkIcon, KeyIcon, SparklesIcon, CloudIcon, LanguageIcon, ChevronRightIcon, ArrowLeftIcon, ClockIcon } from '@heroicons/react/24/outline';
 import { getStoredApiKey, setStoredApiKey, removeStoredApiKey } from '../services/aiCompletion';
@@ -31,7 +32,6 @@ export default function SettingsModal({ onClose, initialScreen = 'main' }: Setti
   const [highlightedSection, setHighlightedSection] = useState<SettingsScreen | null>(null);
   const [apiKey, setApiKey] = useState('');
   const [showKey, setShowKey] = useState(false);
-  const [saved, setSaved] = useState(false);
 
   const {
     cloudSync,
@@ -112,39 +112,30 @@ export default function SettingsModal({ onClose, initialScreen = 'main' }: Setti
     setScheduledExportsServerUrl(scheduledExportsServerUrl.trim());
     setScheduledExportsApiKey(scheduledExportsApiKey.trim());
 
-    setSaved(true);
+    toast.success(t('settings.saved'));
     setTimeout(() => {
       handleClose();
-    }, 1000);
+    }, 500);
   };
 
   const handleRemove = () => {
     setApiKey('');
     removeStoredApiKey();
-    setSaved(true);
-    setTimeout(() => {
-      setSaved(false);
-    }, 2000);
+    toast.success('API key removed successfully');
   };
 
   const handleClearCloudSync = () => {
     setSyncPassphraseLocal('');
     setAutoSyncLocal(false);
     clearCloudSyncSettings();
-    setSaved(true);
-    setTimeout(() => {
-      setSaved(false);
-    }, 2000);
+    toast.success('Cloud sync settings cleared');
   };
 
   const handleClearScheduledExports = () => {
     setScheduledExportsServerUrlLocal('');
     setScheduledExportsApiKeyLocal('');
     clearScheduledExportsSettings();
-    setSaved(true);
-    setTimeout(() => {
-      setSaved(false);
-    }, 2000);
+    toast.success('Scheduled exports settings cleared');
   };
 
   const renderMainScreen = () => (
@@ -355,12 +346,6 @@ export default function SettingsModal({ onClose, initialScreen = 'main' }: Setti
           {t('settings.save')}
         </button>
       </div>
-
-      {saved && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-          <p className="text-sm text-green-800">{t('settings.saved')}</p>
-        </div>
-      )}
     </div>
   );
 
@@ -477,12 +462,6 @@ export default function SettingsModal({ onClose, initialScreen = 'main' }: Setti
           {t('settings.save')}
         </button>
       </div>
-
-      {saved && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-          <p className="text-sm text-green-800">{t('settings.saved')}</p>
-        </div>
-      )}
     </div>
   );
 
@@ -590,12 +569,6 @@ export default function SettingsModal({ onClose, initialScreen = 'main' }: Setti
           {t('settings.save')}
         </button>
       </div>
-
-      {saved && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-          <p className="text-sm text-green-800">{t('settings.saved')}</p>
-        </div>
-      )}
     </div>
   );
 

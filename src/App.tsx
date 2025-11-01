@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import JournalList from './components/JournalList';
 import RichTextEditor from './components/RichTextEditor';
 import DonationNotification from './components/DonationNotification';
@@ -56,6 +58,20 @@ function App() {
       
       {/* Non-intrusive donation notification */}
       <DonationNotification />
+      
+      {/* Toast notifications */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </div>
   );
 }
