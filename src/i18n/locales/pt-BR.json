@@ -356,5 +356,13 @@
     "signIn": "Entrar",
     "signOut": "Sair",
     "plan": "Plano"
+  },
+  "donationNotification": {
+    "dismiss": "Dispensar notificação",
+    "title": "Apoie o Código Aberto",
+    "description": "Somos uma pequena empresa focada em ética e privacidade. Sem anúncios, sem venda de dados—nunca! Seu apoio nos ajuda a manter o Caderno gratuito e de código aberto. ❤️",
+    "viewPlans": "Ver Planos",
+    "maybeLater": "Talvez Mais Tarde",
+    "subscribeNote": "Assine para desativar estas notificações"
   }
 }

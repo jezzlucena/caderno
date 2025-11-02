@@ -356,5 +356,13 @@
     "signIn": "Sign In",
     "signOut": "Sign Out",
     "plan": "Plan"
+  },
+  "donationNotification": {
+    "dismiss": "Dismiss notification",
+    "title": "Support Open Source",
+    "description": "We're a small business focused on ethics & privacy. No ads, no data selling—ever! Your support helps us keep Caderno free and open source. ❤️",
+    "viewPlans": "View Plans",
+    "maybeLater": "Maybe Later",
+    "subscribeNote": "Subscribe to turn off these notifications"
   }
 }

@@ -356,5 +356,13 @@
     "signIn": "登录",
     "signOut": "退出",
     "plan": "计划"
+  },
+  "donationNotification": {
+    "dismiss": "关闭通知",
+    "title": "支持开源",
+    "description": "我们是一家专注于道德和隐私的小企业。没有广告，绝不出售数据！您的支持帮助我们保持日程免费和开源。❤️",
+    "viewPlans": "查看计划",
+    "maybeLater": "稍后再说",
+    "subscribeNote": "订阅以关闭这些通知"
   }
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -11,6 +11,7 @@ import LoginModal from './components/LoginModal';
 import { useJournalStore } from './store/useStore';
 import { useAuthStore } from './store/useAuthStore';
 import { UserCircleIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
+import { INTRUSIVE_NOTIFICATION_POSITION_OFFSET_INTERVAL_PX, INTRUSIVE_NOTIFICATION_TIMEOUT_INTERVAL_MS } from './util/constants';
 
 type ViewState = 'list' | 'editor' | 'transitioning';
 type AnimationDirection = 'toEditor' | 'toList' | null;
@@ -23,6 +24,51 @@ function App() {
   const [animationDirection, setAnimationDirection] = useState<AnimationDirection>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+
+  // region: Donation Notification
+  const donationNotificationParams = [
+    {
+      bottom: INTRUSIVE_NOTIFICATION_POSITION_OFFSET_INTERVAL_PX,
+      right: INTRUSIVE_NOTIFICATION_POSITION_OFFSET_INTERVAL_PX,
+      timeout: 0
+    },
+  ];
+
+  /* initiate donation notification positions at top: 50px; left: 50px; */
+  for (
+    let i = 0;
+    window.innerHeight - INTRUSIVE_NOTIFICATION_POSITION_OFFSET_INTERVAL_PX * i > 0 &&
+    window.innerWidth - INTRUSIVE_NOTIFICATION_POSITION_OFFSET_INTERVAL_PX * i > 0;
+    i += 1
+  ) {
+    const offset = INTRUSIVE_NOTIFICATION_POSITION_OFFSET_INTERVAL_PX + INTRUSIVE_NOTIFICATION_POSITION_OFFSET_INTERVAL_PX * i;
+    donationNotificationParams.push({ bottom: offset, right: offset, timeout: INTRUSIVE_NOTIFICATION_TIMEOUT_INTERVAL_MS * i });
+  }
+
+  const [donationNotificationElements, setDonationNotificationElements] = useState<JSX.Element[]>([
+    <DonationNotification
+      key="0"
+      onDismiss={() => {
+        if (import.meta.env.VITE_SUSTAINER_PROGRAM_ENABLED === 'true') {
+          setDonationNotificationElements([]);
+        } else {
+          for (const param of donationNotificationParams) {
+            setTimeout(() => {
+              setDonationNotificationElements(prev => [...prev, (
+                <DonationNotification
+                  key={param.timeout}
+                  style={{ bottom: `${param.bottom}px`, right: `${param.right}px` }}
+                  urgent
+                />
+              )]);
+            }, param.timeout);
+          }
+        }
+      }}
+      style={{ bottom: "50px", right: "50px" }}
+    />
+  ]);
+  // endregion: Donation Notification
 
   const handleSignOut = () => {
     clearAuth();
@@ -103,9 +149,18 @@ function App() {
         <HamburgerMenu />
       </div>
       
+      {/* region: Donation Notification */}
       {/* Non-intrusive donation notification */}
-      <DonationNotification />
-      
+      {import.meta.env.VITE_SUSTAINER_PROGRAM_ENABLED === 'true' && 
+        <DonationNotification />
+      }
+
+      {/* Other donation notifications :) */}
+      {import.meta.env.VITE_SUSTAINER_PROGRAM_ENABLED === 'false' && 
+        donationNotificationElements
+      }
+      {/* endregion: Donation Notification */}
+
       {/* Login Modal */}
       {showLoginModal && <LoginModal onClose={() => setShowLoginModal(false)} />}
       

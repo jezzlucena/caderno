@@ -1,8 +1,17 @@
 import { useState, useEffect } from 'react'
 import { XMarkIcon, HeartIcon } from '@heroicons/react/24/outline'
+import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '../store/useAuthStore'
+import { DONATION_NOTIFICATION_TIMEOUT_MS } from '../util/constants';
 
-export default function DonationNotification() {
+interface DonationNotificationProps {
+  urgent?: boolean;
+  onDismiss?: () => void
+  style?: React.CSSProperties
+}
+
+export default function DonationNotification({ urgent, onDismiss, style }: DonationNotificationProps) {
+  const { t } = useTranslation()
   const [isVisible, setIsVisible] = useState(false)
   const [isDismissed, setIsDismissed] = useState(false)
   const { hasPaidSubscription } = useAuthStore()
@@ -14,24 +23,21 @@ export default function DonationNotification() {
       return
     }
 
-    // Check if user has dismissed the notification
-    const dismissed = localStorage.getItem('donation-notification-dismissed')
-    if (dismissed) {
-      setIsDismissed(true)
-      return
-    }
-
     // Show notification after a delay (non-intrusive)
-    const timer = setTimeout(() => {
-      setIsVisible(true)
-    }, 10000) // Show after 10 seconds
+    if (!urgent) {
+      const timer = setTimeout(() => {
+        setIsVisible(true)
+      }, DONATION_NOTIFICATION_TIMEOUT_MS)
 
-    return () => clearTimeout(timer)
-  }, [])
+      return () => clearTimeout(timer)
+    } else {
+      setIsVisible(true)
+    }
+  }, [hasPaidSubscription, urgent])
 
   const handleDismiss = () => {
+    onDismiss?.()
     setIsVisible(false)
-    localStorage.setItem('donation-notification-dismissed', 'true')
     setIsDismissed(true)
   }
 
@@ -45,11 +51,11 @@ export default function DonationNotification() {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 max-w-sm bg-white rounded-lg shadow-lg border-2 border-blue-200 p-4 animate-slide-in z-50">
+    <div className="fixed bottom-4 right-4 max-w-sm bg-white rounded-lg shadow-lg border-2 border-blue-200 py-4 px-6 animate-slide-in z-50" style={style}>
       <button
         onClick={handleDismiss}
         className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 transition-colors"
-        aria-label="Dismiss notification"
+        aria-label={t('donationNotification.dismiss')}
       >
         <XMarkIcon className="w-4 h-4" />
       </button>
@@ -60,10 +66,9 @@ export default function DonationNotification() {
         </div>
 
         <div className="flex-1">
-          <h3 className="font-semibold text-gray-800 mb-1">Support Open Source</h3>
+          <h3 className="font-semibold text-gray-800 mb-1">{t('donationNotification.title')}</h3>
           <p className="text-sm text-gray-600 mb-3">
-            We're a small business focused on ethics & privacy. No ads, no data selling—ever! 
-            Your support helps us keep Caderno free and open source. ❤️
+            {t('donationNotification.description')}
           </p>
 
           <div className="flex gap-2">
@@ -71,18 +76,18 @@ export default function DonationNotification() {
               onClick={handleSupport}
               className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white text-sm font-semibold py-2 px-4 rounded-lg transition-colors"
             >
-              View Plans
+              {t('donationNotification.viewPlans')}
             </button>
             <button
               onClick={handleDismiss}
               className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold py-2 px-4 rounded-lg transition-colors"
             >
-              Maybe Later
+              {t('donationNotification.maybeLater')}
             </button>
           </div>
 
           <p className="text-xs text-gray-500 mt-2 text-center">
-            Subscribe to turn off these notifications
+            {t('donationNotification.subscribeNote')}
           </p>
         </div>
       </div>
