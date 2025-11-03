@@ -2,6 +2,8 @@
 
 A beautiful, privacy-focused personal journal application built with React, TypeScript, and modern web technologies. Write your thoughts, attach images, and leverage AI-powered autocomplete - all with optional encryption for maximum privacy.
 
+Please checkout [src/utils/constants.ts](src/utils/constants.ts) for a quick message from the creator.
+
 ![React](https://img.shields.io/badge/React-19-blue)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue)
 ![Vite](https://img.shields.io/badge/Vite-6-purple)

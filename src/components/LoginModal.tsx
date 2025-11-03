@@ -25,6 +25,7 @@ export default function LoginModal({ onClose }: LoginModalProps) {
         ? await api.signUp(email, password)
         : await api.signIn(email, password)
 
+      localStorage.setItem('token', data.token);
       setAuth(data.user, data.token)
       
       // Fetch subscription info

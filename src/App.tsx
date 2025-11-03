@@ -12,6 +12,7 @@ import { useJournalStore } from './store/useStore';
 import { useAuthStore } from './store/useAuthStore';
 import { UserCircleIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
 import { INTRUSIVE_NOTIFICATION_POSITION_OFFSET_INTERVAL_PX, INTRUSIVE_NOTIFICATION_TIMEOUT_INTERVAL_MS } from './util/constants';
+import { api } from './services/api';
 
 type ViewState = 'list' | 'editor' | 'transitioning';
 type AnimationDirection = 'toEditor' | 'toList' | null;
@@ -19,7 +20,7 @@ type AnimationDirection = 'toEditor' | 'toList' | null;
 function App() {
   const { t } = useTranslation();
   const { currentEntryId } = useJournalStore();
-  const { isAuthenticated, user, clearAuth } = useAuthStore();
+  const { isAuthenticated, user, clearAuth, setAuth } = useAuthStore();
   const [viewState, setViewState] = useState<ViewState>('list');
   const [animationDirection, setAnimationDirection] = useState<AnimationDirection>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -71,8 +72,29 @@ function App() {
   // endregion: Donation Notification
 
   const handleSignOut = () => {
+    localStorage.removeItem('token');
     clearAuth();
   };
+
+  // Fetch subscription data on mount if authenticated
+  useEffect(() => {
+    const fetchSubscription = async () => {
+      if (isAuthenticated && user) {
+        try {
+          const subData = await api.getSubscription();
+          if (subData.subscription) {
+            // Update user with subscription data
+            setAuth({ ...user, subscription: subData.subscription }, localStorage.getItem('token') || '');
+          }
+        } catch (err) {
+          console.error('Error fetching subscription:', err);
+        }
+      }
+    };
+
+    fetchSubscription();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated]);
 
   useEffect(() => {
     const targetView = currentEntryId ? 'editor' : 'list';

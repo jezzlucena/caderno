@@ -17,22 +17,23 @@ import { useJournalStore } from '../store/useStore';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getCompletion, getStoredApiKey } from '../services/aiCompletion';
-import { Cog6ToothIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import SettingsModal from './SettingsModal';
+import AISetupModal from './AISetupModal';
+import { useAuthStore } from '../store/useAuthStore';
 
 export default function RichTextEditor() {
   const { getCurrentEntry, updateEntry, setCurrentEntry, setIsAISummarizing } = useJournalStore();
   const { t } = useTranslation();
+  const { user } = useAuthStore();
   const currentEntry = getCurrentEntry();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const apiKey = getStoredApiKey();
+  const summaryTimerRef = useRef<number | null>(null);
   const [suggestion, setSuggestion] = useState<string>('');
   const [isLoadingSuggestion, setIsLoadingSuggestion] = useState(false);
   const [suggestionError, setSuggestionError] = useState<string>('');
   const [showSuggestion, setShowSuggestion] = useState(false);
-  const apiKey = getStoredApiKey();
-  const summaryTimerRef = useRef<number | null>(null);
   const [showAISetupModal, setShowAISetupModal] = useState(false);
-  const [dontShowAgain, setDontShowAgain] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
 
   const editor = useEditor({
@@ -109,7 +110,7 @@ export default function RichTextEditor() {
   // Check if AI setup modal should be shown
   useEffect(() => {
     const dismissed = localStorage.getItem('caderno-ai-setup-dismissed');
-    if (!apiKey && !dismissed) {
+    if (!apiKey && !dismissed && user?.subscription?.planId !== 'free') {
       setShowAISetupModal(true);
     }
   }, [apiKey]);
@@ -225,12 +226,6 @@ export default function RichTextEditor() {
     setSuggestionError('');
   };
 
-  const handleDismissAISetupModal = () => {
-    if (dontShowAgain) {
-      localStorage.setItem('caderno-ai-setup-dismissed', 'true');
-    }
-    setShowAISetupModal(false);
-  };
 
   if (!currentEntry) {
     return null;
@@ -281,122 +276,11 @@ export default function RichTextEditor() {
   return (
     <>
       {/* AI Setup Instructional Modal */}
-      {showAISetupModal && (
-        <div
-          className="fixed inset-0 bg-black/30 flex items-center justify-center p-4 z-50 animate-fadeIn"
-          onClick={handleDismissAISetupModal}
-        >
-          <div
-            className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto animate-slideUp"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold text-gray-800">AI Autocomplete</h2>
-              <button
-                onClick={handleDismissAISetupModal}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                <XMarkIcon width={24} />
-              </button>
-            </div>
-
-            <div className="space-y-6">
-              {/* Header */}
-              <div className="text-center">
-                <div className="mx-auto w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mb-4">
-                  <SparklesIcon className="w-8 h-8 text-indigo-600" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">
-                  Set Up AI Autocomplete
-                </h3>
-                <p className="text-gray-600">
-                  Get AI-powered writing suggestions and automatic entry summaries
-                </p>
-              </div>
-
-              {/* Instructions */}
-              <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-lg p-6 space-y-4">
-                <h4 className="font-semibold text-gray-800 flex items-center gap-2">
-                  <span className="flex items-center justify-center w-6 h-6 bg-indigo-600 text-white rounded-full text-sm">1</span>
-                  Configure AI Autocomplete
-                </h4>
-                <p className="text-sm text-gray-700 ml-8">
-                  Go to <strong>Settings → AI Autocomplete</strong> to enter your HuggingFace API key
-                </p>
-
-                <h4 className="font-semibold text-gray-800 flex items-center gap-2">
-                  <span className="flex items-center justify-center w-6 h-6 bg-indigo-600 text-white rounded-full text-sm">2</span>
-                  Get Your API Key
-                </h4>
-                <div className="text-sm text-gray-700 ml-8 space-y-2">
-                  <p>To use AI features, you need a HuggingFace API key:</p>
-                  <ul className="list-disc list-inside space-y-1 ml-2">
-                    <li>Visit <a href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-700 underline">huggingface.co/settings/tokens</a></li>
-                    <li>Create a free account</li>
-                    <li>Generate your API key</li>
-                    <li>Add it in Settings</li>
-                  </ul>
-                </div>
-
-                <h4 className="font-semibold text-gray-800 flex items-center gap-2">
-                  <span className="flex items-center justify-center w-6 h-6 bg-indigo-600 text-white rounded-full text-sm">3</span>
-                  Start Using AI Features
-                </h4>
-                <p className="text-sm text-gray-700 ml-8">
-                  Press <kbd className="px-2 py-1 bg-white border border-gray-300 rounded text-xs">Shift + Space</kbd> for writing suggestions
-                </p>
-              </div>
-
-              {/* Don't Show Again Checkbox */}
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="dontShowAgain"
-                  checked={dontShowAgain}
-                  onChange={(e) => setDontShowAgain(e.target.checked)}
-                  className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"
-                />
-                <label htmlFor="dontShowAgain" className="text-sm text-gray-700 cursor-pointer">
-                  Don't show this again
-                </label>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex flex-col gap-3">
-                <button
-                  onClick={() => {
-                    handleDismissAISetupModal();
-                    setShowSettingsModal(true);
-                  }}
-                  className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-                >
-                  <Cog6ToothIcon width={20} />
-                  <span>Go to Settings to Configure</span>
-                </button>
-                
-                <button
-                  onClick={handleDismissAISetupModal}
-                  className="w-full px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  {dontShowAgain ? "Don't Show Again" : "Maybe Later"}
-                </button>
-              </div>
-
-              {/* Help Link */}
-              <div className="text-center">
-                <a
-                  href="https://github.com/jezzlucena/caderno/blob/main/AI_AUTOCOMPLETE_GUIDE.md"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-indigo-600 hover:text-indigo-700 underline"
-                >
-                  View Full Setup Guide →
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <AISetupModal
+        isOpen={showAISetupModal}
+        onClose={() => setShowAISetupModal(false)}
+        onOpenSettings={() => setShowSettingsModal(true)}
+      />
 
       <div className="h-full w-full bg-gradient-to-br from-blue-50 to-indigo-100 overflow-auto">
       <div className="container mx-auto px-4 py-8">
