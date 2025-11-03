@@ -167,20 +167,20 @@ export default function AboutModal({ onClose, initialTab = 'mission' }: AboutMod
         {/* Tabs */}
         <div 
           ref={tabsContainerRef}
-          className="flex gap-0.5 px-4 pt-4 bg-indigo-100 overflow-x-auto scroll-smooth"
+          className="flex gap-0.5 px-4 pt-4 bg-indigo-200 overflow-x-auto scroll-smooth"
         >
           {tabs.map((tab) => (
             <button
               key={tab.id}
               ref={(el) => { tabRefs.current[tab.id] = el; }}
               onClick={() => handleTabClick(tab.id)}
-              className={`h-12 pl-4 pr-6 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors border-2 rounded-b-none border-indigo-200 bg-indigo-50 z-10 ${
+              className={`h-10 pl-4 pr-6 rounded-lg text-sm font-medium whitespace-nowrap transition-colors border-2 rounded-b-none border-indigo-200 bg-indigo-50 z-10 ${
                 activeTab === tab.id
                   ? 'bg-white border-b-0'
                   : 'text-gray-600 hover:bg-gray-100'
               }`}
             >
-              <span className="mr-1 rounded-full bg-white h-8 w-8 inline-flex items-center justify-center">{tab.icon}</span>
+              <span className="text-lg mr-1 rounded-full inline-flex items-center justify-center">{tab.icon}</span>
               {tab.label}
             </button>
           ))}
