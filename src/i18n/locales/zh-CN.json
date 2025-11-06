@@ -78,6 +78,20 @@
       "invalidFormat": "文件格式无效。请选择有效的日程备份文件。",
       "cancel": "取消",
       "import": "导入"
+    },
+    "apiKeyConfirmation": {
+      "title": "⚠️ 生成新的 API 密钥？",
+      "description": "生成新的 API 密钥将为此服务器连接创建一个新的身份验证令牌。",
+      "warning": {
+        "header": "重要提示：",
+        "unavailable": "当前的定时导出将变为<strong>不可用</strong>状态",
+        "noManagement": "您将无法使用新的 API 密钥查看、编辑或删除现有的计划",
+        "stillExecute": "但是，活动的定时导出<strong>仍将在</strong>设定的时间执行",
+        "serverMemory": "它们会保留在服务器内存中，直到完成"
+      },
+      "advisory": "仅在您理解这些影响或丢失了当前 API 密钥访问权限时才继续。",
+      "cancel": "取消",
+      "continue": "继续"
     }
   },
   "language": {
@@ -94,7 +108,7 @@
   "settings": {
     "title": "设置",
     "language": {
-      "title": "语言",
+      "title": "Language - Idioma - 語 - 文",
       "description": "选择您偏好的应用程序语言。"
     },
     "aiAutocomplete": "AI自动补全",
@@ -195,7 +209,182 @@
   },
   "scheduledExports": {
     "title": "定时导出",
-    "description": "配置自动化PDF导出服务器"
+    "description": "配置自动化PDF导出服务器",
+    "modal": {
+      "title": "定时导出"
+    },
+    "instructional": {
+      "header": "设置定时导出",
+      "subtitle": "通过定时PDF生成和发送来自动化您的日记导出",
+      "step1Title": "设置您的服务器",
+      "step1Description": "启动您的日程服务器（参见<code>caderno/server</code>文件夹）",
+      "step2Title": "配置连接",
+      "step2Description": "前往<strong>设置 → 定时导出</strong>进行以下操作：",
+      "step2Bullet1": "输入您的服务器URL",
+      "step2Bullet2": "使用\"生成\"按钮生成API密钥，或通过命令行生成",
+      "step3Title": "创建计划",
+      "step3Description": "配置完成后，返回此处创建和管理您的定时导出",
+      "goToSettings": "前往设置进行配置",
+      "generateApiKey": "生成API密钥",
+      "generating": "生成中...",
+      "setupLater": "稍后设置",
+      "viewGuide": "查看完整设置指南 →",
+      "serverUrlRequired": "服务器URL是必需的且必须有效"
+    },
+    "list": {
+      "scheduleCount_one": "已配置{{count}}个计划",
+      "scheduleCount_other": "已配置{{count}}个计划",
+      "newSchedule": "新建计划",
+      "loading": "加载计划中...",
+      "noSchedules": "暂无计划。创建一个以开始！",
+      "executed": "已执行",
+      "pending": "待执行",
+      "executedOn": "执行于{{date}}",
+      "recipientCount_one": "{{count}}个接收者",
+      "recipientCount_other": "{{count}}个接收者",
+      "entryCount_one": "{{count}}个条目",
+      "entryCount_other": "{{count}}个条目",
+      "original": "原始：{{duration}}",
+      "executedAt": "执行时间：{{date}}",
+      "edit": "编辑",
+      "delete": "删除",
+      "runNow": "立即运行",
+      "resetTimer": "重置计时器为{{duration}}"
+    },
+    "detail": {
+      "backToList": "← 返回列表",
+      "timeRemaining": "剩余时间",
+      "executionTime": "执行时间",
+      "originalDuration": "原始时长：{{duration}}",
+      "entrySelection": "条目选择",
+      "recipients": "接收者",
+      "scheduledFor": "计划时间",
+      "executedAt": "执行时间",
+      "executionHistory": "执行历史",
+      "executeNow": "立即执行",
+      "reset": "重置",
+      "recipientsConfigured": "已配置{{count}}个"
+    },
+    "form": {
+      "backToList": "← 返回列表",
+      "editingNotice": "<strong>编辑计划：</strong>在下方进行更改并点击\"更新计划\"以保存。",
+      "scheduleNameLabel": "计划名称",
+      "scheduleNamePlaceholder": "每周导出",
+      "whenToRunLabel": "何时运行此导出？",
+      "whenToRunDescription": "从现在开始设置一个时长，导出将在此时间后执行一次",
+      "yearsLabel": "年（0-100）",
+      "monthsLabel": "月（0-12）",
+      "weeksLabel": "周（0-4）",
+      "daysLabel": "天（0-7）",
+      "hoursLabel": "小时（0-23）",
+      "minutesLabel": "分钟（1-59）",
+      "entrySelectionLabel": "条目选择",
+      "allEntries": "所有条目",
+      "dateRange": "日期范围",
+      "startDate": "开始日期",
+      "endDate": "结束日期",
+      "passphraseLabel": "加密密码短语",
+      "passphrasePlaceholder": "输入安全的密码短语",
+      "passphraseNote": "此密码短语将用于加密您的日记条目。请妥善保管！",
+      "passphraseUpdateNote": "更改密码短语将使用新密码短语重新加密您的日记条目。",
+      "recipientsLabel": "接收者",
+      "emailType": "电子邮件",
+      "smsType": "短信",
+      "emailPlaceholder": "user@example.com",
+      "smsPlaceholder": "+1234567890",
+      "addRecipient": "添加接收者",
+      "createButton": "创建计划",
+      "creating": "创建中...",
+      "updateButton": "更新计划",
+      "updating": "更新中..."
+    },
+    "time": {
+      "executionTimePassed": "执行时间已过",
+      "years_one": "{{count}}年",
+      "years_other": "{{count}}年",
+      "months": "{{count}}月",
+      "weeks_one": "{{count}}周",
+      "weeks_other": "{{count}}周",
+      "days_one": "{{count}}天",
+      "days_other": "{{count}}天",
+      "hours_one": "{{count}}小时",
+      "hours_other": "{{count}}小时",
+      "minutes": "{{count}}分钟"
+    },
+    "status": {
+      "success": "成功",
+      "failed": "失败",
+      "running": "运行中"
+    },
+    "messages": {
+      "invalidApiKey": "无效的API密钥。请检查您的设置。",
+      "loadSchedulesFailed": "加载计划失败。服务器返回错误。",
+      "networkError": "网络错误。请检查您的连接和服务器URL。",
+      "unableToConnect": "无法连接到服务器。请检查您的配置。",
+      "serverConnectionFailed": "服务器连接失败。请确保服务器正在运行。",
+      "scheduleNameRequired": "计划名称是必需的",
+      "passphraseRequired": "加密密码短语是必需的",
+      "durationRequired": "请至少设置一个大于0的时长字段",
+      "recipientRequired": "至少需要一个接收者",
+      "noEntriesMatch": "没有符合选择条件的条目。请调整您的选择。",
+      "scheduleCreatedSuccess": "计划创建成功！此导出将包含{{count}}个{{entryWord}}。",
+      "createScheduleFailed": "创建计划失败",
+      "createScheduleNetworkError": "网络错误。创建计划失败。",
+      "scheduleUpdatedSuccess": "计划更新成功！此导出将包含{{count}}个{{entryWord}}。",
+      "updateScheduleFailed": "更新计划失败",
+      "updateScheduleNetworkError": "网络错误。更新计划失败。",
+      "deleteConfirm": "您确定要删除此计划吗？",
+      "scheduleDeletedSuccess": "计划删除成功",
+      "deleteScheduleFailed": "删除计划失败",
+      "deleteScheduleNetworkError": "网络错误。删除计划失败。",
+      "executionStarted": "计划执行已开始！请稍后查看您的电子邮件。",
+      "executeFailed": "执行计划失败",
+      "executeNetworkError": "网络错误。执行计划失败。",
+      "loadDetailsFailed": "加载计划详情失败",
+      "loadDetailsNetworkError": "加载计划详情时发生网络错误",
+      "serverUrlRequired": "服务器URL是必需的。请先在设置中配置。",
+      "invalidServerUrl": "无效的服务器URL格式",
+      "apiKeyGeneratedSuccess": "API密钥生成并保存成功",
+      "apiKeyGenerationFailed": "生成API密钥失败",
+      "apiKeyNetworkError": "网络错误。请检查您的服务器URL并重试。",
+      "resetTimerConfirm": "将此计划的计时器重置为原始时长？",
+      "timerResetSuccess": "计时器重置成功！",
+      "resetTimerFailed": "重置计时器失败",
+      "resetTimerNetworkError": "网络错误。重置计时器失败。"
+    }
+  },
+  "aiSetup": {
+    "title": "AI 自动补全",
+    "header": {
+      "title": "设置 AI 自动补全",
+      "description": "获取 AI 驱动的写作建议和自动条目摘要"
+    },
+    "step1": {
+      "title": "配置 AI 自动补全",
+      "description": "转到<strong>设置 → AI 自动补全</strong>以输入您的 HuggingFace API 密钥"
+    },
+    "step2": {
+      "title": "获取您的 API 密钥",
+      "description": "要使用 AI 功能，您需要一个 HuggingFace API 密钥：",
+      "listItem1": "访问 huggingface.co/settings/tokens",
+      "listItem2": "创建免费账户",
+      "listItem3": "生成您的 API 密钥",
+      "listItem4": "在设置中添加它"
+    },
+    "step3": {
+      "title": "开始使用 AI 功能",
+      "description": "按",
+      "shortcut": "Shift + 空格"
+    },
+    "checkbox": {
+      "dontShowAgain": "不再显示此内容"
+    },
+    "buttons": {
+      "goToSettings": "转到设置进行配置",
+      "maybeLater": "稍后再说",
+      "dontShowAgain": "不再显示"
+    },
+    "helpLink": "查看完整设置指南 →"
   },
   "about": {
     "title": "关于日程",

@@ -78,6 +78,20 @@
       "invalidFormat": "Formato de archivo inválido. Por favor, selecciona un archivo de respaldo válido de Caderno.",
       "cancel": "Cancelar",
       "import": "Importar"
+    },
+    "apiKeyConfirmation": {
+      "title": "⚠️ ¿Generar Nueva Clave de API?",
+      "description": "Generar una nueva clave de API creará un nuevo token de autenticación para esta conexión con el servidor.",
+      "warning": {
+        "header": "Importante:",
+        "unavailable": "Las exportaciones programadas actuales quedarán <strong>no disponibles</strong> para gestión",
+        "noManagement": "No podrás ver, editar o eliminar programaciones existentes con la nueva clave de API",
+        "stillExecute": "Sin embargo, las exportaciones programadas activas <strong>seguirán ejecutándose</strong> en sus horarios establecidos",
+        "serverMemory": "Permanecen en la memoria del servidor hasta que se completen"
+      },
+      "advisory": "Procede solo si comprendes estas implicaciones o si perdiste el acceso a tu clave de API actual.",
+      "cancel": "Cancelar",
+      "continue": "Continuar"
     }
   },
   "language": {
@@ -94,7 +108,7 @@
   "settings": {
     "title": "Configuración",
     "language": {
-      "title": "Idioma",
+      "title": "Language - Idioma - 語 - 文",
       "description": "Elige tu idioma preferido para la aplicación."
     },
     "aiAutocomplete": "Autocompletar con IA",
@@ -195,7 +209,182 @@
   },
   "scheduledExports": {
     "title": "Exportaciones Programadas",
-    "description": "Configurar servidor de exportaciones PDF automatizadas"
+    "description": "Configurar servidor de exportaciones PDF automatizadas",
+    "modal": {
+      "title": "Exportaciones Programadas"
+    },
+    "instructional": {
+      "header": "Configurar Exportaciones Programadas",
+      "subtitle": "Automatiza tus exportaciones del diario con generación y entrega programada de PDFs",
+      "step1Title": "Configura tu Servidor",
+      "step1Description": "Inicia tu Servidor Caderno (ve la carpeta <code>caderno/server</code>)",
+      "step2Title": "Configura la Conexión",
+      "step2Description": "Ve a <strong>Configuración → Exportaciones Programadas</strong> para:",
+      "step2Bullet1": "Ingresar la URL de tu servidor",
+      "step2Bullet2": "Generar una clave API usando el botón \"Generar\", o por línea de comandos",
+      "step3Title": "Crear Programaciones",
+      "step3Description": "Una vez configurado, regresa aquí para crear y administrar tus exportaciones programadas",
+      "goToSettings": "Ir a Configuración para Configurar",
+      "generateApiKey": "Generar Clave API",
+      "generating": "Generando...",
+      "setupLater": "Lo Configuraré Después",
+      "viewGuide": "Ver Guía Completa de Configuración →",
+      "serverUrlRequired": "La URL del servidor es requerida y debe ser válida"
+    },
+    "list": {
+      "scheduleCount_one": "{{count}} programación configurada",
+      "scheduleCount_other": "{{count}} programaciones configuradas",
+      "newSchedule": "Nueva Programación",
+      "loading": "Cargando programaciones...",
+      "noSchedules": "Aún no hay programaciones. ¡Crea una para comenzar!",
+      "executed": "Ejecutada",
+      "pending": "Pendiente",
+      "executedOn": "Ejecutada el {{date}}",
+      "recipientCount_one": "{{count}} destinatario",
+      "recipientCount_other": "{{count}} destinatarios",
+      "entryCount_one": "{{count}} entrada",
+      "entryCount_other": "{{count}} entradas",
+      "original": "Original: {{duration}}",
+      "executedAt": "Ejecutada: {{date}}",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "runNow": "Ejecutar ahora",
+      "resetTimer": "Restablecer temporizador a {{duration}}"
+    },
+    "detail": {
+      "backToList": "← Volver a la lista",
+      "timeRemaining": "Tiempo Restante",
+      "executionTime": "Tiempo de Ejecución",
+      "originalDuration": "Duración original: {{duration}}",
+      "entrySelection": "Selección de Entradas",
+      "recipients": "Destinatarios",
+      "scheduledFor": "Programada Para",
+      "executedAt": "Ejecutada El",
+      "executionHistory": "Historial de Ejecución",
+      "executeNow": "Ejecutar Ahora",
+      "reset": "Restablecer",
+      "recipientsConfigured": "{{count}} configurados"
+    },
+    "form": {
+      "backToList": "← Volver a la lista",
+      "editingNotice": "<strong>Editando programación:</strong> Realiza tus cambios abajo y haz clic en \"Actualizar Programación\" para guardar.",
+      "scheduleNameLabel": "Nombre de la Programación",
+      "scheduleNamePlaceholder": "Exportación Semanal",
+      "whenToRunLabel": "¿Cuándo debería ejecutarse esta exportación?",
+      "whenToRunDescription": "Configura una duración desde ahora cuando la exportación se ejecutará una vez",
+      "yearsLabel": "Años (0-100)",
+      "monthsLabel": "Meses (0-12)",
+      "weeksLabel": "Semanas (0-4)",
+      "daysLabel": "Días (0-7)",
+      "hoursLabel": "Horas (0-23)",
+      "minutesLabel": "Minutos (1-59)",
+      "entrySelectionLabel": "Selección de Entradas",
+      "allEntries": "Todas las entradas",
+      "dateRange": "Rango de fechas",
+      "startDate": "Fecha de Inicio",
+      "endDate": "Fecha de Fin",
+      "passphraseLabel": "Contraseña de Encriptación",
+      "passphrasePlaceholder": "Ingresa una contraseña segura",
+      "passphraseNote": "Esta contraseña se usará para encriptar las entradas de tu diario. ¡Manténla segura!",
+      "passphraseUpdateNote": "Cambiar la contraseña volverá a encriptar las entradas de tu diario con la nueva contraseña.",
+      "recipientsLabel": "Destinatarios",
+      "emailType": "Correo",
+      "smsType": "SMS",
+      "emailPlaceholder": "usuario@ejemplo.com",
+      "smsPlaceholder": "+1234567890",
+      "addRecipient": "Agregar destinatario",
+      "createButton": "Crear Programación",
+      "creating": "Creando...",
+      "updateButton": "Actualizar Programación",
+      "updating": "Actualizando..."
+    },
+    "time": {
+      "executionTimePassed": "Tiempo de ejecución pasado",
+      "years_one": "{{count}} año",
+      "years_other": "{{count}} años",
+      "months": "{{count}} mes",
+      "weeks_one": "{{count}} sem",
+      "weeks_other": "{{count}} sems",
+      "days_one": "{{count}} día",
+      "days_other": "{{count}} días",
+      "hours_one": "{{count}} hr",
+      "hours_other": "{{count}} hrs",
+      "minutes": "{{count}} min"
+    },
+    "status": {
+      "success": "exitoso",
+      "failed": "fallido",
+      "running": "ejecutando"
+    },
+    "messages": {
+      "invalidApiKey": "Clave API inválida. Por favor, verifica tu configuración.",
+      "loadSchedulesFailed": "Error al cargar programaciones. El servidor devolvió un error.",
+      "networkError": "Error de red. Por favor, verifica tu conexión y la URL del servidor.",
+      "unableToConnect": "No se puede conectar al servidor. Por favor, verifica tu configuración.",
+      "serverConnectionFailed": "Error de conexión al servidor. Asegúrate de que el servidor esté funcionando.",
+      "scheduleNameRequired": "El nombre de la programación es requerido",
+      "passphraseRequired": "La contraseña de encriptación es requerida",
+      "durationRequired": "Por favor, configura al menos un campo de duración mayor que 0",
+      "recipientRequired": "Se requiere al menos un destinatario",
+      "noEntriesMatch": "Ninguna entrada coincide con los criterios de selección. Por favor, ajusta tu selección.",
+      "scheduleCreatedSuccess": "¡Programación creada exitosamente! {{count}} {{entryWord}} se incluirán en esta exportación.",
+      "createScheduleFailed": "Error al crear programación",
+      "createScheduleNetworkError": "Error de red. Error al crear programación.",
+      "scheduleUpdatedSuccess": "¡Programación actualizada exitosamente! {{count}} {{entryWord}} se incluirán en esta exportación.",
+      "updateScheduleFailed": "Error al actualizar programación",
+      "updateScheduleNetworkError": "Error de red. Error al actualizar programación.",
+      "deleteConfirm": "¿Estás seguro de que quieres eliminar esta programación?",
+      "scheduleDeletedSuccess": "Programación eliminada exitosamente",
+      "deleteScheduleFailed": "Error al eliminar programación",
+      "deleteScheduleNetworkError": "Error de red. Error al eliminar programación.",
+      "executionStarted": "¡Ejecución de programación iniciada! Revisa tu correo en breve.",
+      "executeFailed": "Error al ejecutar programación",
+      "executeNetworkError": "Error de red. Error al ejecutar programación.",
+      "loadDetailsFailed": "Error al cargar detalles de programación",
+      "loadDetailsNetworkError": "Error de red al cargar detalles de programación",
+      "serverUrlRequired": "La URL del servidor es requerida. Por favor, configúrala en Configuración primero.",
+      "invalidServerUrl": "Formato de URL del servidor inválido",
+      "apiKeyGeneratedSuccess": "Clave API generada y guardada exitosamente",
+      "apiKeyGenerationFailed": "Error al generar clave API",
+      "apiKeyNetworkError": "Error de red. Por favor, verifica la URL de tu servidor e intenta nuevamente.",
+      "resetTimerConfirm": "¿Restablecer el temporizador de esta programación a la duración original?",
+      "timerResetSuccess": "¡Temporizador restablecido exitosamente!",
+      "resetTimerFailed": "Error al restablecer temporizador",
+      "resetTimerNetworkError": "Error de red. Error al restablecer temporizador."
+    }
+  },
+  "aiSetup": {
+    "title": "Autocompletar con IA",
+    "header": {
+      "title": "Configurar Autocompletar con IA",
+      "description": "Obtén sugerencias de escritura impulsadas por IA y resúmenes automáticos de entradas"
+    },
+    "step1": {
+      "title": "Configurar Autocompletar con IA",
+      "description": "Ve a <strong>Configuración → Autocompletar con IA</strong> para ingresar tu clave de API de HuggingFace"
+    },
+    "step2": {
+      "title": "Obtener Tu Clave de API",
+      "description": "Para usar las funciones de IA, necesitas una clave de API de HuggingFace:",
+      "listItem1": "Visita huggingface.co/settings/tokens",
+      "listItem2": "Crea una cuenta gratuita",
+      "listItem3": "Genera tu clave de API",
+      "listItem4": "Agrégala en Configuración"
+    },
+    "step3": {
+      "title": "Comenzar a Usar Funciones de IA",
+      "description": "Presiona",
+      "shortcut": "Mayús + Espacio"
+    },
+    "checkbox": {
+      "dontShowAgain": "No mostrar esto de nuevo"
+    },
+    "buttons": {
+      "goToSettings": "Ir a Configuración",
+      "maybeLater": "Tal Vez Más Tarde",
+      "dontShowAgain": "No Mostrar de Nuevo"
+    },
+    "helpLink": "Ver Guía Completa de Configuración →"
   },
   "about": {
     "title": "Acerca de Caderno",

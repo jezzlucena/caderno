@@ -78,6 +78,20 @@
       "invalidFormat": "Formato de ficheiro inválido. Por favor, seleccione um ficheiro de cópia de segurança válido do Caderno.",
       "cancel": "Cancelar",
       "import": "Importar"
+    },
+    "apiKeyConfirmation": {
+      "title": "⚠️ Gerar Nova Chave de API?",
+      "description": "Gerar uma nova chave de API criará um novo token de autenticação para esta ligação com o servidor.",
+      "warning": {
+        "header": "Importante:",
+        "unavailable": "As exportações agendadas actuais ficarão <strong>indisponíveis</strong> para gestão",
+        "noManagement": "Não poderá visualizar, editar ou eliminar agendamentos existentes com a nova chave de API",
+        "stillExecute": "No entanto, as exportações agendadas activas <strong>ainda serão executadas</strong> nos horários definidos",
+        "serverMemory": "Permanecem na memória do servidor até serem concluídas"
+      },
+      "advisory": "Prossiga apenas se compreender estas implicações ou se perdeu o acesso à sua chave de API actual.",
+      "cancel": "Cancelar",
+      "continue": "Continuar"
     }
   },
   "language": {
@@ -94,7 +108,7 @@
   "settings": {
     "title": "Definições",
     "language": {
-      "title": "Idioma",
+      "title": "Language - Idioma - 語 - 文",
       "description": "Escolha o seu idioma preferido para a aplicação."
     },
     "aiAutocomplete": "Autocompletar com IA",
@@ -195,7 +209,182 @@
   },
   "scheduledExports": {
     "title": "Exportações Agendadas",
-    "description": "Configurar servidor de exportações PDF automatizadas"
+    "description": "Configurar servidor de exportações PDF automatizadas",
+    "modal": {
+      "title": "Exportações Agendadas"
+    },
+    "instructional": {
+      "header": "Configurar Exportações Agendadas",
+      "subtitle": "Automatize as suas exportações de diário com geração e entrega de PDF agendadas",
+      "step1Title": "Configure o Seu Servidor",
+      "step1Description": "Inicie o seu Servidor Caderno (consulte a pasta <code>caderno/server</code>)",
+      "step2Title": "Configure a Ligação",
+      "step2Description": "Vá a <strong>Definições → Exportações Agendadas</strong> para:",
+      "step2Bullet1": "Inserir o URL do seu servidor",
+      "step2Bullet2": "Gerar uma chave de API usando o botão \"Gerar\", ou via linha de comandos",
+      "step3Title": "Criar Agendamentos",
+      "step3Description": "Uma vez configurado, retorne aqui para criar e gerir as suas exportações agendadas",
+      "goToSettings": "Ir para Definições",
+      "generateApiKey": "Gerar Chave de API",
+      "generating": "A gerar...",
+      "setupLater": "Vou Configurar Isto Depois",
+      "viewGuide": "Ver Guia Completo de Configuração →",
+      "serverUrlRequired": "O URL do servidor é obrigatório e deve ser válido"
+    },
+    "list": {
+      "scheduleCount_one": "{{count}} agendamento configurado",
+      "scheduleCount_other": "{{count}} agendamentos configurados",
+      "newSchedule": "Novo Agendamento",
+      "loading": "A carregar agendamentos...",
+      "noSchedules": "Ainda sem agendamentos. Crie um para começar!",
+      "executed": "Executado",
+      "pending": "Pendente",
+      "executedOn": "Executado em {{date}}",
+      "recipientCount_one": "{{count}} destinatário",
+      "recipientCount_other": "{{count}} destinatários",
+      "entryCount_one": "{{count}} entrada",
+      "entryCount_other": "{{count}} entradas",
+      "original": "Original: {{duration}}",
+      "executedAt": "Executado: {{date}}",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "runNow": "Executar agora",
+      "resetTimer": "Reiniciar temporizador para {{duration}}"
+    },
+    "detail": {
+      "backToList": "← Voltar à lista",
+      "timeRemaining": "Tempo Restante",
+      "executionTime": "Tempo de Execução",
+      "originalDuration": "Duração original: {{duration}}",
+      "entrySelection": "Selecção de Entradas",
+      "recipients": "Destinatários",
+      "scheduledFor": "Agendado Para",
+      "executedAt": "Executado A",
+      "executionHistory": "Histórico de Execução",
+      "executeNow": "Executar Agora",
+      "reset": "Reiniciar",
+      "recipientsConfigured": "{{count}} configurados"
+    },
+    "form": {
+      "backToList": "← Voltar à lista",
+      "editingNotice": "<strong>A editar agendamento:</strong> Faça as suas alterações abaixo e clique em \"Actualizar Agendamento\" para guardar.",
+      "scheduleNameLabel": "Nome do Agendamento",
+      "scheduleNamePlaceholder": "Exportação Semanal",
+      "whenToRunLabel": "Quando deve esta exportação ser executada?",
+      "whenToRunDescription": "Defina uma duração a partir de agora quando a exportação será executada uma vez",
+      "yearsLabel": "Anos (0-100)",
+      "monthsLabel": "Meses (0-12)",
+      "weeksLabel": "Semanas (0-4)",
+      "daysLabel": "Dias (0-7)",
+      "hoursLabel": "Horas (0-23)",
+      "minutesLabel": "Minutos (1-59)",
+      "entrySelectionLabel": "Selecção de Entradas",
+      "allEntries": "Todas as entradas",
+      "dateRange": "Intervalo de datas",
+      "startDate": "Data Inicial",
+      "endDate": "Data Final",
+      "passphraseLabel": "Palavra-passe de Encriptação",
+      "passphrasePlaceholder": "Introduza uma palavra-passe segura",
+      "passphraseNote": "Esta palavra-passe será usada para encriptar as entradas do seu diário. Mantenha-a segura!",
+      "passphraseUpdateNote": "Alterar a palavra-passe irá reencriptar as entradas do seu diário com a nova palavra-passe.",
+      "recipientsLabel": "Destinatários",
+      "emailType": "Email",
+      "smsType": "SMS",
+      "emailPlaceholder": "utilizador@exemplo.pt",
+      "smsPlaceholder": "+351912345678",
+      "addRecipient": "Adicionar destinatário",
+      "createButton": "Criar Agendamento",
+      "creating": "A criar...",
+      "updateButton": "Actualizar Agendamento",
+      "updating": "A actualizar..."
+    },
+    "time": {
+      "executionTimePassed": "Tempo de execução passou",
+      "years_one": "{{count}} ano",
+      "years_other": "{{count}} anos",
+      "months": "{{count}} mês",
+      "weeks_one": "{{count}} sem",
+      "weeks_other": "{{count}} sems",
+      "days_one": "{{count}} dia",
+      "days_other": "{{count}} dias",
+      "hours_one": "{{count}} h",
+      "hours_other": "{{count}} hs",
+      "minutes": "{{count}} min"
+    },
+    "status": {
+      "success": "sucesso",
+      "failed": "falhou",
+      "running": "a executar"
+    },
+    "messages": {
+      "invalidApiKey": "Chave de API inválida. Por favor, verifique as suas definições.",
+      "loadSchedulesFailed": "Falha ao carregar agendamentos. O servidor retornou um erro.",
+      "networkError": "Erro de rede. Por favor, verifique a sua ligação e URL do servidor.",
+      "unableToConnect": "Não foi possível ligar ao servidor. Por favor, verifique a sua configuração.",
+      "serverConnectionFailed": "Falha na ligação com o servidor. Certifique-se de que o servidor está em execução.",
+      "scheduleNameRequired": "Nome do agendamento é obrigatório",
+      "passphraseRequired": "Palavra-passe de encriptação é obrigatória",
+      "durationRequired": "Por favor, defina pelo menos um campo de duração maior que 0",
+      "recipientRequired": "Pelo menos um destinatário é obrigatório",
+      "noEntriesMatch": "Nenhuma entrada corresponde aos critérios de selecção. Por favor, ajuste a sua selecção.",
+      "scheduleCreatedSuccess": "Agendamento criado com sucesso! {{count}} {{entryWord}} será incluído nesta exportação.",
+      "createScheduleFailed": "Falha ao criar agendamento",
+      "createScheduleNetworkError": "Erro de rede. Falha ao criar agendamento.",
+      "scheduleUpdatedSuccess": "Agendamento actualizado com sucesso! {{count}} {{entryWord}} será incluído nesta exportação.",
+      "updateScheduleFailed": "Falha ao actualizar agendamento",
+      "updateScheduleNetworkError": "Erro de rede. Falha ao actualizar agendamento.",
+      "deleteConfirm": "Tem a certeza que deseja eliminar este agendamento?",
+      "scheduleDeletedSuccess": "Agendamento eliminado com sucesso",
+      "deleteScheduleFailed": "Falha ao eliminar agendamento",
+      "deleteScheduleNetworkError": "Erro de rede. Falha ao eliminar agendamento.",
+      "executionStarted": "Execução do agendamento iniciada! Verifique o seu email em breve.",
+      "executeFailed": "Falha ao executar agendamento",
+      "executeNetworkError": "Erro de rede. Falha ao executar agendamento.",
+      "loadDetailsFailed": "Falha ao carregar detalhes do agendamento",
+      "loadDetailsNetworkError": "Erro de rede ao carregar detalhes do agendamento",
+      "serverUrlRequired": "O URL do servidor é obrigatório. Por favor, configure-o em Definições primeiro.",
+      "invalidServerUrl": "Formato de URL do servidor inválido",
+      "apiKeyGeneratedSuccess": "Chave de API gerada e guardada com sucesso",
+      "apiKeyGenerationFailed": "Falha ao gerar chave de API",
+      "apiKeyNetworkError": "Erro de rede. Por favor, verifique o URL do seu servidor e tente novamente.",
+      "resetTimerConfirm": "Reiniciar o temporizador deste agendamento para a duração original?",
+      "timerResetSuccess": "Temporizador reiniciado com sucesso!",
+      "resetTimerFailed": "Falha ao reiniciar temporizador",
+      "resetTimerNetworkError": "Erro de rede. Falha ao reiniciar temporizador."
+    }
+  },
+  "aiSetup": {
+    "title": "Autocompletar com IA",
+    "header": {
+      "title": "Configurar Autocompletar com IA",
+      "description": "Obtenha sugestões de escrita alimentadas por IA e resumos automáticos de entradas"
+    },
+    "step1": {
+      "title": "Configurar Autocompletar com IA",
+      "description": "Vá a <strong>Definições → Autocompletar com IA</strong> para inserir a sua chave de API do HuggingFace"
+    },
+    "step2": {
+      "title": "Obter a Sua Chave de API",
+      "description": "Para usar os recursos de IA, precisa de uma chave de API do HuggingFace:",
+      "listItem1": "Visite huggingface.co/settings/tokens",
+      "listItem2": "Crie uma conta gratuita",
+      "listItem3": "Gere a sua chave de API",
+      "listItem4": "Adicione-a nas Definições"
+    },
+    "step3": {
+      "title": "Começar a Usar Recursos de IA",
+      "description": "Prima",
+      "shortcut": "Shift + Espaço"
+    },
+    "checkbox": {
+      "dontShowAgain": "Não mostrar isto novamente"
+    },
+    "buttons": {
+      "goToSettings": "Ir para Definições",
+      "maybeLater": "Talvez Mais Tarde",
+      "dontShowAgain": "Não Mostrar Novamente"
+    },
+    "helpLink": "Ver Guia Completo de Configuração →"
   },
   "about": {
     "title": "Sobre o Caderno",

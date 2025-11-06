@@ -78,6 +78,20 @@
       "invalidFormat": "Invalid file format. Please select a valid Caderno backup file.",
       "cancel": "Cancel",
       "import": "Import"
+    },
+    "apiKeyConfirmation": {
+      "title": "⚠️ Generate New API Key?",
+      "description": "Generating a new API key will create a fresh authentication token for this server connection.",
+      "warning": {
+        "header": "Important:",
+        "unavailable": "Current scheduled exports will become <strong>unavailable</strong> for management",
+        "noManagement": "You won't be able to view, edit, or delete existing schedules with the new API key",
+        "stillExecute": "However, active scheduled exports will <strong>still execute</strong> at their set times",
+        "serverMemory": "They remain in the server's memory until they complete"
+      },
+      "advisory": "Only proceed if you understand these implications or if you've lost access to your current API key.",
+      "cancel": "Cancel",
+      "continue": "Continue"
     }
   },
   "language": {
@@ -94,7 +108,7 @@
   "settings": {
     "title": "Settings",
     "language": {
-      "title": "Language",
+      "title": "Language - Idioma - 語 - 文",
       "description": "Choose your preferred language for the application."
     },
     "aiAutocomplete": "AI Autocomplete",
@@ -195,7 +209,182 @@
   },
   "scheduledExports": {
     "title": "Scheduled Exports",
-    "description": "Configure automated PDF exports server"
+    "description": "Configure automated PDF exports server",
+    "modal": {
+      "title": "Scheduled Exports"
+    },
+    "instructional": {
+      "header": "Set Up Scheduled Exports",
+      "subtitle": "Automate your journal exports with scheduled PDF generation and delivery",
+      "step1Title": "Set Up Your Server",
+      "step1Description": "Start your Caderno Server (see <code>caderno/server</code> folder)",
+      "step2Title": "Configure Connection",
+      "step2Description": "Go to <strong>Settings → Scheduled Exports</strong> to:",
+      "step2Bullet1": "Enter your server URL",
+      "step2Bullet2": "Generate an API key using the \"Generate\" button, or via command line",
+      "step3Title": "Create Schedules",
+      "step3Description": "Once configured, return here to create and manage your scheduled exports",
+      "goToSettings": "Go to Settings to Configure",
+      "generateApiKey": "Generate API Key",
+      "generating": "Generating...",
+      "setupLater": "I'll Set This Up Later",
+      "viewGuide": "View Full Setup Guide →",
+      "serverUrlRequired": "Server URL is required and must be valid"
+    },
+    "list": {
+      "scheduleCount_one": "{{count}} schedule configured",
+      "scheduleCount_other": "{{count}} schedules configured",
+      "newSchedule": "New Schedule",
+      "loading": "Loading schedules...",
+      "noSchedules": "No schedules yet. Create one to get started!",
+      "executed": "Executed",
+      "pending": "Pending",
+      "executedOn": "Executed on {{date}}",
+      "recipientCount_one": "{{count}} recipient",
+      "recipientCount_other": "{{count}} recipients",
+      "entryCount_one": "{{count}} entry",
+      "entryCount_other": "{{count}} entries",
+      "original": "Original: {{duration}}",
+      "executedAt": "Executed: {{date}}",
+      "edit": "Edit",
+      "delete": "Delete",
+      "runNow": "Run now",
+      "resetTimer": "Reset timer to {{duration}}"
+    },
+    "detail": {
+      "backToList": "← Back to list",
+      "timeRemaining": "Time Remaining",
+      "executionTime": "Execution Time",
+      "originalDuration": "Original duration: {{duration}}",
+      "entrySelection": "Entry Selection",
+      "recipients": "Recipients",
+      "scheduledFor": "Scheduled For",
+      "executedAt": "Executed At",
+      "executionHistory": "Execution History",
+      "executeNow": "Execute Now",
+      "reset": "Reset",
+      "recipientsConfigured": "{{count}} configured"
+    },
+    "form": {
+      "backToList": "← Back to list",
+      "editingNotice": "<strong>Editing schedule:</strong> Make your changes below and click \"Update Schedule\" to save.",
+      "scheduleNameLabel": "Schedule Name",
+      "scheduleNamePlaceholder": "Weekly Export",
+      "whenToRunLabel": "When should this export run?",
+      "whenToRunDescription": "Set a duration from now when the export will be executed once",
+      "yearsLabel": "Years (0-100)",
+      "monthsLabel": "Months (0-12)",
+      "weeksLabel": "Weeks (0-4)",
+      "daysLabel": "Days (0-7)",
+      "hoursLabel": "Hours (0-23)",
+      "minutesLabel": "Minutes (1-59)",
+      "entrySelectionLabel": "Entry Selection",
+      "allEntries": "All entries",
+      "dateRange": "Date range",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "passphraseLabel": "Encryption Passphrase",
+      "passphrasePlaceholder": "Enter a secure passphrase",
+      "passphraseNote": "This passphrase will be used to encrypt your journal entries. Keep it secure!",
+      "passphraseUpdateNote": "Changing the passphrase will re-encrypt your journal entries with the new passphrase.",
+      "recipientsLabel": "Recipients",
+      "emailType": "Email",
+      "smsType": "SMS",
+      "emailPlaceholder": "user@example.com",
+      "smsPlaceholder": "+1234567890",
+      "addRecipient": "Add recipient",
+      "createButton": "Create Schedule",
+      "creating": "Creating...",
+      "updateButton": "Update Schedule",
+      "updating": "Updating..."
+    },
+    "time": {
+      "executionTimePassed": "Execution time passed",
+      "years_one": "{{count}} yr",
+      "years_other": "{{count}} yrs",
+      "months": "{{count}} mo",
+      "weeks_one": "{{count}} wk",
+      "weeks_other": "{{count}} wks",
+      "days_one": "{{count}} day",
+      "days_other": "{{count}} days",
+      "hours_one": "{{count}} hr",
+      "hours_other": "{{count}} hrs",
+      "minutes": "{{count}} min"
+    },
+    "status": {
+      "success": "success",
+      "failed": "failed",
+      "running": "running"
+    },
+    "messages": {
+      "invalidApiKey": "Invalid API key. Please check your settings.",
+      "loadSchedulesFailed": "Failed to load schedules. Server returned an error.",
+      "networkError": "Network error. Please check your connection and server URL.",
+      "unableToConnect": "Unable to connect to server. Please check your configuration.",
+      "serverConnectionFailed": "Server connection failed. Make sure the server is running.",
+      "scheduleNameRequired": "Schedule name is required",
+      "passphraseRequired": "Encryption passphrase is required",
+      "durationRequired": "Please set at least one duration field greater than 0",
+      "recipientRequired": "At least one recipient is required",
+      "noEntriesMatch": "No entries match the selection criteria. Please adjust your selection.",
+      "scheduleCreatedSuccess": "Schedule created successfully! {{count}} {{entryWord}} will be included in this export.",
+      "createScheduleFailed": "Failed to create schedule",
+      "createScheduleNetworkError": "Network error. Failed to create schedule.",
+      "scheduleUpdatedSuccess": "Schedule updated successfully! {{count}} {{entryWord}} will be included in this export.",
+      "updateScheduleFailed": "Failed to update schedule",
+      "updateScheduleNetworkError": "Network error. Failed to update schedule.",
+      "deleteConfirm": "Are you sure you want to delete this schedule?",
+      "scheduleDeletedSuccess": "Schedule deleted successfully",
+      "deleteScheduleFailed": "Failed to delete schedule",
+      "deleteScheduleNetworkError": "Network error. Failed to delete schedule.",
+      "executionStarted": "Schedule execution started! Check your email shortly.",
+      "executeFailed": "Failed to execute schedule",
+      "executeNetworkError": "Network error. Failed to execute schedule.",
+      "loadDetailsFailed": "Failed to load schedule details",
+      "loadDetailsNetworkError": "Network error whilst loading schedule details",
+      "serverUrlRequired": "Server URL is required. Please configure it in Settings first.",
+      "invalidServerUrl": "Invalid Server URL format",
+      "apiKeyGeneratedSuccess": "API key generated and saved successfully",
+      "apiKeyGenerationFailed": "Failed to generate API key",
+      "apiKeyNetworkError": "Network error. Please check your server URL and try again.",
+      "resetTimerConfirm": "Reset this schedule's timer to the original duration?",
+      "timerResetSuccess": "Timer reset successfully!",
+      "resetTimerFailed": "Failed to reset timer",
+      "resetTimerNetworkError": "Network error. Failed to reset timer."
+    }
+  },
+  "aiSetup": {
+    "title": "AI Autocomplete",
+    "header": {
+      "title": "Set Up AI Autocomplete",
+      "description": "Get AI-powered writing suggestions and automatic entry summaries"
+    },
+    "step1": {
+      "title": "Configure AI Autocomplete",
+      "description": "Go to <strong>Settings → AI Autocomplete</strong> to enter your HuggingFace API key"
+    },
+    "step2": {
+      "title": "Get Your API Key",
+      "description": "To use AI features, you need a HuggingFace API key:",
+      "listItem1": "Visit huggingface.co/settings/tokens",
+      "listItem2": "Create a free account",
+      "listItem3": "Generate your API key",
+      "listItem4": "Add it in Settings"
+    },
+    "step3": {
+      "title": "Start Using AI Features",
+      "description": "Press",
+      "shortcut": "Shift + Space"
+    },
+    "checkbox": {
+      "dontShowAgain": "Don't show this again"
+    },
+    "buttons": {
+      "goToSettings": "Go to Settings to Configure",
+      "maybeLater": "Maybe Later",
+      "dontShowAgain": "Don't Show Again"
+    },
+    "helpLink": "View Full Setup Guide →"
   },
   "about": {
     "title": "About Caderno",

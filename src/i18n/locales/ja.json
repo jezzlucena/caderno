@@ -78,6 +78,20 @@
       "invalidFormat": "ファイル形式が無効です。有効なアジェンダバックアップファイルを選択してください。",
       "cancel": "キャンセル",
       "import": "インポート"
+    },
+    "apiKeyConfirmation": {
+      "title": "⚠️ 新しい API キーを生成しますか？",
+      "description": "新しい API キーを生成すると、このサーバー接続用の新しい認証トークンが作成されます。",
+      "warning": {
+        "header": "重要：",
+        "unavailable": "現在のスケジュール済みエクスポートは管理が<strong>不可能</strong>になります",
+        "noManagement": "新しい API キーでは既存のスケジュールの表示、編集、削除ができなくなります",
+        "stillExecute": "ただし、アクティブなスケジュール済みエクスポートは設定された時刻に<strong>引き続き実行されます</strong>",
+        "serverMemory": "これらは完了するまでサーバーのメモリに残ります"
+      },
+      "advisory": "これらの影響を理解している場合、または現在の API キーへのアクセスを失った場合にのみ続行してください。",
+      "cancel": "キャンセル",
+      "continue": "続行"
     }
   },
   "language": {
@@ -94,7 +108,7 @@
   "settings": {
     "title": "設定",
     "language": {
-      "title": "言語",
+      "title": "Language - Idioma - 語 - 文",
       "description": "アプリケーションの優先言語を選択してください。"
     },
     "aiAutocomplete": "AI自動補完",
@@ -195,7 +209,182 @@
   },
   "scheduledExports": {
     "title": "スケジュールされたエクスポート",
-    "description": "自動化されたPDFエクスポートサーバーを設定"
+    "description": "自動化されたPDFエクスポートサーバーを設定",
+    "modal": {
+      "title": "スケジュールされたエクスポート"
+    },
+    "instructional": {
+      "header": "スケジュールされたエクスポートを設定",
+      "subtitle": "スケジュールされたPDF生成と配信で日記のエクスポートを自動化",
+      "step1Title": "サーバーを設定",
+      "step1Description": "Cadernoサーバーを起動してください（<code>caderno/server</code>フォルダを参照）",
+      "step2Title": "接続を設定",
+      "step2Description": "<strong>設定 → スケジュールされたエクスポート</strong>へ移動して：",
+      "step2Bullet1": "サーバーURLを入力",
+      "step2Bullet2": "「生成」ボタンを使用してAPIキーを生成するか、コマンドラインから生成",
+      "step3Title": "スケジュールを作成",
+      "step3Description": "設定が完了したら、ここに戻ってスケジュールされたエクスポートを作成・管理します",
+      "goToSettings": "設定へ移動して設定",
+      "generateApiKey": "APIキーを生成",
+      "generating": "生成中...",
+      "setupLater": "後で設定します",
+      "viewGuide": "完全な設定ガイドを表示 →",
+      "serverUrlRequired": "サーバーURLは必須であり、有効である必要があります"
+    },
+    "list": {
+      "scheduleCount_one": "{{count}}件のスケジュールが設定されています",
+      "scheduleCount_other": "{{count}}件のスケジュールが設定されています",
+      "newSchedule": "新しいスケジュール",
+      "loading": "スケジュールを読み込み中...",
+      "noSchedules": "スケジュールがありません。最初のスケジュールを作成しましょう！",
+      "executed": "実行済み",
+      "pending": "保留中",
+      "executedOn": "{{date}}に実行",
+      "recipientCount_one": "{{count}}人の受信者",
+      "recipientCount_other": "{{count}}人の受信者",
+      "entryCount_one": "{{count}}件のエントリ",
+      "entryCount_other": "{{count}}件のエントリ",
+      "original": "元の期間：{{duration}}",
+      "executedAt": "実行日時：{{date}}",
+      "edit": "編集",
+      "delete": "削除",
+      "runNow": "今すぐ実行",
+      "resetTimer": "タイマーを{{duration}}にリセット"
+    },
+    "detail": {
+      "backToList": "← リストに戻る",
+      "timeRemaining": "残り時間",
+      "executionTime": "実行時刻",
+      "originalDuration": "元の期間：{{duration}}",
+      "entrySelection": "エントリ選択",
+      "recipients": "受信者",
+      "scheduledFor": "スケジュール日時",
+      "executedAt": "実行日時",
+      "executionHistory": "実行履歴",
+      "executeNow": "今すぐ実行",
+      "reset": "リセット",
+      "recipientsConfigured": "{{count}}件設定済み"
+    },
+    "form": {
+      "backToList": "← リストに戻る",
+      "editingNotice": "<strong>スケジュールを編集中：</strong>以下で変更を行い、「スケジュールを更新」をクリックして保存してください。",
+      "scheduleNameLabel": "スケジュール名",
+      "scheduleNamePlaceholder": "週次エクスポート",
+      "whenToRunLabel": "このエクスポートをいつ実行しますか？",
+      "whenToRunDescription": "エクスポートが一度実行される時刻までの期間を設定",
+      "yearsLabel": "年（0-100）",
+      "monthsLabel": "月（0-12）",
+      "weeksLabel": "週（0-4）",
+      "daysLabel": "日（0-7）",
+      "hoursLabel": "時間（0-23）",
+      "minutesLabel": "分（1-59）",
+      "entrySelectionLabel": "エントリ選択",
+      "allEntries": "すべてのエントリ",
+      "dateRange": "日付範囲",
+      "startDate": "開始日",
+      "endDate": "終了日",
+      "passphraseLabel": "暗号化パスフレーズ",
+      "passphrasePlaceholder": "安全なパスフレーズを入力",
+      "passphraseNote": "このパスフレーズは日記エントリの暗号化に使用されます。安全に保管してください！",
+      "passphraseUpdateNote": "パスフレーズを変更すると、日記エントリが新しいパスフレーズで再暗号化されます。",
+      "recipientsLabel": "受信者",
+      "emailType": "メール",
+      "smsType": "SMS",
+      "emailPlaceholder": "user@example.com",
+      "smsPlaceholder": "+1234567890",
+      "addRecipient": "受信者を追加",
+      "createButton": "スケジュールを作成",
+      "creating": "作成中...",
+      "updateButton": "スケジュールを更新",
+      "updating": "更新中..."
+    },
+    "time": {
+      "executionTimePassed": "実行時刻が経過しました",
+      "years_one": "{{count}}年",
+      "years_other": "{{count}}年",
+      "months": "{{count}}ヶ月",
+      "weeks_one": "{{count}}週",
+      "weeks_other": "{{count}}週",
+      "days_one": "{{count}}日",
+      "days_other": "{{count}}日",
+      "hours_one": "{{count}}時間",
+      "hours_other": "{{count}}時間",
+      "minutes": "{{count}}分"
+    },
+    "status": {
+      "success": "成功",
+      "failed": "失敗",
+      "running": "実行中"
+    },
+    "messages": {
+      "invalidApiKey": "APIキーが無効です。設定を確認してください。",
+      "loadSchedulesFailed": "スケジュールの読み込みに失敗しました。サーバーがエラーを返しました。",
+      "networkError": "ネットワークエラー。接続とサーバーURLを確認してください。",
+      "unableToConnect": "サーバーに接続できません。設定を確認してください。",
+      "serverConnectionFailed": "サーバー接続に失敗しました。サーバーが実行されていることを確認してください。",
+      "scheduleNameRequired": "スケジュール名は必須です",
+      "passphraseRequired": "暗号化パスフレーズは必須です",
+      "durationRequired": "少なくとも1つの期間フィールドを0より大きく設定してください",
+      "recipientRequired": "少なくとも1人の受信者が必要です",
+      "noEntriesMatch": "選択条件に一致するエントリがありません。選択を調整してください。",
+      "scheduleCreatedSuccess": "スケジュールを作成しました！このエクスポートには{{count}}件の{{entryWord}}が含まれます。",
+      "createScheduleFailed": "スケジュールの作成に失敗しました",
+      "createScheduleNetworkError": "ネットワークエラー。スケジュールの作成に失敗しました。",
+      "scheduleUpdatedSuccess": "スケジュールを更新しました！このエクスポートには{{count}}件の{{entryWord}}が含まれます。",
+      "updateScheduleFailed": "スケジュールの更新に失敗しました",
+      "updateScheduleNetworkError": "ネットワークエラー。スケジュールの更新に失敗しました。",
+      "deleteConfirm": "このスケジュールを削除してもよろしいですか？",
+      "scheduleDeletedSuccess": "スケジュールを削除しました",
+      "deleteScheduleFailed": "スケジュールの削除に失敗しました",
+      "deleteScheduleNetworkError": "ネットワークエラー。スケジュールの削除に失敗しました。",
+      "executionStarted": "スケジュールの実行を開始しました！まもなくメールを確認してください。",
+      "executeFailed": "スケジュールの実行に失敗しました",
+      "executeNetworkError": "ネットワークエラー。スケジュールの実行に失敗しました。",
+      "loadDetailsFailed": "スケジュールの詳細の読み込みに失敗しました",
+      "loadDetailsNetworkError": "スケジュールの詳細の読み込み中にネットワークエラーが発生しました",
+      "serverUrlRequired": "サーバーURLは必須です。まず設定で設定してください。",
+      "invalidServerUrl": "サーバーURLの形式が無効です",
+      "apiKeyGeneratedSuccess": "APIキーを生成して保存しました",
+      "apiKeyGenerationFailed": "APIキーの生成に失敗しました",
+      "apiKeyNetworkError": "ネットワークエラー。サーバーURLを確認して再試行してください。",
+      "resetTimerConfirm": "このスケジュールのタイマーを元の期間にリセットしますか？",
+      "timerResetSuccess": "タイマーをリセットしました！",
+      "resetTimerFailed": "タイマーのリセットに失敗しました",
+      "resetTimerNetworkError": "ネットワークエラー。タイマーのリセットに失敗しました。"
+    }
+  },
+  "aiSetup": {
+    "title": "AI 自動補完",
+    "header": {
+      "title": "AI 自動補完を設定",
+      "description": "AI を活用した執筆提案と自動エントリー要約を取得"
+    },
+    "step1": {
+      "title": "AI 自動補完を構成",
+      "description": "<strong>設定 → AI 自動補完</strong>に移動して、HuggingFace API キーを入力してください"
+    },
+    "step2": {
+      "title": "API キーを取得",
+      "description": "AI 機能を使用するには、HuggingFace API キーが必要です：",
+      "listItem1": "huggingface.co/settings/tokens にアクセス",
+      "listItem2": "無料アカウントを作成",
+      "listItem3": "API キーを生成",
+      "listItem4": "設定に追加"
+    },
+    "step3": {
+      "title": "AI 機能の使用を開始",
+      "description": "押す",
+      "shortcut": "Shift + スペース"
+    },
+    "checkbox": {
+      "dontShowAgain": "今後表示しない"
+    },
+    "buttons": {
+      "goToSettings": "設定に移動して構成",
+      "maybeLater": "後で",
+      "dontShowAgain": "今後表示しない"
+    },
+    "helpLink": "完全なセットアップガイドを表示 →"
   },
   "about": {
     "title": "アジェンダについて",
