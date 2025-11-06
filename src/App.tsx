@@ -7,7 +7,7 @@ import JournalList from './components/JournalList';
 import RichTextEditor from './components/RichTextEditor';
 import DonationNotification from './components/DonationNotification';
 import HamburgerMenu from './components/HamburgerMenu';
-import LoginModal from './components/LoginModal';
+import LoginModal from './components/modals/LoginModal';
 import { useJournalStore } from './store/useStore';
 import { useAuthStore } from './store/useAuthStore';
 import { UserCircleIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
@@ -141,12 +141,12 @@ function App() {
       <div className="fixed top-6 right-6 z-50 flex items-center gap-2">
         {isAuthenticated ? (
           <div className="flex items-center gap-2">
-            <div className="text-right mr-2 bg-white/90 backdrop-blur-sm px-3 py-2 rounded-lg border border-gray-300 shadow-md">
-              <p className="text-sm font-medium text-gray-700">{user?.email}</p>
+            <div className="text-right mr-2 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-gray-300 shadow-md">
+              <span className="text-sm font-medium text-gray-700">{user?.email}</span>
               {user?.subscription && user.subscription.planId !== 'free' && (
-                <p className="text-xs text-indigo-600 font-semibold">
+                <span className="ml-2 text-xs text-indigo-600 border border-indigo-600 rounded-full px-2 py-0.5 font-semibold">
                   {user.subscription.planId.charAt(0).toUpperCase() + user.subscription.planId.slice(1)} {t('auth.plan')}
-                </p>
+                </span>
               )}
             </div>
             <button

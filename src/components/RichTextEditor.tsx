@@ -17,8 +17,8 @@ import { useJournalStore } from '../store/useStore';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getCompletion, getStoredApiKey } from '../services/aiCompletion';
-import SettingsModal from './SettingsModal';
-import AISetupModal from './AISetupModal';
+import SettingsModal from './modals/settings/SettingsModal';
+import AISetupModal from './modals/AISetupModal';
 import { useAuthStore } from '../store/useAuthStore';
 
 export default function RichTextEditor() {

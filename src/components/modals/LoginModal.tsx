@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { toast } from 'react-toastify'
 import { XMarkIcon } from '@heroicons/react/24/outline'
-import { useAuthStore } from '../store/useAuthStore'
-import { api } from '../services/api'
+import { useAuthStore } from '../../store/useAuthStore'
+import { api } from '../../services/api'
 
 interface LoginModalProps {
   onClose: () => void

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import { XMarkIcon, ArrowDownTrayIcon, ArrowUpTrayIcon, LockClosedIcon, LockOpenIcon } from '@heroicons/react/24/outline';
-import { useJournalStore, type JournalEntry } from '../store/useStore';
+import { useJournalStore, type JournalEntry } from '../../store/useStore';
 import CryptoJS from 'crypto-js';
 
 interface BackupModalProps {

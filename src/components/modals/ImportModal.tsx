@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { XMarkIcon, ArrowUpTrayIcon, LockOpenIcon } from '@heroicons/react/24/outline';
-import { useJournalStore, type JournalEntry } from '../store/useStore';
+import { useJournalStore, type JournalEntry } from '../../store/useStore';
 import CryptoJS from 'crypto-js';
 
 interface ImportModalProps {

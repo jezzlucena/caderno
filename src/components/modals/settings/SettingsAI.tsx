@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SparklesIcon, KeyIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
-import { getStoredApiKey, setStoredApiKey, removeStoredApiKey } from '../../services/aiCompletion';
+import { getStoredApiKey, setStoredApiKey, removeStoredApiKey } from '../../../services/aiCompletion';
 import { toast } from 'react-toastify';
 
 interface SettingsAIProps {
@@ -40,10 +40,6 @@ export default function SettingsAI({ onBack, onSave }: SettingsAIProps) {
         <span>{t('settings.title')}</span>
       </button>
 
-      <div className="flex items-center gap-2 mb-3">
-        <SparklesIcon width={20} className="text-indigo-600" />
-        <h3 className="text-lg font-semibold text-gray-800">{t('settings.aiAutocomplete')}</h3>
-      </div>
       <p className="text-sm text-gray-600 mb-4">
         {t('settings.aiDescription')}
       </p>

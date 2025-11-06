@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { XMarkIcon, CloudArrowUpIcon, CloudArrowDownIcon, Cog6ToothIcon, CloudIcon } from '@heroicons/react/24/outline';
-import { useJournalStore } from '../store/useStore';
-import { useSettingsStore } from '../store/useStore';
+import { useJournalStore } from '../../store/useStore';
+import { useSettingsStore } from '../../store/useStore';
 import { useTranslation } from 'react-i18next';
-import { uploadToIPFS, downloadFromIPFS } from '../services/cloudSync';
+import { uploadToIPFS, downloadFromIPFS } from '../../services/cloudSync';
 
 interface CloudSyncModalProps {
   onClose: () => void;
@@ -140,7 +140,7 @@ export default function CloudSyncModal({ onClose, onOpenSettings }: CloudSyncMod
       onClick={handleClose}
     >
       <div
-        className={`bg-white rounded-xl shadow-2xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto ${
+        className={`bg-white rounded-xl shadow-2xl p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto ${
           isClosing ? 'animate-slideDown' : 'animate-slideUp'
         }`}
         onClick={(e) => e.stopPropagation()}

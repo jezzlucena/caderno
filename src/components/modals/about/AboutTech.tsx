@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next';
-import reactLogo from '../../assets/react-logo.svg';
-import typescriptLogo from '../../assets/typescript-logo.svg';
-import nodejsLogo from '../../assets/nodejs-logo.svg';
-import viteLogo from '../../assets/vite-logo.svg';
-import tailwindLogo from '../../assets/tailwind-logo.svg';
-import dockerLogo from '../../assets/docker-logo.svg';
+import reactLogo from '../../../assets/react-logo.svg';
+import typescriptLogo from '../../../assets/typescript-logo.svg';
+import nodejsLogo from '../../../assets/nodejs-logo.svg';
+import viteLogo from '../../../assets/vite-logo.svg';
+import tailwindLogo from '../../../assets/tailwind-logo.svg';
+import dockerLogo from '../../../assets/docker-logo.svg';
 
 export default function AboutTech() {
   const { t } = useTranslation();

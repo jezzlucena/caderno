@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CloudIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
-import { useSettingsStore } from '../../store/useStore';
+import { ArrowLeftIcon } from '@heroicons/react/24/outline';
+import { useSettingsStore } from '../../../store/useStore';
 import { toast } from 'react-toastify';
+import CommandBox from '../../CommandBox';
 
 interface SettingsCloudSyncProps {
   onBack: () => void;
@@ -41,10 +42,6 @@ export default function SettingsCloudSync({ onBack, onSave }: SettingsCloudSyncP
         <span>{t('settings.title')}</span>
       </button>
 
-      <div className="flex items-center gap-2 mb-3">
-        <CloudIcon width={20} className="text-indigo-600" />
-        <h3 className="text-lg font-semibold text-gray-800">{t('settings.cloudSync.title')}</h3>
-      </div>
       <p className="text-sm text-gray-600 mb-4">
         {t('settings.cloudSync.description')}
       </p>
@@ -53,8 +50,13 @@ export default function SettingsCloudSync({ onBack, onSave }: SettingsCloudSyncP
         <p className="text-sm text-indigo-800 mb-2">
           <strong>📘 Setup Instructions</strong>
         </p>
-        <ol className="text-sm text-indigo-700 space-y-1 list-decimal list-inside">
-          <li>Start your Caderno Server (see caderno/server folder)</li>
+        <ol className="text-sm text-indigo-700 space-y-2 list-decimal list-inside">
+          <li>
+            <span>Start your Caderno Server:</span>
+            <div className="mt-1">
+              <CommandBox command="cd caderno/server && npm run dev" />
+            </div>
+          </li>
           <li>Set a secure passphrase to encrypt your journal entries</li>
           <li>Use the Cloud Sync button to backup your entries to IPFS</li>
         </ol>
@@ -91,7 +93,7 @@ export default function SettingsCloudSync({ onBack, onSave }: SettingsCloudSyncP
         </div>
 
         {/* Auto Sync Toggle */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 mt-4">
           <input
             type="checkbox"
             id="autoSync"
@@ -106,22 +108,23 @@ export default function SettingsCloudSync({ onBack, onSave }: SettingsCloudSyncP
         <p className="text-xs text-gray-500 ml-7">
           {t('settings.cloudSync.autoSyncDescription')}
         </p>
-
-        {syncPassphrase && (
-          <button
-            onClick={handleClear}
-            className="text-sm text-red-600 hover:text-red-700"
-          >
-            {t('settings.cloudSync.clearSettings')}
-          </button>
-        )}
-
-        <p className="text-xs text-gray-500">
-          {t('settings.cloudSync.storageNote')}
-        </p>
       </div>
 
       <div className="flex gap-3 justify-end mt-6">
+        <div className="flex-1">
+          {syncPassphrase && (
+            <button
+              onClick={handleClear}
+              className="text-xs text-red-600 hover:text-red-700"
+            >
+              {t('settings.cloudSync.clearSettings')}
+            </button>
+          )}
+
+          <p className="text-xs text-gray-500">
+            {t('settings.cloudSync.storageNote')}
+          </p>
+        </div>
         <button
           onClick={onBack}
           className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"

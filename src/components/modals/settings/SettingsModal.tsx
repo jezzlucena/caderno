@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { XMarkIcon, SparklesIcon, CloudIcon, LanguageIcon, ChevronRightIcon, ClockIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, SparklesIcon, CloudIcon, LanguageIcon, ChevronRightIcon, ClockIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
 import { toast } from 'react-toastify';
-import SettingsLanguage from './settings/SettingsLanguage';
-import SettingsAI from './settings/SettingsAI';
-import SettingsCloudSync from './settings/SettingsCloudSync';
-import SettingsScheduledExports from './settings/SettingsScheduledExports';
-import ApiKeyConfirmationModal from './ApiKeyConfirmationModal';
+import SettingsLanguage from './SettingsLanguage';
+import SettingsAI from './SettingsAI';
+import SettingsCloudSync from './SettingsCloudSync';
+import SettingsScheduledExports from './SettingsScheduledExports';
+import ApiKeyConfirmationModal from '../ApiKeyConfirmationModal';
 
 type SettingsScreen = 'main' | 'language' | 'ai' | 'cloudSync' | 'scheduledExports';
 
@@ -154,7 +154,7 @@ export default function SettingsModal({ onClose, initialScreen = 'main' }: Setti
         onClick={() => navigateToScreen('language')}
         className={`w-full flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-all border border-gray-200 ${
           highlightedSection === 'language'
-            ? 'bg-indigo-100 border-indigo-400 scale-105 shadow-lg animate-pulse'
+            ? 'bg-indigo-100 border-indigo-400 shadow-lg animate-pulse'
             : ''
         }`}
       >
@@ -162,7 +162,7 @@ export default function SettingsModal({ onClose, initialScreen = 'main' }: Setti
           <LanguageIcon className="w-6 h-6 text-indigo-600 flex-shrink-0" />
           <div className="text-left">
             <h3 className="font-semibold text-gray-800">{t('settings.language.title')}</h3>
-            <p className="text-sm text-gray-600">{t('settings.language.description')}</p>
+            <p className="text-xs text-gray-600">{t('settings.language.description')}</p>
           </div>
         </div>
         <ChevronRightIcon className="w-6 h-6 text-gray-400 flex-shrink-0" />
@@ -173,7 +173,7 @@ export default function SettingsModal({ onClose, initialScreen = 'main' }: Setti
         onClick={() => navigateToScreen('ai')}
         className={`w-full flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-all border border-gray-200 ${
           highlightedSection === 'ai'
-            ? 'bg-indigo-100 border-indigo-400 scale-105 shadow-lg animate-pulse'
+            ? 'bg-indigo-100 border-indigo-400 shadow-lg animate-pulse'
             : ''
         }`}
       >
@@ -181,7 +181,7 @@ export default function SettingsModal({ onClose, initialScreen = 'main' }: Setti
           <SparklesIcon className="w-6 h-6 text-indigo-600 flex-shrink-0" />
           <div className="text-left">
             <h3 className="font-semibold text-gray-800">{t('settings.aiAutocomplete')}</h3>
-            <p className="text-sm text-gray-600">{t('settings.aiDescription')}</p>
+            <p className="text-xs text-gray-600">{t('settings.aiDescription')}</p>
           </div>
         </div>
         <ChevronRightIcon className="w-6 h-6 text-gray-400 flex-shrink-0" />
@@ -192,7 +192,7 @@ export default function SettingsModal({ onClose, initialScreen = 'main' }: Setti
         onClick={() => navigateToScreen('cloudSync')}
         className={`w-full flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-all border border-gray-200 ${
           highlightedSection === 'cloudSync'
-            ? 'bg-indigo-100 border-indigo-400 scale-105 shadow-lg animate-pulse'
+            ? 'bg-indigo-100 border-indigo-400 shadow-lg animate-pulse'
             : ''
         }`}
       >
@@ -200,7 +200,7 @@ export default function SettingsModal({ onClose, initialScreen = 'main' }: Setti
           <CloudIcon className="w-6 h-6 text-indigo-600 flex-shrink-0" />
           <div className="text-left">
             <h3 className="font-semibold text-gray-800">{t('settings.cloudSync.title')}</h3>
-            <p className="text-sm text-gray-600">{t('settings.cloudSync.description')}</p>
+            <p className="text-xs text-gray-600">{t('settings.cloudSync.description')}</p>
           </div>
         </div>
         <ChevronRightIcon className="w-6 h-6 text-gray-400 flex-shrink-0" />
@@ -211,7 +211,7 @@ export default function SettingsModal({ onClose, initialScreen = 'main' }: Setti
         onClick={() => navigateToScreen('scheduledExports')}
         className={`w-full flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-all border border-gray-200 ${
           highlightedSection === 'scheduledExports'
-            ? 'bg-indigo-100 border-indigo-400 scale-105 shadow-lg animate-pulse'
+            ? 'bg-indigo-100 border-indigo-400 shadow-lg animate-pulse'
             : ''
         }`}
       >
@@ -219,7 +219,7 @@ export default function SettingsModal({ onClose, initialScreen = 'main' }: Setti
           <ClockIcon className="w-6 h-6 text-indigo-600 flex-shrink-0" />
           <div className="text-left">
             <h3 className="font-semibold text-gray-800">{t('scheduledExports.title')}</h3>
-            <p className="text-sm text-gray-600">{t('scheduledExports.description')}</p>
+            <p className="text-xs text-gray-600">{t('scheduledExports.description')}</p>
           </div>
         </div>
         <ChevronRightIcon className="w-6 h-6 text-gray-400 flex-shrink-0" />
@@ -244,7 +244,26 @@ export default function SettingsModal({ onClose, initialScreen = 'main' }: Setti
         }}
       >
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-800">{t('settings.title')}</h2>
+          <h2 className="flex items-center gap-2 text-2xl font-bold text-gray-800">
+            <Cog6ToothIcon width={20} className="text-indigo-600" />
+            {currentScreen === 'main' && t('settings.title')}
+            {currentScreen === 'language' && <>
+              <LanguageIcon width={20} className="text-indigo-600" />
+              {t('settings.language.title')}
+            </>}
+            {currentScreen === 'ai' && <>
+              <SparklesIcon width={20} className="text-indigo-600" />
+              {t('settings.aiAutocomplete')}
+            </>}
+            {currentScreen === 'cloudSync' && <>
+              <CloudIcon width={20} className="text-indigo-600" />
+              {t('settings.cloudSync.title')}
+            </>}
+            {currentScreen === 'scheduledExports' && <>
+              <ClockIcon width={20} className="text-indigo-600" />
+              {t('scheduledExports.title')}
+            </>}
+          </h2>
           <button
             onClick={handleClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -254,7 +273,7 @@ export default function SettingsModal({ onClose, initialScreen = 'main' }: Setti
         </div>
 
         <div 
-          className="overflow-y-auto"
+          className="overflow-y-auto px-1"
           style={{
             height: contentHeight > 0 ? `${contentHeight}px` : 'auto',
             transition: 'height 300ms ease-in-out',

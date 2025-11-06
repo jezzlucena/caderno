@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { LanguageIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 
 const languages = [
   { code: 'en-US', name: 'English (USA)' },
@@ -29,10 +29,6 @@ export default function SettingsLanguage({ onBack }: SettingsLanguageProps) {
         <span>{t('settings.title')}</span>
       </button>
 
-      <div className="flex items-center gap-2 mb-3">
-        <LanguageIcon width={20} className="text-indigo-600" />
-        <h3 className="text-lg font-semibold text-gray-800">{t('settings.language.title')}</h3>
-      </div>
       <p className="text-sm text-gray-600 mb-4">
         {t('settings.language.description')}
       </p>

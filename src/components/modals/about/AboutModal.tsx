@@ -1,14 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { XMarkIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
-import AboutMission from './about/AboutMission';
-import AboutVision from './about/AboutVision';
-import AboutEthos from './about/AboutEthos';
-import AboutPrivacy from './about/AboutPrivacy';
-import AboutSecurity from './about/AboutSecurity';
-import AboutMonetization from './about/AboutMonetization';
-import AboutTech from './about/AboutTech';
-import AboutDownloads from './about/AboutDownloads';
+import AboutMission from './AboutMission';
+import AboutVision from './AboutVision';
+import AboutEthos from './AboutEthos';
+import AboutPrivacy from './AboutPrivacy';
+import AboutSecurity from './AboutSecurity';
+import AboutMonetization from './AboutMonetization';
+import AboutTech from './AboutTech';
+import AboutDownloads from './AboutDownloads';
 
 interface AboutModalProps {
   onClose: () => void;
@@ -167,7 +167,7 @@ export default function AboutModal({ onClose, initialTab = 'mission' }: AboutMod
         {/* Tabs */}
         <div 
           ref={tabsContainerRef}
-          className="flex gap-0.5 px-4 pt-4 bg-indigo-200 overflow-x-auto scroll-smooth"
+          className="flex gap-0.5 px-4 pt-3 bg-indigo-200 overflow-x-auto scroll-smooth no-scrollbar"
         >
           {tabs.map((tab) => (
             <button

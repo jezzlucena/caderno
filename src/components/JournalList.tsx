@@ -85,9 +85,9 @@ export default function JournalList() {
   return (
     <div className="h-full w-full bg-gradient-to-br from-blue-50 to-indigo-100 overflow-auto">
       <div className="container mx-auto px-4 py-8">
-        <header className="mb-8">
+        <header className="mb-8 pt-12 md:pt-0">
           <div className="flex items-center gap-3">
-            <DocumentTextIcon width={32} className="text-indigo-600" />
+            <DocumentTextIcon width={48} className="text-indigo-600" />
             <div>
               <h1 className="text-3xl font-bold text-gray-800">{t('app.name')}</h1>
               <p className="text-sm text-gray-600">{t('app.tagline')}</p>

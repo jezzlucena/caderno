@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { XMarkIcon, DocumentArrowDownIcon } from '@heroicons/react/24/outline';
-import { useJournalStore } from '../store/useStore';
+import { useJournalStore } from '../../store/useStore';
 import { useTranslation } from 'react-i18next';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';

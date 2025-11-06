@@ -9,12 +9,12 @@ import {
   CloudIcon, 
   ClockIcon 
 } from '@heroicons/react/24/outline';
-import BackupModal from './BackupModal';
-import SettingsModal from './SettingsModal';
-import ExportPDFModal from './ExportPDFModal';
-import CloudSyncModal from './CloudSyncModal';
-import ScheduledExportsModal from './ScheduledExportsModal';
-import AboutModal from './AboutModal';
+import BackupModal from './modals/BackupModal';
+import SettingsModal from './modals/settings/SettingsModal';
+import ExportPDFModal from './modals/ExportPDFModal';
+import CloudSyncModal from './modals/CloudSyncModal';
+import ScheduledExportsModal from './modals/ScheduledExportsModal';
+import AboutModal from './modals/about/AboutModal';
 
 export default function HamburgerMenu() {
   const { t } = useTranslation();
@@ -315,7 +315,6 @@ export default function HamburgerMenu() {
           }}
           onOpenSettings={(screen) => {
             setShowCloudSyncModal(false);
-            setSettingsInitialScreen(screen);
             window.location.hash = `#settings/${screen}`;
           }}
         />
@@ -328,7 +327,6 @@ export default function HamburgerMenu() {
           }}
           onOpenSettings={(screen) => {
             setShowScheduledExportsModal(false);
-            setSettingsInitialScreen(screen);
             window.location.hash = `#settings/${screen}`;
           }}
         />
