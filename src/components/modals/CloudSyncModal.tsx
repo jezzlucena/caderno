@@ -164,10 +164,10 @@ export default function CloudSyncModal({ onClose, onOpenSettings }: CloudSyncMod
                 <CloudIcon className="w-8 h-8 text-indigo-600" />
               </div>
               <h3 className="text-xl font-bold text-gray-800 mb-2">
-                Set Up Cloud Sync
+                {t('cloudSync.instructional.header')}
               </h3>
               <p className="text-gray-600">
-                Securely backup and sync your journal entries across devices using IPFS
+                {t('cloudSync.instructional.subtitle')}
               </p>
             </div>
 
@@ -175,10 +175,10 @@ export default function CloudSyncModal({ onClose, onOpenSettings }: CloudSyncMod
             <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-lg p-6 space-y-4">
               <h4 className="font-semibold text-gray-800 flex items-center gap-2">
                 <span className="flex items-center justify-center w-6 h-6 bg-indigo-600 text-white rounded-full text-sm">1</span>
-                Start Caderno Server
+                {t('cloudSync.instructional.step1Title')}
               </h4>
               <div className="text-sm text-gray-700 ml-8 space-y-2">
-                <p>Cloud Sync uses a self-hosted IPFS node. Start the server:</p>
+                <p>{t('cloudSync.instructional.step1Description')}</p>
                 <div className="bg-gray-900 text-gray-100 p-2 rounded font-mono text-xs">
                   cd caderno/server && npm run dev
                 </div>
@@ -186,18 +186,18 @@ export default function CloudSyncModal({ onClose, onOpenSettings }: CloudSyncMod
 
               <h4 className="font-semibold text-gray-800 flex items-center gap-2">
                 <span className="flex items-center justify-center w-6 h-6 bg-indigo-600 text-white rounded-full text-sm">2</span>
-                Set Encryption Passphrase
+                {t('cloudSync.instructional.step2Title')}
               </h4>
               <p className="text-sm text-gray-700 ml-8">
-                Go to <strong>Settings → Cloud Sync</strong> and set a secure passphrase to encrypt your journal entries before uploading to IPFS
+                {t('cloudSync.instructional.step2Description')}
               </p>
 
               <h4 className="font-semibold text-gray-800 flex items-center gap-2">
                 <span className="flex items-center justify-center w-6 h-6 bg-indigo-600 text-white rounded-full text-sm">3</span>
-                Enjoy Free Forever Sync
+                {t('cloudSync.instructional.step3Title')}
               </h4>
               <p className="text-sm text-gray-700 ml-8">
-                No API keys, no subscriptions, no trials. Your data stays on your infrastructure with full IPFS network redundancy!
+                {t('cloudSync.instructional.step3Description')}
               </p>
             </div>
 
@@ -213,21 +213,21 @@ export default function CloudSyncModal({ onClose, onOpenSettings }: CloudSyncMod
                   className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
                 >
                   <Cog6ToothIcon width={20} />
-                  <span>Go to Settings to Configure</span>
+                  <span>{t('cloudSync.instructional.goToSettings')}</span>
                 </button>
-              
+
               <button
                 onClick={handleClose}
                 className="w-full px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                I'll Set This Up Later
+                {t('cloudSync.instructional.setupLater')}
               </button>
             </div>
 
             {/* Help Text */}
             <div className="text-center space-y-2">
               <p className="text-xs text-gray-500">
-                Your data is encrypted locally before upload. Only you can decrypt it with your passphrase.
+                {t('cloudSync.instructional.encryptionNote')}
               </p>
               <a
                 href="https://github.com/jezzlucena/caderno/blob/main/CLOUD_SYNC_GUIDE.md"
@@ -235,7 +235,7 @@ export default function CloudSyncModal({ onClose, onOpenSettings }: CloudSyncMod
                 rel="noopener noreferrer"
                 className="inline-block text-sm text-indigo-600 hover:text-indigo-700 underline"
               >
-                View Full Setup Guide →
+                {t('cloudSync.instructional.viewGuide')}
               </a>
             </div>
           </div>

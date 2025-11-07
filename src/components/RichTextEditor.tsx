@@ -457,7 +457,7 @@ export default function RichTextEditor() {
         </div>
 
         {/* AI Autocomplete Hint */}
-        <div 
+        <div
           className="px-8 py-3 bg-gray-50 rounded-b-xl border-t border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors"
           onClick={() => {
             if (!apiKey) {
@@ -466,7 +466,7 @@ export default function RichTextEditor() {
               handleGetSuggestion();
             }
           }}
-          title={!apiKey ? 'Click to set up AI Autocomplete' : 'Click to get AI suggestions'}
+          title={!apiKey ? t('richTextEditor.tooltip.setup') : t('richTextEditor.tooltip.getSuggestions')}
         >
           <p className="text-xs text-gray-500 text-center">
             <kbd className="px-2 py-1 bg-white border border-gray-300 rounded text-xs">Shift + Space</kbd>

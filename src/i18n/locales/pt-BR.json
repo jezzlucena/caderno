@@ -55,6 +55,7 @@
       "passphraseRequired": "Por favor, digite uma senha",
       "passphraseMismatch": "As senhas não coincidem",
       "passphraseMinLength": "A senha deve ter pelo menos 8 caracteres",
+      "success": "Diário exportado com sucesso",
       "cancel": "Cancelar",
       "export": "Exportar"
     },
@@ -76,6 +77,7 @@
       "invalidEntries": "O arquivo de backup contém entradas inválidas",
       "importFailed": "Falha ao importar o arquivo. Por favor, verifique o formato do arquivo.",
       "invalidFormat": "Formato de arquivo inválido. Por favor, selecione um arquivo de backup válido do Caderno.",
+      "success": "{{count}} entradas importadas com sucesso",
       "cancel": "Cancelar",
       "import": "Importar"
     },
@@ -92,6 +94,47 @@
       "advisory": "Prossiga apenas se você entender essas implicações ou se perdeu o acesso à sua chave de API atual.",
       "cancel": "Cancelar",
       "continue": "Continuar"
+    },
+    "login": {
+      "title": {
+        "signIn": "Entrar",
+        "createAccount": "Criar Conta"
+      },
+      "form": {
+        "email": "Email",
+        "emailPlaceholder": "seu@email.com",
+        "password": "Senha",
+        "passwordPlaceholder": "Digite sua senha",
+        "passwordRequirement": "Mínimo 8 caracteres"
+      },
+      "button": {
+        "loading": "Carregando...",
+        "signIn": "Entrar",
+        "signUp": "Cadastrar-se"
+      },
+      "divider": {
+        "orContinueWith": "Ou continue com"
+      },
+      "oauth": {
+        "google": "Google",
+        "github": "GitHub",
+        "microsoft": "Microsoft",
+        "apple": "Apple"
+      },
+      "toggle": {
+        "alreadyHaveAccount": "Já tem uma conta? Entre",
+        "dontHaveAccount": "Não tem uma conta? Cadastre-se"
+      },
+      "footer": {
+        "description": "Entre para sincronizar seus diários e acessar recursos premium"
+      },
+      "success": {
+        "signedIn": "Login realizado com sucesso!",
+        "accountCreated": "Conta criada com sucesso!"
+      },
+      "error": {
+        "generic": "Ocorreu um erro. Por favor, tente novamente."
+      }
     }
   },
   "language": {
@@ -124,6 +167,10 @@
     "hide": "Ocultar",
     "removeKey": "Remover chave de API",
     "keyStorageNote": "Sua chave de API é armazenada localmente no seu navegador e nunca é enviada para nossos servidores.",
+    "keyRemoved": "Chave de API removida com sucesso",
+    "apiKeyGenerated": "Chave de API gerada com sucesso",
+    "apiKeyFailed": "Falha ao gerar chave de API",
+    "networkError": "Erro de rede. Verifique a URL do servidor e tente novamente.",
     "saved": "Configurações salvas com sucesso!",
     "cancel": "Cancelar",
     "save": "Salvar",
@@ -137,7 +184,32 @@
       "autoSync": "Ativar sincronização automática",
       "autoSyncDescription": "Sincronizar automaticamente suas entradas para IPFS após cada alteração",
       "clearSettings": "Limpar configurações de sincronização na nuvem",
-      "storageNote": "Sua senha é armazenada localmente e nunca enviada para nossos servidores."
+      "storageNote": "Sua senha é armazenada localmente e nunca enviada para nossos servidores.",
+      "settingsCleared": "Configurações de sincronização na nuvem limpas",
+      "setupInstructions": "📘 Instruções de Configuração",
+      "instruction1": "Inicie o servidor Caderno:",
+      "instruction2": "Defina uma senha segura para criptografar suas entradas de diário",
+      "instruction3": "Use o botão Cloud Sync para fazer backup das suas entradas no IPFS",
+      "encryptionNote": "Seus dados são criptografados localmente antes do upload. Nenhuma chave de API necessária!"
+    },
+    "scheduledExports": {
+      "description": "Configure sua conexão com o servidor para exportações PDF agendadas automatizadas",
+      "quickSetup": "Configuração Rápida: Iniciar servidor → Gerar chave de API → Configurar abaixo",
+      "runServer": "• Executar servidor:",
+      "generateKeyInstruction": "• Gerar chave usando o botão abaixo ou via comando:",
+      "fullGuide": "Guia Completo →",
+      "serverUrlLabel": "URL do Servidor",
+      "serverUrlPlaceholder": "http://localhost:3002",
+      "serverUrlNote": "A URL onde seu servidor Caderno está rodando",
+      "apiKeyLabel": "Chave de API",
+      "apiKeyPlaceholder": "Digite sua chave de API",
+      "apiKeyNote": "Gere fazendo POST para /api/auth/register",
+      "generateButtonTooltip": "URL do servidor é obrigatória e deve ser válida",
+      "clearSettings": "Limpar Configurações",
+      "storageNote": "As configurações são armazenadas localmente no seu navegador por segurança",
+      "settingsCleared": "Configurações de exportações agendadas limpas",
+      "serverUrlRequired": "URL do servidor é obrigatória",
+      "invalidServerUrl": "Formato de URL do servidor inválido"
     }
   },
   "autocomplete": {
@@ -147,6 +219,16 @@
     "pressEsc": "Pressione Esc para dispensar",
     "noApiKey": "Configure o autocompletar com IA nas Configurações",
     "trigger": "Pressione Shift+Espaço para sugestões de IA"
+  },
+  "richTextEditor": {
+    "tooltip": {
+      "setup": "Clique para configurar o Autocompletar com IA",
+      "getSuggestions": "Clique para obter sugestões de IA"
+    }
+  },
+  "commandBox": {
+    "copied": "Comando copiado!",
+    "copyButton": "Copiar"
   },
   "backup": {
     "title": "Backup e Restauração",
@@ -180,6 +262,20 @@
     "notConfigured": "A sincronização na nuvem não está configurada. Por favor, configure sua chave de API Lighthouse e senha nas Configurações primeiro.",
     "lastSync": "Última sincronização: {{date}}",
     "close": "Fechar",
+    "instructional": {
+      "header": "Configurar Cloud Sync",
+      "subtitle": "Faça backup e sincronize com segurança suas entradas de diário entre dispositivos usando IPFS",
+      "step1Title": "Iniciar Servidor Caderno",
+      "step1Description": "Cloud Sync usa um nó IPFS auto-hospedado. Inicie o servidor:",
+      "step2Title": "Definir Senha de Criptografia",
+      "step2Description": "Vá em <strong>Configurações → Cloud Sync</strong> e defina uma senha segura para criptografar suas entradas de diário antes de fazer upload para o IPFS",
+      "step3Title": "Aproveite a Sincronização Gratuita para Sempre",
+      "step3Description": "Sem chaves de API, sem assinaturas, sem períodos de teste. Seus dados ficam na sua infraestrutura com redundância completa da rede IPFS!",
+      "goToSettings": "Ir para Configurações",
+      "setupLater": "Vou Configurar Isso Depois",
+      "encryptionNote": "Seus dados são criptografados localmente antes do upload. Somente você pode descriptografá-los com sua senha.",
+      "viewGuide": "Ver Guia Completo de Configuração →"
+    },
     "upload": {
       "title": "Enviar para a Nuvem",
       "description": "Enviar {{count}} entradas para armazenamento blockchain IPFS",

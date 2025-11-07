@@ -214,7 +214,7 @@ export default function ExportPDFModal({ onClose }: ExportPDFModalProps) {
       pdf.save(fileName);
 
       setProgress(100);
-      toast.success(`PDF exported successfully with ${selectedEntries.length} entries`);
+      toast.success(t('exportPDF.successMessage', { count: selectedEntries.length }));
       setTimeout(() => {
         onClose();
       }, 500);

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SparklesIcon, KeyIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
+import { KeyIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { getStoredApiKey, setStoredApiKey, removeStoredApiKey } from '../../../services/aiCompletion';
 import { toast } from 'react-toastify';
 
@@ -27,7 +27,7 @@ export default function SettingsAI({ onBack, onSave }: SettingsAIProps) {
   const handleRemove = () => {
     setApiKey('');
     removeStoredApiKey();
-    toast.success('API key removed successfully');
+    toast.success(t('settings.keyRemoved'));
   };
 
   return (

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { XMarkIcon, ArrowUpTrayIcon, LockOpenIcon } from '@heroicons/react/24/outline';
+import { useTranslation } from 'react-i18next';
 import { useJournalStore, type JournalEntry } from '../../store/useStore';
 import CryptoJS from 'crypto-js';
 
@@ -9,6 +10,7 @@ interface ImportModalProps {
 }
 
 export default function ImportModal({ onClose }: ImportModalProps) {
+  const { t } = useTranslation();
   const { importEntries } = useJournalStore();
   const [isClosing, setIsClosing] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -45,7 +47,7 @@ export default function ImportModal({ onClose }: ImportModalProps) {
           setNeedsPassphrase(parsed.encrypted);
           setFileData(parsed);
         } catch (err) {
-          toast.error('Invalid file format. Please select a valid Caderno backup file.');
+          toast.error(t('modal.import.invalidFormat'));
           console.error(err);
         }
       };
@@ -55,7 +57,7 @@ export default function ImportModal({ onClose }: ImportModalProps) {
 
   const handleImport = () => {
     if (!file || !fileData) {
-      toast.error('Please select a file to import');
+      toast.error(t('modal.import.fileRequired'));
       return;
     }
 
@@ -66,7 +68,7 @@ export default function ImportModal({ onClose }: ImportModalProps) {
 
       if (fileData.encrypted) {
         if (!passphrase) {
-          toast.error('Please enter the passphrase for this encrypted file');
+          toast.error(t('modal.import.passphraseRequired'));
           return;
         }
 
@@ -74,13 +76,13 @@ export default function ImportModal({ onClose }: ImportModalProps) {
           const decrypted = CryptoJS.AES.decrypt(fileData.data, passphrase).toString(CryptoJS.enc.Utf8);
 
           if (!decrypted) {
-            toast.error('Incorrect passphrase. Please try again.');
+            toast.error(t('modal.import.incorrectPassphrase'));
             return;
           }
 
           dataToImport = JSON.parse(decrypted);
         } catch (err) {
-          toast.error('Failed to decrypt file. Please check your passphrase.');
+          toast.error(t('modal.import.decryptionFailed'));
           console.error(err);
           return;
         }
@@ -90,7 +92,7 @@ export default function ImportModal({ onClose }: ImportModalProps) {
 
       // Validate the data structure
       if (!dataToImport.entries || !Array.isArray(dataToImport.entries)) {
-        toast.error('Invalid backup file structure');
+        toast.error(t('modal.import.invalidStructure'));
         return;
       }
 
@@ -100,7 +102,7 @@ export default function ImportModal({ onClose }: ImportModalProps) {
       );
 
       if (!isValid) {
-        toast.error('Backup file contains invalid entries');
+        toast.error(t('modal.import.invalidEntries'));
         return;
       }
 
@@ -108,10 +110,10 @@ export default function ImportModal({ onClose }: ImportModalProps) {
       importEntries(dataToImport.entries as JournalEntry[], merge);
 
       // Show success and close
-      toast.success(`Successfully imported ${dataToImport.entries.length} journal entries`);
+      toast.success(t('modal.import.success', { count: dataToImport.entries.length }));
       onClose();
     } catch (err) {
-      toast.error('Failed to import file. Please check the file format.');
+      toast.error(t('modal.import.importFailed'));
       console.error(err);
     }
   };
@@ -130,7 +132,7 @@ export default function ImportModal({ onClose }: ImportModalProps) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold text-gray-800">Import Journal</h2>
+          <h2 className="text-2xl font-bold text-gray-800">{t('modal.import.title')}</h2>
           <button
             onClick={handleClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -140,13 +142,13 @@ export default function ImportModal({ onClose }: ImportModalProps) {
         </div>
 
         <p className="text-gray-600 mb-4">
-          Import journal entries from a previously exported backup file.
+          {t('modal.import.description')}
         </p>
 
         {/* File input */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Select backup file
+            {t('modal.import.selectFile')}
           </label>
           <input
             type="file"
@@ -156,11 +158,11 @@ export default function ImportModal({ onClose }: ImportModalProps) {
           />
           {file && (
             <p className="mt-2 text-sm text-gray-600">
-              Selected: {file.name}
+              {t('modal.import.selected', { filename: file.name })}
               {needsPassphrase && (
                 <span className="ml-2 inline-flex items-center gap-1 text-amber-600">
                   <LockOpenIcon width={14} />
-                  <span>Encrypted</span>
+                  <span>{t('modal.import.encrypted')}</span>
                 </span>
               )}
             </p>
@@ -171,13 +173,13 @@ export default function ImportModal({ onClose }: ImportModalProps) {
         {needsPassphrase && (
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Passphrase
+              {t('modal.import.passphrase')}
             </label>
             <input
               type="password"
               value={passphrase}
               onChange={(e) => setPassphrase(e.target.value)}
-              placeholder="Enter passphrase to decrypt"
+              placeholder={t('modal.import.passphrasePlaceholder')}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
@@ -193,9 +195,9 @@ export default function ImportModal({ onClose }: ImportModalProps) {
               className="mt-1 w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"
             />
             <div>
-              <span className="font-medium text-gray-700">Merge with existing entries</span>
+              <span className="font-medium text-gray-700">{t('modal.import.merge')}</span>
               <p className="text-xs text-gray-500 mt-1">
-                If unchecked, your current entries will be replaced
+                {t('modal.import.mergeDescription')}
               </p>
             </div>
           </label>
@@ -206,7 +208,7 @@ export default function ImportModal({ onClose }: ImportModalProps) {
             onClick={handleClose}
             className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
           >
-            Cancel
+            {t('modal.import.cancel')}
           </button>
           <button
             onClick={handleImport}
@@ -214,7 +216,7 @@ export default function ImportModal({ onClose }: ImportModalProps) {
             className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ArrowUpTrayIcon width={18} />
-            <span>Import</span>
+            <span>{t('modal.import.import')}</span>
           </button>
         </div>
       </div>

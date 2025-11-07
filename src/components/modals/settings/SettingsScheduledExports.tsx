@@ -31,13 +31,13 @@ export default function SettingsScheduledExports({ onBack, onSave, onShowApiKeyC
     setScheduledExportsServerUrlLocal('');
     setScheduledExportsApiKeyLocal('');
     clearScheduledExportsSettings();
-    toast.success('Scheduled exports settings cleared');
+    toast.success(t('settings.scheduledExports.settingsCleared'));
   };
 
   const handleGenerateApiKeyClick = () => {
     // Validate server URL before showing confirmation
     if (!scheduledExportsServerUrl.trim()) {
-      toast.error('Server URL is required');
+      toast.error(t('settings.scheduledExports.serverUrlRequired'));
       return;
     }
 
@@ -45,7 +45,7 @@ export default function SettingsScheduledExports({ onBack, onSave, onShowApiKeyC
     try {
       new URL(scheduledExportsServerUrl.trim());
     } catch {
-      toast.error('Invalid Server URL format');
+      toast.error(t('settings.scheduledExports.invalidServerUrl'));
       return;
     }
 
@@ -75,18 +75,18 @@ export default function SettingsScheduledExports({ onBack, onSave, onShowApiKeyC
       </button>
 
       <p className="text-sm text-gray-600 mb-4">
-        Configure your server connection for automated scheduled PDF exports
+        {t('settings.scheduledExports.description')}
       </p>
 
       <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg p-3 mb-3 border border-amber-200">
         <p className="text-amber-800 mb-2 font-semibold">
-          Quick Setup: Start server → Generate API key → Configure below
+          {t('settings.scheduledExports.quickSetup')}
         </p>
         <div className="text-amber-700 space-y-1">
-          <p>• Run server:</p>
+          <p>{t('settings.scheduledExports.runServer')}</p>
           <CommandBox command="cd caderno/server && npm run dev" />
 
-          <p>• Generate key using button below or via command:</p>
+          <p>{t('settings.scheduledExports.generateKeyInstruction')}</p>
           <CommandBox command="curl -X POST http://localhost:3002/api/auth/register" />
         </div>
         <a
@@ -95,7 +95,7 @@ export default function SettingsScheduledExports({ onBack, onSave, onShowApiKeyC
           rel="noopener noreferrer"
           className="inline-block mt-2 text-amber-600 hover:text-amber-800 underline"
         >
-          Full Guide →
+          {t('settings.scheduledExports.fullGuide')}
         </a>
       </div>
 
@@ -103,18 +103,18 @@ export default function SettingsScheduledExports({ onBack, onSave, onShowApiKeyC
         {/* Server URL */}
         <div className="mt-4">
           <label className="absolute px-2 pt-1 block text-[11px] font-medium text-gray-700" htmlFor="server-url">
-            Server URL
+            {t('settings.scheduledExports.serverUrlLabel')}
           </label>
           <input
             type="url"
             id="server-url"
             value={scheduledExportsServerUrl}
             onChange={(e) => setScheduledExportsServerUrlLocal(e.target.value)}
-            placeholder="http://localhost:3002"
+            placeholder={t('settings.scheduledExports.serverUrlPlaceholder')}
             className="text-sm w-full px-2 pt-5 pb-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
           <p className="text-xs text-gray-500 mt-1">
-            The URL where your Caderno Server is running
+            {t('settings.scheduledExports.serverUrlNote')}
           </p>
         </div>
 
@@ -123,7 +123,7 @@ export default function SettingsScheduledExports({ onBack, onSave, onShowApiKeyC
           <label className="absolute px-2 pt-1 block text-[11px] font-medium text-gray-700">
             <div className="flex items-center gap-1">
               <KeyIcon width={12} />
-              API Key
+              {t('settings.scheduledExports.apiKeyLabel')}
             </div>
           </label>
           <div className="relative">
@@ -140,7 +140,7 @@ export default function SettingsScheduledExports({ onBack, onSave, onShowApiKeyC
                   setScheduledExportsApiKeyLocal(e.target.value);
                 }
               }}
-              placeholder="Enter your API key"
+              placeholder={t('settings.scheduledExports.apiKeyPlaceholder')}
               rows={1}
               className="text-xs w-full px-2 pt-5 pb-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-24 resize-none font-mono"
               style={{
@@ -159,7 +159,7 @@ export default function SettingsScheduledExports({ onBack, onSave, onShowApiKeyC
           </div>
           <div className="flex items-top gap-2">
             <p className="text-gray-500 flex-1 text-xs">
-              Generate by POSTing to /api/auth/register
+              {t('settings.scheduledExports.apiKeyNote')}
             </p>
             <div className="relative group">
               <button
@@ -172,7 +172,7 @@ export default function SettingsScheduledExports({ onBack, onSave, onShowApiKeyC
               {!scheduledExportsServerUrl.trim() && !isGeneratingApiKey && (
                 <div className="absolute bottom-full right-0 mb-2 hidden group-hover:block z-10">
                   <div className="bg-gray-900 text-white rounded-lg py-2 px-3 whitespace-nowrap shadow-xl">
-                    Server URL is required and must be valid
+                    {t('settings.scheduledExports.generateButtonTooltip')}
                     <div className="absolute top-full right-4 -mt-1">
                       <div className="border-4 border-transparent border-t-gray-900"></div>
                     </div>
@@ -191,11 +191,11 @@ export default function SettingsScheduledExports({ onBack, onSave, onShowApiKeyC
               onClick={handleClear}
               className="block mt-1 text-xs text-red-600 hover:text-red-700"
             >
-              Clear Settings
+              {t('settings.scheduledExports.clearSettings')}
             </button>
           )}
           <p className="text-left flex-1 text-gray-500 text-xs">
-            Settings are stored locally in your browser for security
+            {t('settings.scheduledExports.storageNote')}
           </p>
         </div>
         <button

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { XMarkIcon, ArrowDownTrayIcon, LockClosedIcon } from '@heroicons/react/24/outline';
+import { useTranslation } from 'react-i18next';
 import { useJournalStore } from '../../store/useStore';
 import CryptoJS from 'crypto-js';
 
@@ -9,6 +10,7 @@ interface ExportModalProps {
 }
 
 export default function ExportModal({ onClose }: ExportModalProps) {
+  const { t } = useTranslation();
   const { exportEntries } = useJournalStore();
   const [isClosing, setIsClosing] = useState(false);
   const [encrypt, setEncrypt] = useState(false);
@@ -26,15 +28,15 @@ export default function ExportModal({ onClose }: ExportModalProps) {
     // Validate passphrase if encryption is enabled
     if (encrypt) {
       if (!passphrase) {
-        toast.error('Please enter a passphrase');
+        toast.error(t('modal.export.passphraseRequired'));
         return;
       }
       if (passphrase !== confirmPassphrase) {
-        toast.error('Passphrases do not match');
+        toast.error(t('modal.export.passphraseMismatch'));
         return;
       }
       if (passphrase.length < 8) {
-        toast.error('Passphrase must be at least 8 characters');
+        toast.error(t('modal.export.passphraseMinLength'));
         return;
       }
     }
@@ -78,7 +80,7 @@ export default function ExportModal({ onClose }: ExportModalProps) {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 
-    toast.success('Journal exported successfully');
+    toast.success(t('modal.export.success'));
     handleClose();
   };
 
@@ -96,7 +98,7 @@ export default function ExportModal({ onClose }: ExportModalProps) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold text-gray-800">Export Journal</h2>
+          <h2 className="text-2xl font-bold text-gray-800">{t('modal.export.title')}</h2>
           <button
             onClick={handleClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -106,7 +108,7 @@ export default function ExportModal({ onClose }: ExportModalProps) {
         </div>
 
         <p className="text-gray-600 mb-4">
-          Export all your journal entries to a file. You can optionally encrypt the file with a passphrase.
+          {t('modal.export.description')}
         </p>
 
         {/* Encryption Toggle */}
@@ -120,7 +122,7 @@ export default function ExportModal({ onClose }: ExportModalProps) {
             />
             <div className="flex items-center gap-2">
               <LockClosedIcon width={18} className="text-gray-600" />
-              <span className="font-medium text-gray-700">Encrypt file with passphrase</span>
+              <span className="font-medium text-gray-700">{t('modal.export.encrypt')}</span>
             </div>
           </label>
         </div>
@@ -130,25 +132,25 @@ export default function ExportModal({ onClose }: ExportModalProps) {
           <div className="space-y-3 mb-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Passphrase
+                {t('modal.export.passphrase')}
               </label>
               <input
                 type="password"
                 value={passphrase}
                 onChange={(e) => setPassphrase(e.target.value)}
-                placeholder="Enter passphrase (min 8 characters)"
+                placeholder={t('modal.export.passphrasePlaceholder')}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Confirm Passphrase
+                {t('modal.export.confirmPassphrase')}
               </label>
               <input
                 type="password"
                 value={confirmPassphrase}
                 onChange={(e) => setConfirmPassphrase(e.target.value)}
-                placeholder="Confirm passphrase"
+                placeholder={t('modal.export.confirmPassphrasePlaceholder')}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
@@ -160,14 +162,14 @@ export default function ExportModal({ onClose }: ExportModalProps) {
             onClick={handleClose}
             className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
           >
-            Cancel
+            {t('modal.export.cancel')}
           </button>
           <button
             onClick={handleExport}
             className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors"
           >
             <ArrowDownTrayIcon width={18} />
-            <span>Export</span>
+            <span>{t('modal.export.export')}</span>
           </button>
         </div>
       </div>

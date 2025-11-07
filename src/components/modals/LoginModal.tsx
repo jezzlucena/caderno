@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { toast } from 'react-toastify'
 import { XMarkIcon } from '@heroicons/react/24/outline'
+import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '../../store/useAuthStore'
 import { api } from '../../services/api'
 
@@ -9,6 +10,7 @@ interface LoginModalProps {
 }
 
 export default function LoginModal({ onClose }: LoginModalProps) {
+  const { t } = useTranslation()
   const [isSignUp, setIsSignUp] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -38,10 +40,10 @@ export default function LoginModal({ onClose }: LoginModalProps) {
         console.error('Error fetching subscription:', err)
       }
 
-      toast.success(isSignUp ? 'Account created successfully!' : 'Signed in successfully!')
+      toast.success(isSignUp ? t('modal.login.success.accountCreated') : t('modal.login.success.signedIn'))
       onClose()
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'An error occurred')
+      toast.error(err instanceof Error ? err.message : t('modal.login.error.generic'))
     } finally {
       setLoading(false)
     }
@@ -57,7 +59,7 @@ export default function LoginModal({ onClose }: LoginModalProps) {
       <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md animate-slideUp">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-800">
-            {isSignUp ? 'Create Account' : 'Sign In'}
+            {isSignUp ? t('modal.login.title.createAccount') : t('modal.login.title.signIn')}
           </h2>
           <button
             onClick={onClose}
@@ -70,7 +72,7 @@ export default function LoginModal({ onClose }: LoginModalProps) {
         <form onSubmit={handleSubmit} className="space-y-4 mb-6">
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-              Email
+              {t('modal.login.form.email')}
             </label>
             <input
               id="email"
@@ -79,13 +81,13 @@ export default function LoginModal({ onClose }: LoginModalProps) {
               onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-              placeholder="you@example.com"
+              placeholder={t('modal.login.form.emailPlaceholder')}
             />
           </div>
 
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-              Password
+              {t('modal.login.form.password')}
             </label>
             <input
               id="password"
@@ -95,10 +97,10 @@ export default function LoginModal({ onClose }: LoginModalProps) {
               required
               minLength={6}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-              placeholder="••••••••"
+              placeholder={t('modal.login.form.passwordPlaceholder')}
             />
             {isSignUp && (
-              <p className="text-xs text-gray-500 mt-1">Password must be at least 6 characters</p>
+              <p className="text-xs text-gray-500 mt-1">{t('modal.login.form.passwordRequirement')}</p>
             )}
           </div>
 
@@ -107,7 +109,7 @@ export default function LoginModal({ onClose }: LoginModalProps) {
             disabled={loading}
             className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Loading...' : isSignUp ? 'Sign Up' : 'Sign In'}
+            {loading ? t('modal.login.button.loading') : isSignUp ? t('modal.login.button.signUp') : t('modal.login.button.signIn')}
           </button>
         </form>
 
@@ -116,7 +118,7 @@ export default function LoginModal({ onClose }: LoginModalProps) {
             <div className="w-full border-t border-gray-300"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-gray-500">Or continue with</span>
+            <span className="px-2 bg-white text-gray-500">{t('modal.login.divider.orContinueWith')}</span>
           </div>
         </div>
 
@@ -126,28 +128,28 @@ export default function LoginModal({ onClose }: LoginModalProps) {
             disabled={loading}
             className="flex items-center justify-center gap-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors disabled:opacity-50"
           >
-            Google
+            {t('modal.login.oauth.google')}
           </button>
           <button
             onClick={() => handleOAuth('github')}
             disabled={loading}
             className="flex items-center justify-center gap-2 bg-gray-800 hover:bg-gray-900 text-white font-medium py-2 px-4 rounded-lg transition-colors disabled:opacity-50"
           >
-            GitHub
+            {t('modal.login.oauth.github')}
           </button>
           <button
             onClick={() => handleOAuth('microsoft')}
             disabled={loading}
             className="flex items-center justify-center gap-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors disabled:opacity-50"
           >
-            Microsoft
+            {t('modal.login.oauth.microsoft')}
           </button>
           <button
             onClick={() => handleOAuth('apple')}
             disabled={loading}
             className="flex items-center justify-center gap-2 bg-black hover:bg-gray-900 text-white font-medium py-2 px-4 rounded-lg transition-colors disabled:opacity-50"
           >
-            Apple
+            {t('modal.login.oauth.apple')}
           </button>
         </div>
 
@@ -156,12 +158,12 @@ export default function LoginModal({ onClose }: LoginModalProps) {
             onClick={() => setIsSignUp(!isSignUp)}
             className="text-blue-600 hover:text-blue-700 font-medium text-sm"
           >
-            {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
+            {isSignUp ? t('modal.login.toggle.alreadyHaveAccount') : t('modal.login.toggle.dontHaveAccount')}
           </button>
         </div>
 
         <p className="text-xs text-gray-500 text-center mt-4">
-          Sign in to sync your journals and access premium features
+          {t('modal.login.footer.description')}
         </p>
       </div>
     </div>

@@ -133,13 +133,13 @@ export default function SettingsModal({ onClose, initialScreen = 'main' }: Setti
       if (response.ok && data.success && data.data?.api_key) {
         setApiKey(data.data.api_key);
         setShowApiKey(true);
-        toast.success('API key generated successfully');
+        toast.success(t('settings.apiKeyGenerated'));
       } else {
-        toast.error(data.message || 'Failed to generate API key');
+        toast.error(data.message || t('settings.apiKeyFailed'));
       }
     } catch (error) {
       console.error('Failed to generate API key:', error);
-      toast.error('Network error. Please check your server URL and try again.');
+      toast.error(t('settings.networkError'));
     } finally {
       setIsGenerating(false);
       // Clean up refs

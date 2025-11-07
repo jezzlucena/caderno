@@ -29,7 +29,7 @@ export default function SettingsCloudSync({ onBack, onSave }: SettingsCloudSyncP
     setSyncPassphraseLocal('');
     setAutoSyncLocal(false);
     clearCloudSyncSettings();
-    toast.success('Cloud sync settings cleared');
+    toast.success(t('settings.cloudSync.settingsCleared'));
   };
 
   return (
@@ -48,20 +48,20 @@ export default function SettingsCloudSync({ onBack, onSave }: SettingsCloudSyncP
 
       <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4 mb-4">
         <p className="text-sm text-indigo-800 mb-2">
-          <strong>📘 Setup Instructions</strong>
+          <strong>{t('settings.cloudSync.setupInstructions')}</strong>
         </p>
         <ol className="text-sm text-indigo-700 space-y-2 list-decimal list-inside">
           <li>
-            <span>Start your Caderno Server:</span>
+            <span>{t('settings.cloudSync.instruction1')}</span>
             <div className="mt-1">
               <CommandBox command="cd caderno/server && npm run dev" />
             </div>
           </li>
-          <li>Set a secure passphrase to encrypt your journal entries</li>
-          <li>Use the Cloud Sync button to backup your entries to IPFS</li>
+          <li>{t('settings.cloudSync.instruction2')}</li>
+          <li>{t('settings.cloudSync.instruction3')}</li>
         </ol>
         <p className="text-sm text-indigo-700 mt-2">
-          Your data is encrypted locally before upload. No API keys needed!
+          {t('settings.cloudSync.encryptionNote')}
         </p>
       </div>
 

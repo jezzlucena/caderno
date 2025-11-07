@@ -11,6 +11,7 @@
     "noEntriesDescription": "最初の日記エントリを作成して始めましょう",
     "createEntry": "エントリを作成",
     "deleteConfirm": "このエントリを削除してもよろしいですか？",
+    "deleteEntryTooltip": "エントリーを削除",
     "today": "今日",
     "yesterday": "昨日",
     "daysAgo": "{{count}}日前",
@@ -55,6 +56,7 @@
       "passphraseRequired": "パスフレーズを入力してください",
       "passphraseMismatch": "パスフレーズが一致しません",
       "passphraseMinLength": "パスフレーズは最低8文字必要です",
+      "success": "日記をエクスポートしました",
       "cancel": "キャンセル",
       "export": "エクスポート"
     },
@@ -76,6 +78,7 @@
       "invalidEntries": "バックアップファイルに無効なエントリが含まれています",
       "importFailed": "ファイルのインポートに失敗しました。ファイル形式を確認してください。",
       "invalidFormat": "ファイル形式が無効です。有効なアジェンダバックアップファイルを選択してください。",
+      "success": "{{count}}件の日記エントリーをインポートしました",
       "cancel": "キャンセル",
       "import": "インポート"
     },
@@ -92,6 +95,47 @@
       "advisory": "これらの影響を理解している場合、または現在の API キーへのアクセスを失った場合にのみ続行してください。",
       "cancel": "キャンセル",
       "continue": "続行"
+    },
+    "login": {
+      "title": {
+        "signIn": "ログイン",
+        "createAccount": "アカウント作成"
+      },
+      "form": {
+        "email": "メールアドレス",
+        "emailPlaceholder": "you@example.com",
+        "password": "パスワード",
+        "passwordPlaceholder": "••••••••",
+        "passwordRequirement": "パスワードは最低6文字必要です"
+      },
+      "button": {
+        "loading": "読み込み中...",
+        "signIn": "ログイン",
+        "signUp": "登録"
+      },
+      "divider": {
+        "orContinueWith": "または次の方法で続行"
+      },
+      "oauth": {
+        "google": "Google",
+        "github": "GitHub",
+        "microsoft": "Microsoft",
+        "apple": "Apple"
+      },
+      "toggle": {
+        "alreadyHaveAccount": "すでにアカウントをお持ちですか？ログイン",
+        "dontHaveAccount": "アカウントをお持ちではありませんか？登録"
+      },
+      "footer": {
+        "description": "ログインして日記を同期し、プレミアム機能にアクセス"
+      },
+      "success": {
+        "signedIn": "ログインしました！",
+        "accountCreated": "アカウントが作成されました！"
+      },
+      "error": {
+        "generic": "エラーが発生しました"
+      }
     }
   },
   "language": {
@@ -104,6 +148,13 @@
     "es-ES": "Español (España)",
     "zh-CN": "中文 (简体)",
     "ja": "日本語"
+  },
+  "menu": {
+    "hamburger": "メニュー"
+  },
+  "commandBox": {
+    "copied": "コマンドをコピーしました！",
+    "copyButton": "コピー"
   },
   "settings": {
     "title": "設定",
@@ -128,6 +179,10 @@
     "cancel": "キャンセル",
     "save": "保存",
     "settings": "設定",
+    "keyRemoved": "APIキーを削除しました",
+    "apiKeyGenerated": "APIキーを生成しました",
+    "apiKeyFailed": "APIキーの生成に失敗しました",
+    "networkError": "ネットワークエラー。サーバーURLを確認して再試行してください。",
     "cloudSync": {
       "title": "クラウド同期（IPFSブロックチェーン）",
       "description": "軍用グレードの暗号化で日記エントリを分散型IPFSストレージに同期します。データは最大限の冗長性のために複数のノードに保存されます。",
@@ -137,7 +192,32 @@
       "autoSync": "自動同期を有効にする",
       "autoSyncDescription": "変更後に自動的にエントリをIPFSに同期する",
       "clearSettings": "クラウド同期設定をクリア",
-      "storageNote": "パスフレーズはローカルに保存され、当社のサーバーに送信されることはありません。"
+      "storageNote": "パスフレーズはローカルに保存され、当社のサーバーに送信されることはありません。",
+      "settingsCleared": "クラウド同期設定をクリアしました",
+      "setupInstructions": "📘 セットアップ手順",
+      "instruction1": "Cadernoサーバーを起動：",
+      "instruction2": "日記エントリーを暗号化する安全なパスワードを設定",
+      "instruction3": "Cloud Syncボタンを使用してエントリーをIPFSにバックアップ",
+      "encryptionNote": "データはアップロード前にローカルで暗号化されます。APIキーは不要です！"
+    },
+    "scheduledExports": {
+      "description": "自動スケジュールPDFエクスポートのためのサーバー接続を設定",
+      "quickSetup": "クイックセットアップ：サーバー起動 → APIキー生成 → 以下で設定",
+      "runServer": "• サーバーを実行：",
+      "generateKeyInstruction": "• 下のボタンまたはコマンドでキーを生成：",
+      "fullGuide": "完全ガイド →",
+      "serverUrlLabel": "サーバーURL",
+      "serverUrlPlaceholder": "http://localhost:3002",
+      "serverUrlNote": "CadernoサーバーのURL",
+      "apiKeyLabel": "APIキー",
+      "apiKeyPlaceholder": "APIキーを入力",
+      "apiKeyNote": "/api/auth/registerにPOSTして生成",
+      "generateButtonTooltip": "サーバーURLは必須で有効である必要があります",
+      "clearSettings": "設定をクリア",
+      "storageNote": "セキュリティのため、設定はブラウザにローカル保存されます",
+      "settingsCleared": "スケジュールエクスポート設定をクリアしました",
+      "serverUrlRequired": "サーバーURLは必須です",
+      "invalidServerUrl": "サーバーURL形式が無効です"
     }
   },
   "autocomplete": {
@@ -147,6 +227,12 @@
     "pressEsc": "Escキーで閉じる",
     "noApiKey": "設定でAI自動補完を設定してください",
     "trigger": "Shift+スペースキーでAI提案を表示"
+  },
+  "richTextEditor": {
+    "tooltip": {
+      "setup": "クリックしてAI自動補完を設定",
+      "getSuggestions": "クリックしてAI提案を取得"
+    }
   },
   "backup": {
     "title": "バックアップと復元",
@@ -172,7 +258,8 @@
     "export": "PDFをエクスポート",
     "exporting": "PDFにエクスポート中...",
     "pleaseWait": "PDFを生成していますので、しばらくお待ちください",
-    "error": "PDFのエクスポートに失敗しました。もう一度お試しください。"
+    "error": "PDFのエクスポートに失敗しました。もう一度お試しください。",
+    "successMessage": "{{count}}件のエントリーを含むPDFをエクスポートしました"
   },
   "cloudSync": {
     "title": "クラウド同期",
@@ -205,6 +292,20 @@
       "noCid": "バックアップが見つかりません。まずエントリをアップロードしてください。",
       "uploadFailed": "アップロード失敗：{{error}}",
       "downloadFailed": "ダウンロード失敗：{{error}}"
+    },
+    "instructional": {
+      "header": "Cloud Syncをセットアップ",
+      "subtitle": "IPFSを使用して日記エントリーを安全にバックアップし、デバイス間で同期",
+      "step1Title": "Cadernoサーバーを起動",
+      "step1Description": "Cloud Syncはセルフホスト型IPFSノードを使用します。サーバーを起動：",
+      "step2Title": "暗号化パスワードを設定",
+      "step2Description": "<strong>設定 → Cloud Sync</strong>に移動し、IPFSにアップロードする前に日記エントリーを暗号化する安全なパスワードを設定",
+      "step3Title": "永久無料の同期を楽しむ",
+      "step3Description": "APIキー不要、サブスクリプション不要、トライアル不要。データはあなたのインフラに残り、IPFSネットワークの完全な冗長性があります！",
+      "goToSettings": "設定に移動",
+      "setupLater": "後でセットアップ",
+      "encryptionNote": "データはアップロード前にローカルで暗号化されます。パスワードでのみ復号化できます。",
+      "viewGuide": "完全セットアップガイドを表示 →"
     }
   },
   "scheduledExports": {

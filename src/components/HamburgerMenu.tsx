@@ -162,7 +162,7 @@ export default function HamburgerMenu() {
         <button
           onClick={() => setShowMenu(!showMenu)}
           className="flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-semibold py-3 px-3 rounded-full transition-all duration-200 shadow-md hover:shadow-lg border border-gray-300"
-          title="Menu"
+          title={t('menu.hamburger')}
         >
           <span className="transition-transform duration-200" style={{ transform: showMenu ? 'rotate(90deg)' : 'rotate(0deg)' }}>
             {showMenu ? <XMarkIcon width={20} /> : <Bars3Icon width={20} />}

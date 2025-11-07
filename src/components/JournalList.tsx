@@ -163,7 +163,7 @@ export default function JournalList() {
                     <button
                       onClick={(e) => handleDeleteEntry(entry.id, e)}
                       className="ml-4 p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                      title="Delete entry"
+                      title={t('journalList.deleteEntryTooltip')}
                     >
                       <TrashIcon width={18} />
                     </button>

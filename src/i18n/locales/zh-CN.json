@@ -11,6 +11,7 @@
     "noEntriesDescription": "创建您的第一个日记条目以开始",
     "createEntry": "创建条目",
     "deleteConfirm": "您确定要删除此条目吗？",
+    "deleteEntryTooltip": "删除条目",
     "today": "今天",
     "yesterday": "昨天",
     "daysAgo": "{{count}}天前",
@@ -55,6 +56,7 @@
       "passphraseRequired": "请输入密码短语",
       "passphraseMismatch": "密码短语不匹配",
       "passphraseMinLength": "密码短语必须至少8个字符",
+      "success": "日记导出成功",
       "cancel": "取消",
       "export": "导出"
     },
@@ -76,6 +78,7 @@
       "invalidEntries": "备份文件包含无效条目",
       "importFailed": "导入文件失败。请检查文件格式。",
       "invalidFormat": "文件格式无效。请选择有效的日程备份文件。",
+      "success": "成功导入 {{count}} 条日记",
       "cancel": "取消",
       "import": "导入"
     },
@@ -92,6 +95,47 @@
       "advisory": "仅在您理解这些影响或丢失了当前 API 密钥访问权限时才继续。",
       "cancel": "取消",
       "continue": "继续"
+    },
+    "login": {
+      "title": {
+        "signIn": "登录",
+        "createAccount": "创建账户"
+      },
+      "form": {
+        "email": "电子邮箱",
+        "emailPlaceholder": "you@example.com",
+        "password": "密码",
+        "passwordPlaceholder": "••••••••",
+        "passwordRequirement": "密码至少需要6个字符"
+      },
+      "button": {
+        "loading": "加载中...",
+        "signIn": "登录",
+        "signUp": "注册"
+      },
+      "divider": {
+        "orContinueWith": "或继续使用"
+      },
+      "oauth": {
+        "google": "Google",
+        "github": "GitHub",
+        "microsoft": "Microsoft",
+        "apple": "Apple"
+      },
+      "toggle": {
+        "alreadyHaveAccount": "已有账户？登录",
+        "dontHaveAccount": "没有账户？注册"
+      },
+      "footer": {
+        "description": "登录以同步您的日记并访问高级功能"
+      },
+      "success": {
+        "signedIn": "登录成功！",
+        "accountCreated": "账户创建成功！"
+      },
+      "error": {
+        "generic": "发生错误"
+      }
     }
   },
   "language": {
@@ -104,6 +148,13 @@
     "es-ES": "Español (España)",
     "zh-CN": "中文 (简体)",
     "ja": "日本語"
+  },
+  "menu": {
+    "hamburger": "菜单"
+  },
+  "commandBox": {
+    "copied": "命令已复制！",
+    "copyButton": "复制"
   },
   "settings": {
     "title": "设置",
@@ -128,6 +179,10 @@
     "cancel": "取消",
     "save": "保存",
     "settings": "设置",
+    "keyRemoved": "API 密钥已成功移除",
+    "apiKeyGenerated": "API 密钥生成成功",
+    "apiKeyFailed": "API 密钥生成失败",
+    "networkError": "网络错误。请检查服务器 URL 并重试。",
     "cloudSync": {
       "title": "云同步（IPFS区块链）",
       "description": "使用军用级加密将日记条目同步到分散式IPFS存储。您的数据存储在多个节点上以实现最大冗余。",
@@ -137,7 +192,32 @@
       "autoSync": "启用自动同步",
       "autoSyncDescription": "每次更改后自动将条目同步到IPFS",
       "clearSettings": "清除云同步设置",
-      "storageNote": "您的密码短语存储在本地，绝不会发送到我们的服务器。"
+      "storageNote": "您的密码短语存储在本地，绝不会发送到我们的服务器。",
+      "settingsCleared": "云同步设置已清除",
+      "setupInstructions": "📘 设置说明",
+      "instruction1": "启动 Caderno 服务器：",
+      "instruction2": "设置安全密码以加密您的日记条目",
+      "instruction3": "使用 Cloud Sync 按钮将您的条目备份到 IPFS",
+      "encryptionNote": "您的数据在上传前本地加密。无需 API 密钥！"
+    },
+    "scheduledExports": {
+      "description": "配置服务器连接以实现自动定时 PDF 导出",
+      "quickSetup": "快速设置：启动服务器 → 生成 API 密钥 → 在下方配置",
+      "runServer": "• 运行服务器：",
+      "generateKeyInstruction": "• 使用下方按钮或通过命令生成密钥：",
+      "fullGuide": "完整指南 →",
+      "serverUrlLabel": "服务器 URL",
+      "serverUrlPlaceholder": "http://localhost:3002",
+      "serverUrlNote": "您的 Caderno 服务器运行的 URL",
+      "apiKeyLabel": "API 密钥",
+      "apiKeyPlaceholder": "输入您的 API 密钥",
+      "apiKeyNote": "通过 POST 到 /api/auth/register 生成",
+      "generateButtonTooltip": "服务器 URL 是必需的且必须有效",
+      "clearSettings": "清除设置",
+      "storageNote": "为了安全，设置存储在您的浏览器本地",
+      "settingsCleared": "定时导出设置已清除",
+      "serverUrlRequired": "服务器 URL 是必需的",
+      "invalidServerUrl": "服务器 URL 格式无效"
     }
   },
   "autocomplete": {
@@ -147,6 +227,12 @@
     "pressEsc": "按Esc关闭",
     "noApiKey": "在设置中配置AI自动补全",
     "trigger": "按Shift+空格键获取AI建议"
+  },
+  "richTextEditor": {
+    "tooltip": {
+      "setup": "点击设置 AI 自动补全",
+      "getSuggestions": "点击获取 AI 建议"
+    }
   },
   "backup": {
     "title": "备份与恢复",
@@ -172,7 +258,8 @@
     "export": "导出PDF",
     "exporting": "正在导出PDF...",
     "pleaseWait": "正在生成PDF，请稍候",
-    "error": "导出PDF失败。请重试。"
+    "error": "导出PDF失败。请重试。",
+    "successMessage": "成功导出包含 {{count}} 条条目的 PDF"
   },
   "cloudSync": {
     "title": "云同步",
@@ -205,6 +292,20 @@
       "noCid": "未找到备份。请先上传您的条目。",
       "uploadFailed": "上传失败：{{error}}",
       "downloadFailed": "下载失败：{{error}}"
+    },
+    "instructional": {
+      "header": "设置 Cloud Sync",
+      "subtitle": "使用 IPFS 安全备份和同步您的日记条目到多个设备",
+      "step1Title": "启动 Caderno 服务器",
+      "step1Description": "Cloud Sync 使用自托管的 IPFS 节点。启动服务器：",
+      "step2Title": "设置加密密码",
+      "step2Description": "转到 <strong>设置 → Cloud Sync</strong> 并设置安全密码以在上传到 IPFS 之前加密您的日记条目",
+      "step3Title": "永久免费同步",
+      "step3Description": "无需 API 密钥、无需订阅、无需试用。您的数据留在您的基础设施上，并具有完整的 IPFS 网络冗余！",
+      "goToSettings": "前往设置",
+      "setupLater": "稍后设置",
+      "encryptionNote": "您的数据在上传前本地加密。只有您可以使用密码解密。",
+      "viewGuide": "查看完整设置指南 →"
     }
   },
   "scheduledExports": {

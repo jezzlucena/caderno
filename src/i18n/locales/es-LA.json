@@ -11,6 +11,7 @@
     "noEntriesDescription": "Crea tu primera entrada en el diario para comenzar",
     "createEntry": "Crear Entrada",
     "deleteConfirm": "¿Estás seguro de que quieres eliminar esta entrada?",
+    "deleteEntryTooltip": "Eliminar entrada",
     "today": "Hoy",
     "yesterday": "Ayer",
     "daysAgo": "hace {{count}} días",
@@ -55,6 +56,7 @@
       "passphraseRequired": "Por favor, ingresa una contraseña",
       "passphraseMismatch": "Las contraseñas no coinciden",
       "passphraseMinLength": "La contraseña debe tener al menos 8 caracteres",
+      "success": "Diario exportado exitosamente",
       "cancel": "Cancelar",
       "export": "Exportar"
     },
@@ -76,6 +78,7 @@
       "invalidEntries": "El archivo de respaldo contiene entradas inválidas",
       "importFailed": "Error al importar el archivo. Por favor, verifica el formato del archivo.",
       "invalidFormat": "Formato de archivo inválido. Por favor, selecciona un archivo de respaldo válido de Caderno.",
+      "success": "{{count}} entradas de diario importadas exitosamente",
       "cancel": "Cancelar",
       "import": "Importar"
     },
@@ -92,6 +95,47 @@
       "advisory": "Procede solo si comprendes estas implicaciones o si perdiste el acceso a tu clave de API actual.",
       "cancel": "Cancelar",
       "continue": "Continuar"
+    },
+    "login": {
+      "title": {
+        "signIn": "Iniciar Sesión",
+        "createAccount": "Crear Cuenta"
+      },
+      "form": {
+        "email": "Correo",
+        "emailPlaceholder": "tu@ejemplo.com",
+        "password": "Contraseña",
+        "passwordPlaceholder": "••••••••",
+        "passwordRequirement": "La contraseña debe tener al menos 6 caracteres"
+      },
+      "button": {
+        "loading": "Cargando...",
+        "signIn": "Iniciar Sesión",
+        "signUp": "Registrarte"
+      },
+      "divider": {
+        "orContinueWith": "O continúa con"
+      },
+      "oauth": {
+        "google": "Google",
+        "github": "GitHub",
+        "microsoft": "Microsoft",
+        "apple": "Apple"
+      },
+      "toggle": {
+        "alreadyHaveAccount": "¿Ya tienes una cuenta? Inicia sesión",
+        "dontHaveAccount": "¿No tienes una cuenta? Regístrate"
+      },
+      "footer": {
+        "description": "Inicia sesión para sincronizar tus diarios y acceder a funciones premium"
+      },
+      "success": {
+        "signedIn": "¡Sesión iniciada exitosamente!",
+        "accountCreated": "¡Cuenta creada exitosamente!"
+      },
+      "error": {
+        "generic": "Ocurrió un error"
+      }
     }
   },
   "language": {
@@ -104,6 +148,9 @@
     "es-ES": "Español (España)",
     "zh-CN": "中文 (简体)",
     "ja": "日本語"
+  },
+  "menu": {
+    "hamburger": "Menú"
   },
   "settings": {
     "title": "Configuración",
@@ -128,6 +175,10 @@
     "cancel": "Cancelar",
     "save": "Guardar",
     "settings": "Configuración",
+    "keyRemoved": "Clave de API eliminada exitosamente",
+    "apiKeyGenerated": "Clave de API generada exitosamente",
+    "apiKeyFailed": "Error al generar la clave de API",
+    "networkError": "Error de red. Por favor, verifica la URL del servidor e inténtalo de nuevo.",
     "cloudSync": {
       "title": "Sincronización en la Nube (IPFS Blockchain)",
       "description": "Sincroniza tus entradas del diario con almacenamiento IPFS descentralizado con encriptación de grado militar. Tus datos se almacenan en múltiples nodos para máxima redundancia.",
@@ -137,7 +188,32 @@
       "autoSync": "Activar sincronización automática",
       "autoSyncDescription": "Sincronizar automáticamente tus entradas a IPFS después de cada cambio",
       "clearSettings": "Limpiar configuraciones de sincronización en la nube",
-      "storageNote": "Tu contraseña se almacena localmente y nunca se envía a nuestros servidores."
+      "storageNote": "Tu contraseña se almacena localmente y nunca se envía a nuestros servidores.",
+      "settingsCleared": "Configuración de sincronización en la nube limpiada",
+      "setupInstructions": "📘 Instrucciones de Configuración",
+      "instruction1": "Iniciar el servidor Caderno:",
+      "instruction2": "Establece una contraseña segura para encriptar tus entradas de diario",
+      "instruction3": "Usa el botón Cloud Sync para hacer respaldo de tus entradas en IPFS",
+      "encryptionNote": "Tus datos se encriptan localmente antes de cargarlos. ¡No se necesitan claves de API!"
+    },
+    "scheduledExports": {
+      "description": "Configura tu conexión al servidor para exportaciones PDF programadas automatizadas",
+      "quickSetup": "Configuración Rápida: Iniciar servidor → Generar clave de API → Configurar abajo",
+      "runServer": "• Ejecutar servidor:",
+      "generateKeyInstruction": "• Generar clave usando el botón de abajo o mediante comando:",
+      "fullGuide": "Guía Completa →",
+      "serverUrlLabel": "URL del Servidor",
+      "serverUrlPlaceholder": "http://localhost:3002",
+      "serverUrlNote": "La URL donde se está ejecutando tu servidor Caderno",
+      "apiKeyLabel": "Clave de API",
+      "apiKeyPlaceholder": "Ingresa tu clave de API",
+      "apiKeyNote": "Genera haciendo POST a /api/auth/register",
+      "generateButtonTooltip": "La URL del servidor es obligatoria y debe ser válida",
+      "clearSettings": "Limpiar Configuración",
+      "storageNote": "La configuración se almacena localmente en tu navegador por seguridad",
+      "settingsCleared": "Configuración de exportaciones programadas limpiada",
+      "serverUrlRequired": "La URL del servidor es obligatoria",
+      "invalidServerUrl": "Formato de URL del servidor no válido"
     }
   },
   "autocomplete": {
@@ -147,6 +223,16 @@
     "pressEsc": "Presiona Esc para descartar",
     "noApiKey": "Configura el autocompletar con IA en Configuración",
     "trigger": "Presiona Shift+Espacio para sugerencias de IA"
+  },
+  "richTextEditor": {
+    "tooltip": {
+      "setup": "Haz clic para configurar el Autocompletado con IA",
+      "getSuggestions": "Haz clic para obtener sugerencias de IA"
+    }
+  },
+  "commandBox": {
+    "copied": "¡Comando copiado!",
+    "copyButton": "Copiar"
   },
   "backup": {
     "title": "Respaldo y Restauración",
@@ -172,6 +258,7 @@
     "export": "Exportar PDF",
     "exporting": "Exportando a PDF...",
     "pleaseWait": "Por favor, espera mientras generamos tu PDF",
+    "successMessage": "PDF exportado exitosamente con {{count}} entradas",
     "error": "Error al exportar PDF. Por favor, intenta nuevamente."
   },
   "cloudSync": {
@@ -180,6 +267,20 @@
     "notConfigured": "La sincronización en la nube no está configurada. Por favor, configura tu clave de API de Lighthouse y contraseña en Configuración primero.",
     "lastSync": "Última sincronización: {{date}}",
     "close": "Cerrar",
+    "instructional": {
+      "header": "Configurar Cloud Sync",
+      "subtitle": "Haz copias de seguridad y sincroniza de forma segura tus entradas de diario entre dispositivos usando IPFS",
+      "step1Title": "Iniciar Servidor Caderno",
+      "step1Description": "Cloud Sync usa un nodo IPFS auto-hospedado. Inicia el servidor:",
+      "step2Title": "Establecer Contraseña de Cifrado",
+      "step2Description": "Ve a <strong>Configuración → Cloud Sync</strong> y establece una contraseña segura para cifrar tus entradas de diario antes de subirlas a IPFS",
+      "step3Title": "Disfruta de Sincronización Gratis para Siempre",
+      "step3Description": "Sin claves de API, sin suscripciones, sin períodos de prueba. ¡Tus datos permanecen en tu infraestructura con redundancia completa de la red IPFS!",
+      "goToSettings": "Ir a Configuración",
+      "setupLater": "Lo Configuraré Más Tarde",
+      "encryptionNote": "Tus datos se cifran localmente antes de subir. Solo puedes descifrarlos con tu contraseña.",
+      "viewGuide": "Ver Guía Completa de Configuración →"
+    },
     "upload": {
       "title": "Subir a la Nube",
       "description": "Subir {{count}} entradas al almacenamiento blockchain IPFS",
@@ -385,6 +486,10 @@
       "dontShowAgain": "No Mostrar de Nuevo"
     },
     "helpLink": "Ver Guía Completa de Configuración →"
+  },
+  "commandBox": {
+    "copied": "¡Comando copiado!",
+    "copyButton": "Copiar"
   },
   "about": {
     "title": "Acerca de Caderno",
