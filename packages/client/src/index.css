@@ -1,0 +1,433 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+/* ============================================
+   iOS-Style Animations
+   ============================================ */
+
+/* Base transition timing - iOS uses ease-in-out with specific curves */
+:root {
+  --ios-timing: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --ios-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --ios-duration-fast: 200ms;
+  --ios-duration-normal: 300ms;
+  --ios-duration-slow: 400ms;
+}
+
+/* ============================================
+   Page Fade Animations
+   ============================================ */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================
+   Slide Animations (iOS-style)
+   ============================================ */
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutLeft {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutDown {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+/* ============================================
+   Scale Animations (for modals/cards)
+   ============================================ */
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes scaleOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ============================================
+   List Item Stagger Animation
+   ============================================ */
+
+@keyframes listItemIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ============================================
+   Utility Animation Classes
+   ============================================ */
+
+.animate-fade-in {
+  animation: fadeIn var(--ios-duration-normal) var(--ios-timing) forwards;
+}
+
+.animate-fade-out {
+  animation: fadeOut var(--ios-duration-normal) var(--ios-timing) forwards;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp var(--ios-duration-normal) var(--ios-timing) forwards;
+}
+
+.animate-fade-in-down {
+  animation: fadeInDown var(--ios-duration-normal) var(--ios-timing) forwards;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight var(--ios-duration-normal) var(--ios-timing) forwards;
+}
+
+.animate-slide-out-right {
+  animation: slideOutRight var(--ios-duration-normal) var(--ios-timing) forwards;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft var(--ios-duration-normal) var(--ios-timing) forwards;
+}
+
+.animate-slide-in-up {
+  animation: slideInUp var(--ios-duration-slow) var(--ios-spring) forwards;
+}
+
+.animate-slide-out-down {
+  animation: slideOutDown var(--ios-duration-normal) var(--ios-timing) forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn var(--ios-duration-fast) var(--ios-timing) forwards;
+}
+
+.animate-scale-out {
+  animation: scaleOut var(--ios-duration-fast) var(--ios-timing) forwards;
+}
+
+.animate-bounce-in {
+  animation: bounceIn var(--ios-duration-slow) var(--ios-spring) forwards;
+}
+
+/* ============================================
+   Staggered List Items
+   ============================================ */
+
+.animate-list-item {
+  animation: listItemIn var(--ios-duration-normal) var(--ios-timing) forwards;
+  opacity: 0;
+}
+
+.animate-list-item:nth-child(1) { animation-delay: 0ms; }
+.animate-list-item:nth-child(2) { animation-delay: 50ms; }
+.animate-list-item:nth-child(3) { animation-delay: 100ms; }
+.animate-list-item:nth-child(4) { animation-delay: 150ms; }
+.animate-list-item:nth-child(5) { animation-delay: 200ms; }
+.animate-list-item:nth-child(6) { animation-delay: 250ms; }
+.animate-list-item:nth-child(7) { animation-delay: 300ms; }
+.animate-list-item:nth-child(8) { animation-delay: 350ms; }
+.animate-list-item:nth-child(9) { animation-delay: 400ms; }
+.animate-list-item:nth-child(10) { animation-delay: 450ms; }
+
+/* ============================================
+   Interactive Elements - iOS Touch Feel
+   ============================================ */
+
+.ios-pressable {
+  transition: transform var(--ios-duration-fast) var(--ios-timing),
+              opacity var(--ios-duration-fast) var(--ios-timing);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ios-pressable:active {
+  transform: scale(0.97);
+  opacity: 0.8;
+}
+
+/* Card press effect */
+.ios-card {
+  transition: transform var(--ios-duration-fast) var(--ios-timing),
+              box-shadow var(--ios-duration-fast) var(--ios-timing);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ios-card:active {
+  transform: scale(0.98);
+}
+
+.ios-card:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+/* Button press effect */
+.ios-button {
+  transition: transform var(--ios-duration-fast) var(--ios-timing),
+              background-color var(--ios-duration-fast) var(--ios-timing),
+              opacity var(--ios-duration-fast) var(--ios-timing);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ios-button:active {
+  transform: scale(0.95);
+  opacity: 0.9;
+}
+
+/* ============================================
+   Modal/Sheet Animations
+   ============================================ */
+
+.modal-backdrop-enter {
+  animation: fadeIn var(--ios-duration-normal) var(--ios-timing) forwards;
+}
+
+.modal-backdrop-exit {
+  animation: fadeOut var(--ios-duration-normal) var(--ios-timing) forwards;
+}
+
+.modal-content-enter {
+  animation: slideInUp var(--ios-duration-slow) var(--ios-spring) forwards;
+}
+
+.modal-content-exit {
+  animation: slideOutDown var(--ios-duration-normal) var(--ios-timing) forwards;
+}
+
+/* Alternative scale animation for modals */
+.modal-scale-enter {
+  animation: scaleIn var(--ios-duration-normal) var(--ios-spring) forwards;
+}
+
+.modal-scale-exit {
+  animation: scaleOut var(--ios-duration-fast) var(--ios-timing) forwards;
+}
+
+/* ============================================
+   Sidebar Slide Animation
+   ============================================ */
+
+.sidebar-enter {
+  animation: slideInLeft var(--ios-duration-normal) var(--ios-timing) forwards;
+}
+
+.sidebar-exit {
+  animation: slideOutLeft var(--ios-duration-normal) var(--ios-timing) forwards;
+}
+
+/* ============================================
+   Page Transition Wrapper
+   ============================================ */
+
+.page-enter {
+  animation: fadeInUp var(--ios-duration-normal) var(--ios-timing) forwards;
+}
+
+.page-exit {
+  animation: fadeOut var(--ios-duration-fast) var(--ios-timing) forwards;
+}
+
+/* ============================================
+   Alert/Toast Animations
+   ============================================ */
+
+.alert-enter {
+  animation: slideInDown var(--ios-duration-normal) var(--ios-spring) forwards;
+}
+
+@keyframes slideInDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.alert-exit {
+  animation: slideOutUp var(--ios-duration-normal) var(--ios-timing) forwards;
+}
+
+@keyframes slideOutUp {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+}
+
+/* ============================================
+   Smooth Scrolling
+   ============================================ */
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* iOS-style momentum scrolling for overflow containers */
+.ios-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* ============================================
+   Reduce motion for accessibility
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.form-control:not(.form-control-compact) {
+  position: relative;
+  padding-top: 0.7em;
+  margin-top: 2em;
+}
+
+form label:not(.relative) {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translateY(-50%);
+  background-color: white;
+  font-size: 0.8rem;
+  color: #666;
+}

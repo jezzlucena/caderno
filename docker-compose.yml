@@ -1,0 +1,61 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      PORT: ${PORT}
+      NODE_ENV: ${NODE_ENV}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      SMTP_FROM: ${SMTP_FROM}
+      VITE_APP_URL: ${VITE_APP_URL}
+      VITE_FEDERATION_ENABLED: ${VITE_FEDERATION_ENABLED:-true}
+      FEDERATION_DOMAIN: ${FEDERATION_DOMAIN:-localhost:3000}
+      SERVER_URL: ${SERVER_URL:-http://localhost:3000}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./packages/server/src:/app/packages/server/src
+
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_APP_URL: ${VITE_APP_URL:-http://localhost:5173}
+      VITE_FEDERATION_ENABLED: ${VITE_FEDERATION_ENABLED:-true}
+    depends_on:
+      - server
+    volumes:
+      - ./packages/client/src:/app/packages/client/src
+      - ./packages/client/index.html:/app/packages/client/index.html
+
+volumes:
+  postgres_data:

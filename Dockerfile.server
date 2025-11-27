@@ -1,0 +1,25 @@
+FROM node:22-alpine
+
+WORKDIR /app
+
+# Enable corepack for pnpm
+RUN corepack enable && corepack prepare pnpm@9.14.2 --activate
+
+# Copy workspace configuration and lockfile
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+
+# Copy all package.json files for workspace
+COPY packages/server/package.json ./packages/server/
+COPY packages/client/package.json ./packages/client/
+
+# Install all dependencies
+RUN pnpm install
+
+# Copy server source code
+COPY packages/server ./packages/server
+
+WORKDIR /app/packages/server
+
+EXPOSE 3000
+
+CMD ["pnpm", "dev"]

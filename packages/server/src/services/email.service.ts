@@ -1,0 +1,125 @@
+import nodemailer from 'nodemailer'
+import { env } from '../config/env.js'
+
+const transporter = nodemailer.createTransport({
+  host: env.SMTP_HOST,
+  port: parseInt(env.SMTP_PORT),
+  secure: env.SMTP_PORT === '465',
+  auth: env.SMTP_USER && env.SMTP_PASS
+    ? { user: env.SMTP_USER, pass: env.SMTP_PASS }
+    : undefined
+})
+
+export async function sendVerificationEmail(email: string, token: string): Promise<void> {
+  const verificationUrl = `${env.VITE_APP_URL}/verify-email/${token}`
+
+  const mailOptions = {
+    from: env.SMTP_FROM,
+    to: email,
+    subject: 'Verify your Caderno account',
+    html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+        <h1 style="color: #333;">Welcome to Caderno</h1>
+        <p>Please verify your email address by clicking the button below:</p>
+        <a href="${verificationUrl}"
+           style="display: inline-block; padding: 12px 24px; background-color: #570df8; color: white; text-decoration: none; border-radius: 8px; margin: 16px 0;">
+          Verify Email
+        </a>
+        <p style="color: #666; font-size: 14px;">
+          Or copy and paste this link into your browser:<br>
+          <a href="${verificationUrl}">${verificationUrl}</a>
+        </p>
+        <p style="color: #666; font-size: 14px;">
+          This link will expire in 24 hours.
+        </p>
+        <hr style="border: none; border-top: 1px solid #eee; margin: 24px 0;">
+        <p style="color: #999; font-size: 12px;">
+          If you didn't create a Caderno account, you can safely ignore this email.
+        </p>
+      </div>
+    `
+  }
+
+  try {
+    await transporter.sendMail(mailOptions)
+    console.log(`Verification email sent to ${email}`)
+  } catch (error) {
+    console.error('Failed to send verification email:', error)
+    // In development, log the verification URL for testing
+    if (env.NODE_ENV === 'development') {
+      console.log(`[DEV] Verification URL: ${verificationUrl}`)
+    }
+  }
+}
+
+export async function sendSwitchTriggeredEmail(
+  recipientEmail: string,
+  recipientName: string,
+  switchId: number,
+  message: string,
+  senderEmail: string,
+  payloadInfo?: { switchId: number; payloadKey: string }
+): Promise<void> {
+  // Build payload section if available
+  let payloadSection = ''
+  if (payloadInfo) {
+    const unlockUrl = `${env.VITE_APP_URL}/unlock/${payloadInfo.switchId}#${payloadInfo.payloadKey}`
+    payloadSection = `
+      <div style="background-color: #e3f2fd; padding: 16px; border-radius: 8px; margin: 24px 0; border: 1px solid #2196f3;">
+        <h3 style="margin-top: 0; color: #1565c0;">
+          📄 Journal Entries Available
+        </h3>
+        <p style="color: #333; margin-bottom: 16px;">
+          The switch owner has included journal entries for you to access. Click the button below to download the PDF.
+        </p>
+        <a href="${unlockUrl}"
+           style="display: inline-block; padding: 12px 24px; background-color: #2196f3; color: white; text-decoration: none; border-radius: 8px;">
+          Download Journal PDF
+        </a>
+        <p style="color: #666; font-size: 12px; margin-top: 12px; margin-bottom: 0;">
+          Or copy this link: <a href="${unlockUrl}" style="word-break: break-all;">${unlockUrl}</a>
+        </p>
+      </div>
+    `
+  }
+
+  const mailOptions = {
+    from: env.SMTP_FROM,
+    to: recipientEmail,
+    subject: `[IMPORTANT] Dead Man's Switch Triggered`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background-color: #f44336; color: white; padding: 16px; border-radius: 8px 8px 0 0;">
+          <h1 style="margin: 0;">Dead Man's Switch Activated</h1>
+        </div>
+        <div style="padding: 24px; border: 1px solid #ddd; border-top: none; border-radius: 0 0 8px 8px;">
+          <p>Dear ${recipientName},</p>
+          <p>
+            A Dead Man's Switch has been triggered.
+            This means the owner of this switch has not checked in within the specified time period.
+          </p>
+
+          <div style="background-color: #f5f5f5; padding: 16px; border-radius: 8px; margin: 24px 0;">
+            <h3 style="margin-top: 0; color: #333;">Message from the switch owner:</h3>
+            <p style="white-space: pre-wrap; color: #333;">${message}</p>
+          </div>
+
+          ${payloadSection}
+
+          <p style="color: #666; font-size: 14px;">
+            This switch was created by: <strong>${senderEmail}</strong>
+          </p>
+
+          <hr style="border: none; border-top: 1px solid #eee; margin: 24px 0;">
+
+          <p style="color: #999; font-size: 12px;">
+            This is an automated message from Caderno, a privacy-first journaling platform.
+            The switch owner designated you as a recipient for this notification.
+          </p>
+        </div>
+      </div>
+    `
+  }
+
+  await transporter.sendMail(mailOptions)
+}

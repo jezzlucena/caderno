@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- Background circle -->
+  <circle cx="50" cy="50" r="48" fill="url(#gradient)" />
+
+  <!-- Notebook body -->
+  <rect x="28" y="22" width="44" height="56" rx="4" fill="#ffffff" stroke="#4a5568" stroke-width="2"/>
+
+  <!-- Writing lines -->
+  <line x1="36" y1="34" x2="64" y2="34" stroke="#cbd5e0" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="36" y1="42" x2="60" y2="42" stroke="#cbd5e0" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="36" y1="50" x2="66" y2="50" stroke="#cbd5e0" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="36" y1="58" x2="54" y2="58" stroke="#cbd5e0" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="36" y1="66" x2="50" y2="66" stroke="#cbd5e0" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- Cute lock -->
+  <g transform="translate(43, 47) scale(1.5)">
+    <!-- Lock body -->
+    <rect x="0" y="6" width="16" height="12" rx="2" fill="url(#gradient)"/>
+    <!-- Lock shackle -->
+    <path d="M3 6V4a5 5 0 0 1 10 0v2" fill="none" stroke="url(#gradient)" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Keyhole -->
+    <circle cx="8" cy="10.5" r="2.5" fill="#ffffff"/>
+    <rect x="7" y="12" width="2" height="4" rx="0.5" fill="#ffffff"/>
+  </g>
+
+  <!-- Gradient definition -->
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea"/>
+      <stop offset="100%" style="stop-color:#764ba2"/>
+    </linearGradient>
+  </defs>
+</svg>
