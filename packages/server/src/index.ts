@@ -36,7 +36,7 @@ app.use(helmet({
 app.use(cors({
   origin: env.NODE_ENV === 'production'
     ? env.VITE_APP_URL
-    : ['http://localhost:5173', 'http://client:5173'],
+    : ['http://localhost:8085', 'http://client:8085'],
   credentials: true
 }))
 

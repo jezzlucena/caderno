@@ -4,7 +4,7 @@ This document describes the REST API endpoints for Project Caderno.
 
 ## Base URL
 
-- **Development**: `http://localhost:3000/api`
+- **Development**: `http://localhost:5055/api`
 - **Production**: `https://yourdomain.com/api`
 
 ## Authentication

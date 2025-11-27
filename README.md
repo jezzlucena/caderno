@@ -62,8 +62,8 @@ The easiest way to get Caderno running is with Docker Compose:
    ```
 
 5. **Access the application**
-   - Frontend: http://localhost:5173
-   - Backend API: http://localhost:3000
+   - Frontend: http://localhost:8085
+   - Backend API: http://localhost:5055
 
 ## Local Development Setup
 
@@ -121,15 +121,15 @@ For development without Docker:
    ```
 
 7. **Access the application**
-   - Frontend: http://localhost:5173
-   - Backend API: http://localhost:3000
+   - Frontend: http://localhost:8085
+   - Backend API: http://localhost:5055
 
 ## Environment Variables
 
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `DATABASE_URL` | PostgreSQL connection string | `postgres://caderno:caderno@db:5432/caderno` |
-| `PORT` | Server port | `3000` |
+| `PORT` | Server port | `5055` |
 | `NODE_ENV` | Environment (`development`, `production`, `test`) | `development` |
 | `JWT_SECRET` | Secret key for JWT tokens (min 32 chars) | Required |
 | `JWT_EXPIRES_IN` | JWT token expiration | `7d` |
@@ -138,11 +138,11 @@ For development without Docker:
 | `SMTP_USER` | SMTP username | - |
 | `SMTP_PASS` | SMTP password | - |
 | `SMTP_FROM` | Email sender address | `noreply@caderno.app` |
-| `VITE_APP_URL` | Frontend application URL, used for backend and frontend | `http://localhost:5173` |
-| `CLIENT_URL` | Client URL for CORS | `http://localhost:5173` |
+| `VITE_APP_URL` | Frontend application URL, used for backend and frontend | `http://localhost:8085` |
+| `CLIENT_URL` | Client URL for CORS | `http://localhost:8085` |
 | `FEDERATION_ENABLED` | Enable ActivityPub federation | `true` |
-| `FEDERATION_DOMAIN` | Domain for ActivityPub handles | `localhost:3000` |
-| `SERVER_URL` | Public URL of the server | `http://localhost:3000` |
+| `FEDERATION_DOMAIN` | Domain for ActivityPub handles | `localhost:5055` |
+| `SERVER_URL` | Public URL of the server | `http://localhost:5055` |
 
 ## Setting Up Federation
 
@@ -160,7 +160,7 @@ For testing federation locally, use [ngrok](https://ngrok.com/) to expose your s
 
 1. **Start ngrok**
    ```bash
-   ngrok http 3000
+   ngrok http 5055
    ```
 
 2. **Copy the HTTPS URL** (e.g., `https://abc123.ngrok.io`)

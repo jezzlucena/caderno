@@ -20,6 +20,6 @@ COPY packages/client ./packages/client
 
 WORKDIR /app/packages/client
 
-EXPOSE 5173
+EXPOSE 8085
 
 CMD ["pnpm", "dev"]

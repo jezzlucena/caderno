@@ -20,6 +20,6 @@ COPY packages/server ./packages/server
 
 WORKDIR /app/packages/server
 
-EXPOSE 3000
+EXPOSE 5055
 
 CMD ["pnpm", "dev"]

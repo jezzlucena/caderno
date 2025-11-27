@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 const envSchema = z.object({
   // Server
-  PORT: z.string().default('3000'),
+  PORT: z.string().default('5055'),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
 
   // Database
@@ -20,12 +20,12 @@ const envSchema = z.object({
   SMTP_FROM: z.string().default('noreply@caderno.app'),
 
   // App
-  VITE_APP_URL: z.string().default('http://localhost:5173'),
+  VITE_APP_URL: z.string().default('http://localhost:8085'),
 
   // Federation (ActivityPub)
   VITE_FEDERATION_ENABLED: z.string().default('true'),
-  FEDERATION_DOMAIN: z.string().default('localhost:3000'),  // Domain for ActivityPub handles
-  SERVER_URL: z.string().default('http://localhost:3000')   // Public URL of this server
+  FEDERATION_DOMAIN: z.string().default('localhost:5055'),  // Domain for ActivityPub handles
+  SERVER_URL: z.string().default('http://localhost:5055')   // Public URL of this server
 })
 
 export const env = envSchema.parse(process.env)

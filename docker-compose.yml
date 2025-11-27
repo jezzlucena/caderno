@@ -14,13 +14,14 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   server:
     build:
       context: .
       dockerfile: Dockerfile.server
     ports:
-      - "3000:3000"
+      - "5055:5055"
     environment:
       DATABASE_URL: ${DATABASE_URL}
       PORT: ${PORT}
@@ -34,28 +35,30 @@ services:
       SMTP_FROM: ${SMTP_FROM}
       VITE_APP_URL: ${VITE_APP_URL}
       VITE_FEDERATION_ENABLED: ${VITE_FEDERATION_ENABLED:-true}
-      FEDERATION_DOMAIN: ${FEDERATION_DOMAIN:-localhost:3000}
-      SERVER_URL: ${SERVER_URL:-http://localhost:3000}
+      FEDERATION_DOMAIN: ${FEDERATION_DOMAIN:-localhost:5055}
+      SERVER_URL: ${SERVER_URL:-http://localhost:5055}
     depends_on:
       db:
         condition: service_healthy
     volumes:
       - ./packages/server/src:/app/packages/server/src
+    restart: unless-stopped
 
   client:
     build:
       context: .
       dockerfile: Dockerfile.client
     ports:
-      - "5173:5173"
+      - "8085:8085"
     environment:
-      VITE_APP_URL: ${VITE_APP_URL:-http://localhost:5173}
+      VITE_APP_URL: ${VITE_APP_URL:-http://localhost:8085}
       VITE_FEDERATION_ENABLED: ${VITE_FEDERATION_ENABLED:-true}
     depends_on:
       - server
     volumes:
       - ./packages/client/src:/app/packages/client/src
       - ./packages/client/index.html:/app/packages/client/index.html
+    restart: unless-stopped
 
 volumes:
   postgres_data:
