@@ -12,6 +12,7 @@ import { Federation } from './pages/Federation'
 import { About } from './pages/About'
 import { Terms } from './pages/Terms'
 import { Privacy } from './pages/Privacy'
+import { Support } from './pages/Support'
 import { Profile } from './pages/Profile'
 import { AccountSettings } from './pages/AccountSettings'
 
@@ -34,6 +35,7 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<Privacy />} />
+        <Route path="/support" element={<Support />} />
         <Route
           path="/"
           element={

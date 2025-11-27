@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../stores/authStore'
+import { AuthFooter } from '../components/AuthFooter'
 
 export function Login() {
   const [emailOrUsername, setEmailOrUsername] = useState('')
@@ -86,13 +87,7 @@ export function Login() {
         </div>
       </div>
 
-      <footer className="mt-8 text-center text-sm text-base-content/60">
-        <Link to="/about" className="link link-hover mx-2">About</Link>
-        <span>·</span>
-        <Link to="/terms" className="link link-hover mx-2">Terms</Link>
-        <span>·</span>
-        <Link to="/privacy" className="link link-hover mx-2">Privacy</Link>
-      </footer>
+      <AuthFooter />
     </div>
   )
 }

@@ -123,3 +123,73 @@ export async function sendSwitchTriggeredEmail(
 
   await transporter.sendMail(mailOptions)
 }
+
+export interface SupportRequestData {
+  category: string
+  categoryLabel: string
+  email: string
+  subject: string
+  message: string
+  isUrgent: boolean
+}
+
+export async function sendSupportRequestEmail(data: SupportRequestData): Promise<void> {
+  const { category, categoryLabel, email, subject, message, isUrgent } = data
+
+  const urgentPrefix = isUrgent ? '[URGENT] ' : ''
+  const urgentBadge = isUrgent
+    ? '<span style="background-color: #f44336; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px;">URGENT</span>'
+    : ''
+
+  const mailOptions = {
+    from: env.SMTP_FROM,
+    to: env.SUPPORT_EMAIL,
+    replyTo: email,
+    subject: `${urgentPrefix}[Caderno Support] ${categoryLabel}: ${subject}`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background-color: ${isUrgent ? '#f44336' : '#570df8'}; color: white; padding: 16px; border-radius: 8px 8px 0 0;">
+          <h1 style="margin: 0; font-size: 20px;">Support Request${urgentBadge}</h1>
+        </div>
+        <div style="padding: 24px; border: 1px solid #ddd; border-top: none; border-radius: 0 0 8px 8px;">
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
+            <tr>
+              <td style="padding: 8px 0; border-bottom: 1px solid #eee; color: #666; width: 120px;">Category</td>
+              <td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>${categoryLabel}</strong> (${category})</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; border-bottom: 1px solid #eee; color: #666;">From</td>
+              <td style="padding: 8px 0; border-bottom: 1px solid #eee;"><a href="mailto:${email}">${email}</a></td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; border-bottom: 1px solid #eee; color: #666;">Subject</td>
+              <td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>${subject}</strong></td>
+            </tr>
+          </table>
+
+          <div style="background-color: #f5f5f5; padding: 16px; border-radius: 8px; margin-bottom: 24px;">
+            <h3 style="margin-top: 0; color: #333;">Message</h3>
+            <p style="white-space: pre-wrap; color: #333; margin-bottom: 0;">${message}</p>
+          </div>
+
+          <p style="color: #666; font-size: 12px; margin-bottom: 0;">
+            Reply directly to this email to respond to the user.
+          </p>
+        </div>
+        <div style="padding: 16px; text-align: center;">
+          <p style="color: #999; font-size: 12px; margin: 0;">
+            Received at ${new Date().toISOString()} via Caderno Support Form
+          </p>
+        </div>
+      </div>
+    `
+  }
+
+  try {
+    await transporter.sendMail(mailOptions)
+    console.log(`Support request email sent from ${email}`)
+  } catch (error) {
+    console.error('Failed to send support request email:', error)
+    throw error
+  }
+}

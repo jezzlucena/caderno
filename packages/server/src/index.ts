@@ -9,6 +9,7 @@ import { switchesRouter } from './routes/switches.js'
 import { activityPubRouter } from './routes/activitypub.js'
 import { federationRouter } from './routes/federation.js'
 import { profileRouter } from './routes/profile.js'
+import { supportRouter } from './routes/support.js'
 import { startScheduler } from './services/scheduler.service.js'
 import { generalLimiter, federationLimiter } from './middleware/rateLimit.js'
 
@@ -53,6 +54,7 @@ app.use('/api/entries', entriesRouter)
 app.use('/api/switches', switchesRouter)
 app.use('/api/federation', federationRouter)
 app.use('/api/profile', profileRouter)
+app.use('/api/support', supportRouter)
 
 // ActivityPub Federation routes (mounted at root for proper URLs)
 if (env.VITE_FEDERATION_ENABLED === 'true') {

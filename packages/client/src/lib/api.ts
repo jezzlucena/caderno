@@ -344,3 +344,17 @@ export const profileApi = {
   getPublicProfile: (username: string) =>
     api<PublicProfile>(`/profile/${username}`)
 }
+
+// Support API
+export interface SupportRequestData {
+  category: 'security' | 'privacy' | 'harassment' | 'threat' | 'account' | 'bug' | 'feature' | 'other'
+  email: string
+  subject: string
+  message: string
+  isUrgent: boolean
+}
+
+export const supportApi = {
+  submit: (data: SupportRequestData) =>
+    api<{ message: string }>('/support', { method: 'POST', body: data })
+}

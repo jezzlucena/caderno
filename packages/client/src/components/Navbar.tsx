@@ -4,7 +4,7 @@ import { useAuthStore } from '../stores/authStore'
 import { useUIStore } from '../stores/uiStore'
 import logoUrl from '../assets/logo.svg'
 
-type Page = 'journal' | 'switches' | 'federation' | 'settings' | 'about' | 'terms' | 'privacy'
+type Page = 'journal' | 'switches' | 'federation' | 'settings' | 'about' | 'terms' | 'privacy' | 'support'
 
 interface NavbarProps {
   currentPage: Page

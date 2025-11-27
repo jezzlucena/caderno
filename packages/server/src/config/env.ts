@@ -18,6 +18,7 @@ const envSchema = z.object({
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),
   SMTP_FROM: z.string().default('noreply@caderno.app'),
+  SUPPORT_EMAIL: z.string().email().default('jezzlucena@gmail.com'),
 
   // App
   VITE_APP_URL: z.string().default('http://localhost:8085'),
