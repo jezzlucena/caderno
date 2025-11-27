@@ -11,14 +11,14 @@ export function Privacy() {
             <p className="text-sm text-base-content/60">Last updated: {new Date().toLocaleDateString()}</p>
 
             <p className="lead text-lg">
-              Your privacy is the foundation of Project Caderno. This policy explains how we handle
+              Your privacy is the foundation of Caderno. This policy explains how we handle
               your data and why our zero-knowledge architecture means your journal entries remain
               truly private.
             </p>
 
             <h2>1. Our Privacy Commitment</h2>
             <p>
-              Project Caderno is built on a simple principle: <strong>your private thoughts should
+              Caderno is built on a simple principle: <strong>your private thoughts should
               remain private</strong>. Unlike traditional cloud services, we've designed our system
               so that we physically cannot read your journal entries, even if compelled to do so.
             </p>
@@ -126,7 +126,7 @@ export function Privacy() {
 
             <h2>11. Children's Privacy</h2>
             <p>
-              Project Caderno is not intended for children under 13 (or the applicable age in your
+              Caderno is not intended for children under 13 (or the applicable age in your
               jurisdiction). We do not knowingly collect data from children.
             </p>
 

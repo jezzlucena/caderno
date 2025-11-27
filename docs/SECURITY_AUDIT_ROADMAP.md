@@ -1,10 +1,10 @@
 # Security Audit Roadmap
 
-Project Caderno is committed to transparency and security. This document outlines our roadmap toward a comprehensive third-party security audit by a recognized firm such as Trail of Bits, Cure53, NCC Group, or Least Authority.
+Caderno is committed to transparency and security. This document outlines our roadmap toward a comprehensive third-party security audit by a recognized firm such as Trail of Bits, Cure53, NCC Group, or Least Authority.
 
 ## Why a Security Audit?
 
-Project Caderno serves journalists, whistleblowers, activists, and survivors who face real threats. Our users trust us with their most sensitive thoughts and evidence. A formal third-party audit:
+Caderno serves journalists, whistleblowers, activists, and survivors who face real threats. Our users trust us with their most sensitive thoughts and evidence. A formal third-party audit:
 
 - Independently verifies our cryptographic implementations
 - Identifies vulnerabilities we may have missed
@@ -116,7 +116,7 @@ Security is not a one-time effort. After the initial audit, we commit to:
 
 ## Get Involved
 
-If you're a security researcher interested in reviewing Project Caderno:
+If you're a security researcher interested in reviewing Caderno:
 
 - Review our open-source code on GitHub
 - Report vulnerabilities through our responsible disclosure process

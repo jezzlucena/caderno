@@ -1,5 +1,5 @@
 <!-- e04f77f2-f5cf-47c2-95d3-4293c363b807 69ab1357-3021-4c89-be69-4dc7697ab452 -->
-# Project Caderno Development Roadmap
+# Caderno Development Roadmap
 
 ## Phase 1: Foundation & Infrastructure
 
@@ -32,7 +32,7 @@ Implement secure user registration and authentication, laying the groundwork for
 
 ## Phase 3: Core Journaling & End-to-End Encryption (E2EE) (Current Goal)
 
-The heart of Project Caderno: secure writing and reading.
+The heart of Caderno: secure writing and reading.
 
 -   **Encryption Layer**
     -   Select crypto library (e.g., Web Crypto API or sodium-plus).
@@ -60,7 +60,7 @@ Implement the automated trigger system.
 
 ## Phase 5: Federation (ActivityPub)
 
-Enable decentralized communication between Project Caderno instances.
+Enable decentralized communication between Caderno instances.
 
 -   **ActivityPub Implementation**
     -   Implement WebFinger and Actor endpoints.

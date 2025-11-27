@@ -1,6 +1,6 @@
-# Project Caderno API Documentation
+# Caderno API Documentation
 
-This document describes the REST API endpoints for Project Caderno.
+This document describes the REST API endpoints for Caderno.
 
 ## Base URL
 
@@ -850,7 +850,7 @@ All errors follow this format:
 
 ## Client-Side Encryption
 
-Project Caderno uses client-side encryption for journal entries. The encryption flow:
+Caderno uses client-side encryption for journal entries. The encryption flow:
 
 1. **Key Derivation**: User password + server-provided salt → PBKDF2 → AES-256 key
 2. **Encryption**: AES-256-GCM with unique IVs for title and content

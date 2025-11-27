@@ -12,13 +12,13 @@ export function Terms() {
 
             <h2>1. Acceptance of Terms</h2>
             <p>
-              By accessing or using Project Caderno ("the Service"), you agree to be bound by these
+              By accessing or using Caderno ("the Service"), you agree to be bound by these
               Terms of Service. If you do not agree to these terms, please do not use the Service.
             </p>
 
             <h2>2. Description of Service</h2>
             <p>
-              Project Caderno is an end-to-end encrypted journaling platform that allows users to
+              Caderno is an end-to-end encrypted journaling platform that allows users to
               create, store, and manage personal journal entries. The Service also includes optional
               features such as Dead Man's Switches and ActivityPub federation.
             </p>

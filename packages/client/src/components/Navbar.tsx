@@ -42,8 +42,8 @@ export function Navbar({ currentPage }: NavbarProps) {
       {/* Logo/Title */}
       <div className="flex-1">
         <Link to="/" className="flex items-center gap-2 text-xl font-bold px-2 sm:px-4">
-          <img src={logoUrl} alt="Project Caderno logo" className="h-10 w-10" />
-          <span className="inline leading-none">Project Caderno</span>
+          <img src={logoUrl} alt="Caderno logo" className="h-10 w-10" />
+          <span className="inline leading-none">Caderno</span>
         </Link>
       </div>
 

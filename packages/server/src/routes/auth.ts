@@ -1,8 +1,8 @@
 import { Router, type Router as RouterType } from 'express'
 import { z } from 'zod'
-import { register, login, verifyEmail, getUserById, updateProfile, checkUsernameAvailability } from '../services/auth.service.js'
+import { register, login, verifyEmail, getUserById, updateProfile, checkUsernameAvailability, resendVerificationEmail } from '../services/auth.service.js'
 import { authMiddleware } from '../middleware/auth.js'
-import { authLimiter } from '../middleware/rateLimit.js'
+import { authLimiter, emailLimiter } from '../middleware/rateLimit.js'
 
 export const authRouter: RouterType = Router()
 
@@ -153,5 +153,24 @@ authRouter.get('/check-username/:username', authMiddleware, async (req, res) => 
     res.json(result)
   } catch (error) {
     res.status(500).json({ error: 'Failed to check username' })
+  }
+})
+
+// POST /api/auth/resend-verification (protected) - Resend email verification
+authRouter.post('/resend-verification', authMiddleware, emailLimiter, async (req, res) => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ error: 'Not authenticated' })
+      return
+    }
+
+    await resendVerificationEmail(req.user.userId)
+    res.json({ message: 'Verification email sent' })
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({ error: error.message })
+      return
+    }
+    res.status(500).json({ error: 'Failed to send verification email' })
   }
 })

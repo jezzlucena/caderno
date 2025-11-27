@@ -45,6 +45,7 @@ export interface User {
   email: string
   emailVerified: boolean
   keySalt: string
+  role: 'admin' | 'moderator' | 'user'
   username: string | null
   profilePublic: boolean
   displayName: string | null
@@ -83,7 +84,10 @@ export const authApi = {
     api<{ user: User; message: string }>('/auth/profile', { method: 'PUT', body: data, token: getAuthToken() }),
 
   checkUsername: (username: string) =>
-    api<{ available: boolean; reason?: string }>(`/auth/check-username/${username}`, { token: getAuthToken() })
+    api<{ available: boolean; reason?: string }>(`/auth/check-username/${username}`, { token: getAuthToken() }),
+
+  resendVerificationEmail: () =>
+    api<{ message: string }>('/auth/resend-verification', { method: 'POST', token: getAuthToken() })
 }
 
 // Entries API

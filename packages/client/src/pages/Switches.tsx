@@ -79,7 +79,7 @@ export function Switches() {
           <div className="flex gap-2 flex-wrap">
             {switches.filter(s => s.isActive && !s.hasTriggered).length > 0 && (
               <button className="btn btn-success btn-sm sm:btn-md" onClick={handleCheckInAll}>
-                Check In (All)
+                Check All
               </button>
             )}
             <button className="btn btn-primary btn-sm sm:btn-md" onClick={handleNewSwitch}>

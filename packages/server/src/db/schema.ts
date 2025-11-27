@@ -6,6 +6,7 @@ export const users = pgTable('users', {
   email: text('email').notNull().unique(),
   passwordHash: text('password_hash').notNull(),
   keySalt: text('key_salt').notNull(),
+  role: text('role').default('user').notNull(), // 'admin' | 'moderator' | 'user'
   emailVerified: boolean('email_verified').default(false).notNull(),
   emailVerificationToken: text('email_verification_token'),
   emailVerificationExpires: timestamp('email_verification_expires'),

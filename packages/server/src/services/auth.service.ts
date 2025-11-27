@@ -69,7 +69,7 @@ export async function register(
   await sendVerificationEmail(newUser.email, emailVerificationToken)
 
   // Generate JWT
-  const token = await signToken({ userId: newUser.id, email: newUser.email })
+  const token = await signToken({ userId: newUser.id, email: newUser.email, role: newUser.role })
 
   // Return user without sensitive fields
   const { passwordHash: _, emailVerificationToken: __, ...safeUser } = newUser
@@ -106,7 +106,7 @@ export async function login(emailOrUsername: string, password: string): Promise<
 
   // Generate JWT
   console.log('[AuthService] Generating JWT...')
-  const token = await signToken({ userId: user.id, email: user.email })
+  const token = await signToken({ userId: user.id, email: user.email, role: user.role })
   console.log('[AuthService] JWT generated successfully')
 
   // Return user without sensitive fields
@@ -238,4 +238,36 @@ export async function checkUsernameAvailability(
   }
 
   return { available: true }
+}
+
+export async function resendVerificationEmail(userId: number): Promise<void> {
+  // Get user by ID
+  const user = await db.query.users.findFirst({
+    where: eq(users.id, userId)
+  })
+
+  if (!user) {
+    throw new Error('User not found')
+  }
+
+  // Check if already verified
+  if (user.emailVerified) {
+    throw new Error('Email is already verified')
+  }
+
+  // Generate new verification token and expiration
+  const emailVerificationToken = generateToken()
+  const emailVerificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
+
+  // Update user with new token
+  await db.update(users)
+    .set({
+      emailVerificationToken,
+      emailVerificationExpires,
+      updatedAt: new Date()
+    })
+    .where(eq(users.id, userId))
+
+  // Send verification email
+  await sendVerificationEmail(user.email, emailVerificationToken)
 }

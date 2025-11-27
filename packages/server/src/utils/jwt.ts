@@ -4,11 +4,12 @@ import { env } from '../config/env.js'
 export interface TokenPayload extends JWTPayload {
   userId: number
   email: string
+  role: string
 }
 
 const getSecret = () => new TextEncoder().encode(env.JWT_SECRET)
 
-export async function signToken(payload: { userId: number; email: string }): Promise<string> {
+export async function signToken(payload: { userId: number; email: string; role: string }): Promise<string> {
   return new SignJWT(payload)
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()

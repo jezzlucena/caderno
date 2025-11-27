@@ -7,10 +7,10 @@ export function About() {
       <div className="container mx-auto p-4 sm:p-6 max-w-4xl">
         <div className="card bg-base-100 shadow-xl">
           <div className="card-body prose max-w-none">
-            <h1>About Project Caderno</h1>
+            <h1>About Caderno</h1>
 
             <p className="lead text-lg">
-              Project Caderno is a privacy-first, end-to-end encrypted journaling platform
+              Caderno is a privacy-first, end-to-end encrypted journaling platform
               designed for people who value their digital privacy and personal security.
             </p>
 
@@ -18,7 +18,7 @@ export function About() {
             <p>
               "Caderno" means "notebook" in Portuguese. We chose this name because, like a
               traditional paper notebook, your digital journal should be completely private—readable
-              only by you. Unlike cloud-based note apps that can read your data, Project Caderno
+              only by you. Unlike cloud-based note apps that can read your data, Caderno
               ensures that your thoughts remain truly yours.
             </p>
 
@@ -55,7 +55,7 @@ export function About() {
 
             <h2>Federation (ActivityPub)</h2>
             <p>
-              Project Caderno supports ActivityPub federation, allowing you to optionally connect
+              Caderno supports ActivityPub federation, allowing you to optionally connect
               with the broader fediverse (Mastodon, Pleroma, and other compatible platforms).
               You can choose to publish selected entries publicly while keeping your private
               journal completely separate and encrypted.
@@ -63,7 +63,7 @@ export function About() {
 
             <h2>Open Source</h2>
             <p>
-              We believe that security software should be transparent and auditable. Project Caderno
+              We believe that security software should be transparent and auditable. Caderno
               is open source, meaning anyone can inspect our code to verify that we do exactly what
               we say—nothing more, nothing less.
             </p>
@@ -82,7 +82,7 @@ export function About() {
             <div className="divider"></div>
 
             <p className="text-sm text-base-content/60">
-              Questions or feedback? We'd love to hear from you. Project Caderno is built by
+              Questions or feedback? We'd love to hear from you. Caderno is built by
               people who care deeply about digital privacy and personal security.
             </p>
           </div>
