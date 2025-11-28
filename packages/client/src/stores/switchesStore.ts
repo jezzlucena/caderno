@@ -8,7 +8,7 @@ export interface DecryptedSwitch {
   id: number
   userId: number
   name: string  // Decrypted name
-  timerDays: number
+  timerMs: number
   lastCheckIn: string
   isActive: boolean
   triggerMessage: string | null
@@ -31,7 +31,7 @@ interface SwitchesState {
   fetchSwitches: () => Promise<void>
   createSwitch: (data: {
     name: string
-    timerDays: number
+    timerMs: number
     triggerMessage?: string
     recipients: { email: string; name?: string }[]
     encryptedPayload?: string
@@ -40,7 +40,7 @@ interface SwitchesState {
   }) => Promise<DecryptedSwitch>
   updateSwitch: (id: number, data: {
     name?: string
-    timerDays?: number
+    timerMs?: number
     triggerMessage?: string
     isActive?: boolean
     recipients?: { email: string; name?: string }[]
@@ -84,7 +84,7 @@ export const useSwitchesStore = create<SwitchesState>((set, get) => ({
             id: sw.id,
             userId: sw.userId,
             name,
-            timerDays: sw.timerDays,
+            timerMs: sw.timerMs,
             lastCheckIn: sw.lastCheckIn,
             isActive: sw.isActive,
             triggerMessage: sw.triggerMessage,
@@ -128,7 +128,7 @@ export const useSwitchesStore = create<SwitchesState>((set, get) => ({
       const result = await switchesApi.create({
         encryptedName,
         iv,
-        timerDays: data.timerDays,
+        timerMs: data.timerMs,
         triggerMessage: data.triggerMessage,
         recipients: data.recipients,
         encryptedPayload: data.encryptedPayload,
@@ -141,7 +141,7 @@ export const useSwitchesStore = create<SwitchesState>((set, get) => ({
         id: result.switch.id,
         userId: result.switch.userId,
         name: data.name, // We already have the plaintext
-        timerDays: result.switch.timerDays,
+        timerMs: result.switch.timerMs,
         lastCheckIn: result.switch.lastCheckIn,
         isActive: result.switch.isActive,
         triggerMessage: result.switch.triggerMessage,
@@ -179,7 +179,7 @@ export const useSwitchesStore = create<SwitchesState>((set, get) => ({
       const updateData: {
         encryptedName?: string
         iv?: string
-        timerDays?: number
+        timerMs?: number
         triggerMessage?: string
         isActive?: boolean
         recipients?: { email: string; name?: string }[]
@@ -193,7 +193,7 @@ export const useSwitchesStore = create<SwitchesState>((set, get) => ({
         updateData.encryptedName = encryptedName
         updateData.iv = iv
       }
-      if (data.timerDays !== undefined) updateData.timerDays = data.timerDays
+      if (data.timerMs !== undefined) updateData.timerMs = data.timerMs
       if (data.triggerMessage !== undefined) updateData.triggerMessage = data.triggerMessage
       if (data.isActive !== undefined) updateData.isActive = data.isActive
       if (data.recipients !== undefined) updateData.recipients = data.recipients
@@ -211,7 +211,7 @@ export const useSwitchesStore = create<SwitchesState>((set, get) => ({
         id: result.switch.id,
         userId: result.switch.userId,
         name,
-        timerDays: result.switch.timerDays,
+        timerMs: result.switch.timerMs,
         lastCheckIn: result.switch.lastCheckIn,
         isActive: result.switch.isActive,
         triggerMessage: result.switch.triggerMessage,
@@ -271,7 +271,7 @@ export const useSwitchesStore = create<SwitchesState>((set, get) => ({
         id: result.switch.id,
         userId: result.switch.userId,
         name,
-        timerDays: result.switch.timerDays,
+        timerMs: result.switch.timerMs,
         lastCheckIn: result.switch.lastCheckIn,
         isActive: result.switch.isActive,
         triggerMessage: result.switch.triggerMessage,

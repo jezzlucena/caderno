@@ -1,4 +1,4 @@
-import { pgTable, serial, text, timestamp, boolean, integer } from 'drizzle-orm/pg-core'
+import { pgTable, serial, text, timestamp, boolean, integer, bigint } from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
 
 export const users = pgTable('users', {
@@ -41,7 +41,7 @@ export const deadManSwitches = pgTable('dead_man_switches', {
   // E2EE encrypted name (client-side encryption)
   encryptedName: text('encrypted_name').notNull(),       // Encrypted name/description of the switch
   iv: text('iv').notNull(),                              // Initialization vector for AES-GCM
-  timerDays: integer('timer_days').notNull().default(7), // Days before trigger if no check-in
+  timerMs: bigint('timer_ms', { mode: 'number' }).notNull().default(604800000), // Milliseconds before trigger if no check-in (default 7 days)
   lastCheckIn: timestamp('last_check_in').defaultNow().notNull(),
   isActive: boolean('is_active').default(true).notNull(),
   // Message sent to recipients when triggered (plaintext - user composes this)

@@ -10,7 +10,7 @@ const CHECK_INTERVAL_MS = 60 * 1000 // Check every minute
  */
 async function checkExpiredSwitches(): Promise<void> {
   try {
-    // Find all active, non-triggered switches where lastCheckIn + timerDays has passed
+    // Find all active, non-triggered switches where lastCheckIn + timerMs has passed
     const expiredSwitches = await db.query.deadManSwitches.findMany({
       where: and(
         eq(deadManSwitches.isActive, true),
@@ -24,8 +24,18 @@ async function checkExpiredSwitches(): Promise<void> {
 
     const now = new Date()
 
+    if (expiredSwitches.length > 0) {
+      console.log(`[Scheduler] Found ${expiredSwitches.length} active switch(es) to check`)
+    }
+
     for (const switchData of expiredSwitches) {
-      const deadline = new Date(switchData.lastCheckIn.getTime() + switchData.timerDays * 24 * 60 * 60 * 1000)
+      // Ensure timerMs is a number (it comes from bigint column)
+      const timerMs = Number(switchData.timerMs)
+      const lastCheckInTime = switchData.lastCheckIn.getTime()
+      const deadline = new Date(lastCheckInTime + timerMs)
+      const msRemaining = deadline.getTime() - now.getTime()
+
+      console.log(`[Scheduler] Switch ID ${switchData.id}: lastCheckIn=${switchData.lastCheckIn.toISOString()}, timerMs=${timerMs}, deadline=${deadline.toISOString()}, msRemaining=${msRemaining}`)
 
       if (now > deadline) {
         console.log(`[Scheduler] Switch ID ${switchData.id} has expired. Triggering...`)
@@ -46,8 +56,11 @@ async function checkExpiredSwitches(): Promise<void> {
 
         // Send emails to all recipients
         // Note: Switch name is E2EE encrypted, so we use switch ID for identification
+        console.log(`[Scheduler] Sending trigger emails to ${switchData.recipients.length} recipient(s)`)
+
         for (const recipient of switchData.recipients) {
           try {
+            console.log(`[Scheduler] Attempting to send email to ${recipient.email}...`)
             await sendSwitchTriggeredEmail(
               recipient.email,
               recipient.name || recipient.email,
@@ -56,9 +69,10 @@ async function checkExpiredSwitches(): Promise<void> {
               switchData.user.email,
               payloadInfo
             )
-            console.log(`[Scheduler] Sent trigger email to ${recipient.email}${payloadInfo ? ' (with payload link)' : ''}`)
+            console.log(`[Scheduler] Successfully sent trigger email to ${recipient.email}${payloadInfo ? ' (with payload link)' : ''}`)
           } catch (emailError) {
-            console.error(`[Scheduler] Failed to send email to ${recipient.email}:`, emailError)
+            console.error(`[Scheduler] Failed to send email to ${recipient.email}:`, emailError instanceof Error ? emailError.message : emailError)
+            console.error(`[Scheduler] Full error:`, emailError)
           }
         }
 
@@ -96,7 +110,8 @@ export async function getSwitchStatuses(userId: number) {
   })
 
   return switches.map(s => {
-    const deadline = new Date(s.lastCheckIn.getTime() + s.timerDays * 24 * 60 * 60 * 1000)
+    const timerMs = Number(s.timerMs)
+    const deadline = new Date(s.lastCheckIn.getTime() + timerMs)
     const now = new Date()
     const msRemaining = deadline.getTime() - now.getTime()
     const hoursRemaining = Math.max(0, Math.floor(msRemaining / (1000 * 60 * 60)))
@@ -108,7 +123,7 @@ export async function getSwitchStatuses(userId: number) {
       encryptedName: s.encryptedName,
       isActive: s.isActive,
       hasTriggered: s.hasTriggered,
-      timerDays: s.timerDays,
+      timerMs,
       lastCheckIn: s.lastCheckIn,
       deadline,
       daysRemaining,

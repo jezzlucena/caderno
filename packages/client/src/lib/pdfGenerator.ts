@@ -277,18 +277,31 @@ function escapeHtml(text: string): string {
  */
 export async function generateJournalPDF(entries: JournalEntry[]): Promise<Blob> {
   // Create a hidden container for rendering
-  const container = document.createElement('div')
-  container.style.position = 'absolute'
-  container.style.left = '-9999px'
-  container.style.top = '0'
-  container.style.width = '800px'
-  container.style.background = 'white'
-  document.body.appendChild(container)
+  // Use an iframe to isolate from page styles (prevents html2canvas color parsing errors)
+  const iframe = document.createElement('iframe')
+  iframe.style.position = 'absolute'
+  iframe.style.left = '-9999px'
+  iframe.style.top = '0'
+  iframe.style.width = '800px'
+  iframe.style.height = '10000px'
+  iframe.style.border = 'none'
+  document.body.appendChild(iframe)
+
+  const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document
+  if (!iframeDoc) {
+    document.body.removeChild(iframe)
+    throw new Error('Failed to create isolated rendering context')
+  }
+
+  const container = iframeDoc.body
 
   try {
     // Inject the HTML content
     const htmlContent = generateHtmlDocument(entries)
     container.innerHTML = htmlContent
+    container.style.margin = '0'
+    container.style.padding = '0'
+    container.style.background = 'white'
 
     // Wait for fonts and images to load
     await new Promise(resolve => setTimeout(resolve, 100))
@@ -299,12 +312,14 @@ export async function generateJournalPDF(entries: JournalEntry[]): Promise<Blob>
       throw new Error('Failed to render PDF content')
     }
 
-    // Capture as canvas
+    // Capture as canvas using iframe's window context
     const canvas = await html2canvas(contentElement, {
       scale: 2, // Higher resolution
       useCORS: true,
       logging: false,
-      backgroundColor: '#ffffff'
+      backgroundColor: '#ffffff',
+      windowWidth: 800,
+      windowHeight: contentElement.scrollHeight
     })
 
     // Create PDF
@@ -342,7 +357,7 @@ export async function generateJournalPDF(entries: JournalEntry[]): Promise<Blob>
     return pdf.output('blob')
   } finally {
     // Clean up
-    document.body.removeChild(container)
+    document.body.removeChild(iframe)
   }
 }
 

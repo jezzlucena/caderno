@@ -151,7 +151,7 @@ export interface DeadManSwitch {
   // E2EE encrypted name fields
   encryptedName: string
   iv: string
-  timerDays: number
+  timerMs: number
   lastCheckIn: string
   isActive: boolean
   triggerMessage: string | null
@@ -169,7 +169,7 @@ interface CreateSwitchData {
   // E2EE encrypted name fields
   encryptedName: string
   iv: string
-  timerDays: number
+  timerMs: number
   triggerMessage?: string
   recipients: { email: string; name?: string }[]
   encryptedPayload?: string
@@ -181,7 +181,7 @@ interface UpdateSwitchData {
   // E2EE encrypted name fields (must be provided together)
   encryptedName?: string
   iv?: string
-  timerDays?: number
+  timerMs?: number
   triggerMessage?: string
   isActive?: boolean
   recipients?: { email: string; name?: string }[]

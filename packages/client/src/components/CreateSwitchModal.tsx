@@ -5,12 +5,74 @@ import { generatePayloadKey, encryptBlob } from '../lib/crypto'
 
 export interface CreateSwitchData {
   name: string
-  timerDays: number
+  timerMs: number
   triggerMessage?: string
   recipients: { email: string; name?: string }[]
   encryptedPayload?: string
   payloadIv?: string
   payloadKey?: string
+}
+
+// Constants for logarithmic scale
+const MIN_TIMER_MS = 60000 // 1 minute
+const MAX_TIMER_MS = 2592000000 // 30 days
+const DEFAULT_TIMER_MS = 604800000 // 7 days
+
+// Convert slider position (0-100) to milliseconds using logarithmic scale
+function sliderToMs(position: number): number {
+  const minLog = Math.log(MIN_TIMER_MS)
+  const maxLog = Math.log(MAX_TIMER_MS)
+  const scale = (maxLog - minLog) / 100
+  return Math.round(Math.exp(minLog + scale * position))
+}
+
+// Convert milliseconds to slider position (0-100)
+function msToSlider(ms: number): number {
+  const minLog = Math.log(MIN_TIMER_MS)
+  const maxLog = Math.log(MAX_TIMER_MS)
+  const scale = (maxLog - minLog) / 100
+  return Math.round((Math.log(ms) - minLog) / scale)
+}
+
+// Format milliseconds to human-readable string
+function formatDuration(ms: number): string {
+  const seconds = Math.floor(ms / 1000)
+  const minutes = Math.floor(seconds / 60)
+  const hours = Math.floor(minutes / 60)
+  const days = Math.floor(hours / 24)
+  const years = Math.floor(days / 365)
+
+  if (years > 0) {
+    const remainingDays = days % 365
+    if (remainingDays > 0) {
+      return `${years}y, ${remainingDays}d`
+    }
+    return `${years}y`
+  }
+  if (days > 0) {
+    const remainingHours = hours % 24
+    const remainingMinutes = minutes % 60
+    if (remainingHours > 0 || remainingMinutes > 0) {
+      return `${days}d, ${remainingHours}h, ${remainingMinutes}min`
+    }
+    return `${days}d`
+  }
+  if (hours > 0) {
+    const remainingMinutes = minutes % 60
+    const remainingSeconds = seconds % 60
+    if (remainingMinutes > 0 || remainingSeconds > 0) {
+      return `${hours}h, ${remainingMinutes}min, ${remainingSeconds}s`
+    }
+    return `${hours}h`
+  }
+  if (minutes > 0) {
+    const remainingSeconds = seconds % 60
+    if (remainingSeconds > 0) {
+      return `${minutes}min, ${remainingSeconds}s`
+    }
+    return `${minutes}min`
+  }
+  return `${seconds}s`
 }
 
 interface CreateSwitchModalProps {
@@ -21,7 +83,8 @@ interface CreateSwitchModalProps {
 export function CreateSwitchModal({ onClose, onCreate }: CreateSwitchModalProps) {
   const { entries, fetchEntries, isLoading: entriesLoading, error: entriesError } = useEntriesStore()
   const [name, setName] = useState('')
-  const [timerDays, setTimerDays] = useState(7)
+  const [timerMs, setTimerMs] = useState(DEFAULT_TIMER_MS)
+  const [sliderPosition, setSliderPosition] = useState(msToSlider(DEFAULT_TIMER_MS))
   const [triggerMessage, setTriggerMessage] = useState('')
   const [recipients, setRecipients] = useState<{ email: string; name: string }[]>([
     { email: '', name: '' }
@@ -148,7 +211,7 @@ export function CreateSwitchModal({ onClose, onCreate }: CreateSwitchModalProps)
 
       await onCreate({
         name: name.trim(),
-        timerDays,
+        timerMs,
         triggerMessage: triggerMessage.trim() || undefined,
         recipients: validRecipients.map(r => ({
           email: r.email.trim(),
@@ -183,7 +246,7 @@ export function CreateSwitchModal({ onClose, onCreate }: CreateSwitchModalProps)
             </label>
             <input
               type="text"
-              className="input input-bordered"
+              className="input input-bordered w-full"
               placeholder="e.g., Personal Safety Switch"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -194,20 +257,26 @@ export function CreateSwitchModal({ onClose, onCreate }: CreateSwitchModalProps)
           <div className="form-control">
             <label className="label">
               <span className="label-text">Timer Duration: </span>
-              <span className="label-text-alt">{timerDays} day{timerDays !== 1 ? 's' : ''}</span>
+              <span className="label-text-alt">{formatDuration(timerMs)}</span>
             </label>
             <input
               type="range"
-              min="1"
-              max="30"
-              value={timerDays}
-              onChange={(e) => setTimerDays(parseInt(e.target.value))}
+              min="0"
+              max="100"
+              step="0.1"
+              value={sliderPosition}
+              onChange={(e) => {
+                const pos = parseFloat(e.target.value)
+                setSliderPosition(pos)
+                setTimerMs(sliderToMs(pos))
+              }}
               className="range range-primary w-full"
             />
             <div className="flex justify-between text-xs px-2 mt-1">
+              <span>1 min</span>
+              <span>10 min</span>
+              <span>3 hours</span>
               <span>1 day</span>
-              <span>10 days</span>
-              <span>20 days</span>
               <span>30 days</span>
             </div>
           </div>

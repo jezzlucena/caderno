@@ -1,6 +1,46 @@
 import { useState, useEffect } from 'react'
 import { type DecryptedSwitch } from '../stores/switchesStore'
 
+// Format milliseconds to human-readable string
+function formatDuration(ms: number): string {
+  const seconds = Math.floor(ms / 1000)
+  const minutes = Math.floor(seconds / 60)
+  const hours = Math.floor(minutes / 60)
+  const days = Math.floor(hours / 24)
+  const months = Math.floor(days / 30)
+  const years = Math.floor(days / 365)
+
+  if (years > 0) {
+    const remainingDays = days % 365
+    if (remainingDays > 0) {
+      return `${years} year${years !== 1 ? 's' : ''}, ${remainingDays} day${remainingDays !== 1 ? 's' : ''}`
+    }
+    return `${years} year${years !== 1 ? 's' : ''}`
+  }
+  if (months > 0) {
+    const remainingDays = days % 30
+    if (remainingDays > 0) {
+      return `${months} month${months !== 1 ? 's' : ''}, ${remainingDays} day${remainingDays !== 1 ? 's' : ''}`
+    }
+    return `${months} month${months !== 1 ? 's' : ''}`
+  }
+  if (days > 0) {
+    const remainingHours = hours % 24
+    if (remainingHours > 0) {
+      return `${days} day${days !== 1 ? 's' : ''}, ${remainingHours} hour${remainingHours !== 1 ? 's' : ''}`
+    }
+    return `${days} day${days !== 1 ? 's' : ''}`
+  }
+  if (hours > 0) {
+    const remainingMinutes = minutes % 60
+    if (remainingMinutes > 0) {
+      return `${hours} hour${hours !== 1 ? 's' : ''}, ${remainingMinutes} minute${remainingMinutes !== 1 ? 's' : ''}`
+    }
+    return `${hours} hour${hours !== 1 ? 's' : ''}`
+  }
+  return `${minutes} minute${minutes !== 1 ? 's' : ''}`
+}
+
 interface SwitchCardProps {
   switchData: DecryptedSwitch
   onCheckIn: () => void
@@ -21,7 +61,7 @@ export function SwitchCard({ switchData, onCheckIn, onDelete }: SwitchCardProps)
     return () => clearInterval(interval)
   }, [switchData.hasTriggered, switchData.isActive])
 
-  const deadline = new Date(new Date(switchData.lastCheckIn).getTime() + switchData.timerDays * 24 * 60 * 60 * 1000)
+  const deadline = new Date(new Date(switchData.lastCheckIn).getTime() + switchData.timerMs)
   const msRemaining = deadline.getTime() - now.getTime()
   const secondsRemaining = Math.max(0, Math.floor(msRemaining / 1000))
   const minutesRemaining = Math.max(0, Math.floor(secondsRemaining / 60))
@@ -55,7 +95,7 @@ export function SwitchCard({ switchData, onCheckIn, onDelete }: SwitchCardProps)
               )}
             </h2>
             <p className="text-xs sm:text-sm text-base-content/70">
-              Timer: {switchData.timerDays} day{switchData.timerDays !== 1 ? 's' : ''}
+              Timer: {formatDuration(switchData.timerMs)}
             </p>
           </div>
 
@@ -82,7 +122,7 @@ export function SwitchCard({ switchData, onCheckIn, onDelete }: SwitchCardProps)
             <progress
               className={`progress w-full ${isExpiringSoon ? 'progress-warning' : 'progress-success'}`}
               value={Math.max(0, msRemaining)}
-              max={switchData.timerDays * 24 * 60 * 60 * 1000}
+              max={switchData.timerMs}
             />
             <p className="text-xs text-base-content/50 mt-1">
               Deadline: {deadline.toLocaleString()}

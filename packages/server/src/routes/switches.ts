@@ -64,7 +64,7 @@ const createSwitchSchema = z.object({
   // E2EE encrypted name fields
   encryptedName: z.string().min(1).max(500).regex(BASE64_REGEX, 'Invalid encrypted name format'),
   iv: z.string().min(16).max(24).regex(BASE64_REGEX, 'Invalid IV format'),
-  timerDays: z.number().int().min(1).max(365).default(7),
+  timerMs: z.number().int().min(60000).max(31536000000).default(604800000), // 1 minute to 1 year in ms, default 7 days
   triggerMessage: z.string().max(5000).optional(),
   recipients: z.array(z.object({
     email: z.string().email().max(320),
@@ -80,7 +80,7 @@ const updateSwitchSchema = z.object({
   // E2EE encrypted name fields (must be provided together)
   encryptedName: z.string().min(1).max(500).regex(BASE64_REGEX, 'Invalid encrypted name format').optional(),
   iv: z.string().min(16).max(24).regex(BASE64_REGEX, 'Invalid IV format').optional(),
-  timerDays: z.number().int().min(1).max(365).optional(),
+  timerMs: z.number().int().min(60000).max(31536000000).optional(), // 1 minute to 1 year in ms
   triggerMessage: z.string().max(5000).optional(),
   isActive: z.boolean().optional(),
   recipients: z.array(z.object({
@@ -143,14 +143,14 @@ switchesRouter.get('/:id', async (req, res) => {
 switchesRouter.post('/', async (req, res) => {
   try {
     const userId = req.user!.userId
-    const { encryptedName, iv, timerDays, triggerMessage, recipients, encryptedPayload, payloadIv, payloadKey } = createSwitchSchema.parse(req.body)
+    const { encryptedName, iv, timerMs, triggerMessage, recipients, encryptedPayload, payloadIv, payloadKey } = createSwitchSchema.parse(req.body)
 
     // Create the switch with E2EE encrypted name
     const [newSwitch] = await db.insert(deadManSwitches).values({
       userId,
       encryptedName,
       iv,
-      timerDays,
+      timerMs,
       triggerMessage,
       encryptedPayload,
       payloadIv,
@@ -199,7 +199,7 @@ switchesRouter.put('/:id', async (req, res) => {
       return
     }
 
-    const { encryptedName, iv, timerDays, triggerMessage, isActive, recipients } = updateSwitchSchema.parse(req.body)
+    const { encryptedName, iv, timerMs, triggerMessage, isActive, recipients } = updateSwitchSchema.parse(req.body)
 
     // Verify ownership
     const existing = await db.query.deadManSwitches.findFirst({
@@ -224,7 +224,7 @@ switchesRouter.put('/:id', async (req, res) => {
       updateData.encryptedName = encryptedName
       updateData.iv = iv
     }
-    if (timerDays !== undefined) updateData.timerDays = timerDays
+    if (timerMs !== undefined) updateData.timerMs = timerMs
     if (triggerMessage !== undefined) updateData.triggerMessage = triggerMessage
     if (isActive !== undefined) updateData.isActive = isActive
 
@@ -349,7 +349,7 @@ switchesRouter.post('/:id/check-in', async (req, res) => {
     res.json({
       switch: updatedSwitch,
       message: 'Check-in successful. Timer has been reset.',
-      nextDeadline: new Date(updatedSwitch!.lastCheckIn.getTime() + updatedSwitch!.timerDays * 24 * 60 * 60 * 1000)
+      nextDeadline: new Date(updatedSwitch!.lastCheckIn.getTime() + updatedSwitch!.timerMs)
     })
   } catch (error) {
     console.error('Failed to check in:', error)
