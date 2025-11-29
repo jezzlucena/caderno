@@ -8,7 +8,6 @@ import { VerifyEmail } from './pages/VerifyEmail'
 import { Dashboard } from './pages/Dashboard'
 import { Switches } from './pages/Switches'
 import { Unlock } from './pages/Unlock'
-import { Federation } from './pages/Federation'
 import { About } from './pages/About'
 import { Terms } from './pages/Terms'
 import { Privacy } from './pages/Privacy'
@@ -49,14 +48,6 @@ function App() {
           element={
             <ProtectedRoute>
               <Switches />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/federation"
-          element={
-            <ProtectedRoute>
-              <Federation />
             </ProtectedRoute>
           }
         />

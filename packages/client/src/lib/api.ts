@@ -230,10 +230,13 @@ export interface FederationProfile {
   followingCount: number
 }
 
+export type NoteVisibility = 'public' | 'followers' | 'private'
+
 export interface PublicEntry {
   id: number
   title: string
   content: string
+  visibility: NoteVisibility
   activityId: string
   published: string
 }
@@ -251,31 +254,30 @@ export interface FeedEntry {
   }
 }
 
-interface SetupFederationData {
-  username: string
-  displayName?: string
-  bio?: string
-}
-
 interface UpdateFederationProfile {
-  displayName?: string
-  bio?: string
   federationEnabled?: boolean
 }
 
 interface PublishEntryData {
   title: string
   content: string
+  visibility?: NoteVisibility
+}
+
+interface UpdateNoteData {
+  title?: string
+  content?: string
+  visibility?: NoteVisibility
 }
 
 export const federationApi = {
   getProfile: () =>
     api<{ profile: FederationProfile }>('/federation/profile', { token: getAuthToken() }),
 
-  setup: (data: SetupFederationData) =>
+  setup: () =>
     api<{ message: string; profile: FederationProfile }>(
       '/federation/setup',
-      { method: 'POST', body: data, token: getAuthToken() }
+      { method: 'POST', token: getAuthToken() }
     ),
 
   updateProfile: (data: UpdateFederationProfile) =>
@@ -292,6 +294,12 @@ export const federationApi = {
 
   getPublished: () =>
     api<{ entries: PublicEntry[] }>('/federation/published', { token: getAuthToken() }),
+
+  updateNote: (id: number, data: UpdateNoteData) =>
+    api<{ message: string; entry: PublicEntry }>(
+      `/federation/published/${id}`,
+      { method: 'PUT', body: data, token: getAuthToken() }
+    ),
 
   unpublish: (id: number) =>
     api<{ message: string }>(
@@ -342,11 +350,30 @@ export interface PublicProfile {
   entryCount: number
   switchCount: number
   createdAt: string
+  isOwnProfile?: boolean
+  isPrivate?: boolean
+}
+
+export interface ProfileNote {
+  id: number
+  title: string
+  content: string
+  visibility: NoteVisibility
+  published: string
+}
+
+export interface ProfileNotesResponse {
+  notes: ProfileNote[]
+  isOwner: boolean
+  isFollower: boolean
 }
 
 export const profileApi = {
   getPublicProfile: (username: string) =>
-    api<PublicProfile>(`/profile/${username}`)
+    api<PublicProfile>(`/profile/${username}`, { token: getAuthToken() }),
+
+  getNotes: (username: string) =>
+    api<ProfileNotesResponse>(`/profile/${username}/notes`, { token: getAuthToken() })
 }
 
 // Support API

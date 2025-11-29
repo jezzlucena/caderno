@@ -4,7 +4,7 @@ import { useAuthStore } from '../stores/authStore'
 import { useUIStore } from '../stores/uiStore'
 import logoUrl from '../assets/logo.svg'
 
-type Page = 'journal' | 'switches' | 'federation' | 'settings' | 'about' | 'terms' | 'privacy' | 'support'
+type Page = 'journal' | 'switches' | 'settings' | 'about' | 'terms' | 'privacy' | 'support'
 
 interface NavbarProps {
   currentPage: Page
@@ -17,10 +17,9 @@ export function Navbar({ currentPage }: NavbarProps) {
   const isAuthenticated = !!user
 
   // App navigation links (only shown when authenticated)
-  const appNavLinks: { to: string; label: string; page: Page, disabled?: boolean }[] = [
+  const appNavLinks: { to: string; label: string; page: Page }[] = [
     { to: '/', label: 'Journal', page: 'journal' },
     { to: '/switches', label: 'Switches', page: 'switches' },
-    { to: '/federation', label: 'Federation', page: 'federation', disabled: !import.meta.env.VITE_FEDERATION_ENABLED },
     { to: '/settings', label: 'Settings', page: 'settings' }
   ]
 
@@ -49,9 +48,11 @@ export function Navbar({ currentPage }: NavbarProps) {
 
       {/* Right side */}
       <div className="flex items-center gap-1 sm:gap-2">
-        {/* User email (only when authenticated) */}
-        {isAuthenticated && (
-          <span className="text-sm hidden md:inline">{user?.email}</span>
+        {/* Username (only when authenticated) */}
+        {isAuthenticated && user?.username && (
+          <Link to={`/${user.username}`} className="text-sm hidden md:inline link link-hover">
+            @{user.username}
+          </Link>
         )}
 
         {/* Settings link (only when authenticated) */}
@@ -86,10 +87,12 @@ export function Navbar({ currentPage }: NavbarProps) {
           <ul tabIndex={0} className="dropdown-content z-1 menu p-2 shadow bg-base-100 rounded-box w-52">
             {isAuthenticated ? (
               <>
-                {appNavLinks.map(link => link.disabled ? null : (
+                {appNavLinks.map(link => (
                   <li key={link.to}><Link to={link.to} className={currentPage === link.page ? 'underline' : ''}>{link.label}</Link></li>
                 ))}
-                <li className="text-xs opacity-70 px-4 py-2">{user?.email}</li>
+                {user?.username && (
+                  <li><Link to={`/${user.username}`} className="text-xs opacity-70">@{user.username}</Link></li>
+                )}
                 <li><button onClick={logout}>Logout</button></li>
               </>
             ) : (

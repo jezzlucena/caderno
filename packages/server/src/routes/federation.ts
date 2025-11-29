@@ -15,21 +15,20 @@ export const federationRouter: RouterType = Router()
 federationRouter.use(authMiddleware)
 
 // Validation schemas
-const setupFederationSchema = z.object({
-  username: z.string().min(3).max(30).trim().regex(/^[a-zA-Z0-9_]+$/, 'Username must contain only letters, numbers, and underscores'),
-  displayName: z.string().max(100).trim().optional(),
-  bio: z.string().max(500).trim().optional()
-})
-
 const updateProfileSchema = z.object({
-  displayName: z.string().max(100).trim().optional(),
-  bio: z.string().max(500).trim().optional(),
   federationEnabled: z.boolean().optional()
 })
 
 const publishEntrySchema = z.object({
   title: z.string().min(1).max(200).trim(),
-  content: z.string().min(1).max(50000) // 50KB max for public entries
+  content: z.string().min(1).max(50000), // 50KB max for public entries
+  visibility: z.enum(['public', 'followers', 'private']).default('public')
+})
+
+const updateNoteSchema = z.object({
+  title: z.string().min(1).max(200).trim().optional(),
+  content: z.string().min(1).max(50000).optional(),
+  visibility: z.enum(['public', 'followers', 'private']).optional()
 })
 
 const followSchema = z.object({
@@ -80,31 +79,10 @@ federationRouter.get('/profile', async (req, res) => {
 })
 
 // POST /api/federation/setup - Enable federation for the first time
+// Uses the user's existing profile data (username, displayName, bio)
 federationRouter.post('/setup', async (req, res) => {
   try {
     const userId = req.user!.userId
-    const { username, displayName, bio } = setupFederationSchema.parse(req.body)
-
-    // Normalize username
-    const normalizedUsername = normalizeUsername(username)
-
-    // Validate username format
-    if (!isValidUsername(normalizedUsername)) {
-      res.status(400).json({
-        error: 'Invalid username. Use 3-30 alphanumeric characters or underscores.'
-      })
-      return
-    }
-
-    // Check if username is already taken
-    const existingUser = await db.query.users.findFirst({
-      where: eq(users.username, normalizedUsername)
-    })
-
-    if (existingUser && existingUser.id !== userId) {
-      res.status(400).json({ error: 'Username is already taken' })
-      return
-    }
 
     // Get current user
     const user = await db.query.users.findFirst({
@@ -113,6 +91,22 @@ federationRouter.post('/setup', async (req, res) => {
 
     if (!user) {
       res.status(404).json({ error: 'User not found' })
+      return
+    }
+
+    // Require username to be set in profile settings first
+    if (!user.username) {
+      res.status(400).json({
+        error: 'Please set a username in your Profile settings before enabling federation.'
+      })
+      return
+    }
+
+    // Validate username format
+    if (!isValidUsername(user.username)) {
+      res.status(400).json({
+        error: 'Invalid username format. Please update your username in Profile settings.'
+      })
       return
     }
 
@@ -126,12 +120,9 @@ federationRouter.post('/setup', async (req, res) => {
       privateKey = keys.privateKey
     }
 
-    // Update user with federation settings
+    // Update user with federation keys and enable
     await db.update(users)
       .set({
-        username: normalizedUsername,
-        displayName: displayName || normalizedUsername,
-        bio: bio || null,
         publicKey,
         privateKey,
         federationEnabled: true,
@@ -142,24 +133,20 @@ federationRouter.post('/setup', async (req, res) => {
     res.json({
       message: 'Federation enabled successfully',
       profile: {
-        username: normalizedUsername,
-        displayName: displayName || normalizedUsername,
-        bio,
-        handle: `@${normalizedUsername}@${env.FEDERATION_DOMAIN}`,
-        actorUrl: `${env.SERVER_URL}/users/${normalizedUsername}`
+        username: user.username,
+        displayName: user.displayName || user.username,
+        bio: user.bio,
+        handle: `@${user.username}@${env.FEDERATION_DOMAIN}`,
+        actorUrl: `${env.SERVER_URL}/users/${user.username}`
       }
     })
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      res.status(400).json({ error: error.issues[0].message })
-      return
-    }
     console.error('Failed to setup federation:', error)
     res.status(500).json({ error: 'Failed to setup federation' })
   }
 })
 
-// PUT /api/federation/profile - Update federation profile
+// PUT /api/federation/profile - Toggle federation enabled/disabled
 federationRouter.put('/profile', async (req, res) => {
   try {
     const userId = req.user!.userId
@@ -174,15 +161,6 @@ federationRouter.put('/profile', async (req, res) => {
       return
     }
 
-    // Build update object
-    const updateData: Record<string, any> = { updatedAt: new Date() }
-
-    if (updates.displayName !== undefined) {
-      updateData.displayName = updates.displayName
-    }
-    if (updates.bio !== undefined) {
-      updateData.bio = updates.bio
-    }
     if (updates.federationEnabled !== undefined) {
       // Can only enable if username and keys are set
       if (updates.federationEnabled && (!user.username || !user.publicKey)) {
@@ -191,29 +169,31 @@ federationRouter.put('/profile', async (req, res) => {
         })
         return
       }
-      updateData.federationEnabled = updates.federationEnabled
+
+      await db.update(users)
+        .set({
+          federationEnabled: updates.federationEnabled,
+          updatedAt: new Date()
+        })
+        .where(eq(users.id, userId))
     }
 
-    await db.update(users)
-      .set(updateData)
-      .where(eq(users.id, userId))
-
-    res.json({ message: 'Profile updated successfully' })
+    res.json({ message: 'Federation settings updated successfully' })
   } catch (error) {
     if (error instanceof z.ZodError) {
       res.status(400).json({ error: error.issues[0].message })
       return
     }
-    console.error('Failed to update profile:', error)
-    res.status(500).json({ error: 'Failed to update profile' })
+    console.error('Failed to update federation settings:', error)
+    res.status(500).json({ error: 'Failed to update federation settings' })
   }
 })
 
-// POST /api/federation/publish - Publish a journal entry publicly
+// POST /api/federation/publish - Publish a note
 federationRouter.post('/publish', async (req, res) => {
   try {
     const userId = req.user!.userId
-    const { title, content } = publishEntrySchema.parse(req.body)
+    const { title, content, visibility } = publishEntrySchema.parse(req.body)
 
     const user = await db.query.users.findFirst({
       where: eq(users.id, userId)
@@ -226,7 +206,7 @@ federationRouter.post('/publish', async (req, res) => {
 
     if (!user.federationEnabled || !user.username) {
       res.status(400).json({
-        error: 'Federation must be enabled to publish entries'
+        error: 'Notes must be enabled to publish entries'
       })
       return
     }
@@ -234,50 +214,62 @@ federationRouter.post('/publish', async (req, res) => {
     // Create unique activity ID
     const activityId = `${env.SERVER_URL}/activities/${randomUUID()}`
 
-    // Create public entry
+    // Create note entry
     const [publicEntry] = await db.insert(publicEntries)
       .values({
         userId,
         title,
         content,
+        visibility,
         activityId,
         published: new Date()
       })
       .returning()
 
-    // Build Create activity for federation
-    const actorUrl = `${env.SERVER_URL}/users/${user.username}`
-    const followersUrl = `${actorUrl}/followers`
-    const createActivity = {
-      '@context': 'https://www.w3.org/ns/activitystreams',
-      id: activityId,
-      type: 'Create',
-      actor: actorUrl,
-      published: publicEntry.published.toISOString(),
-      to: ['https://www.w3.org/ns/activitystreams#Public'],
-      cc: [followersUrl],
-      object: {
-        id: `${env.SERVER_URL}/entries/${publicEntry.id}`,
-        type: 'Note',
-        attributedTo: actorUrl,
-        content: `<h1>${escapeHtml(title)}</h1>\n${markdownToHtml(content)}`,
+    // Only deliver to followers if visibility is public or followers
+    if (visibility !== 'private') {
+      const actorUrl = `${env.SERVER_URL}/users/${user.username}`
+      const followersUrl = `${actorUrl}/followers`
+
+      // Build audience based on visibility
+      const to = visibility === 'public'
+        ? ['https://www.w3.org/ns/activitystreams#Public']
+        : [followersUrl]
+      const cc = visibility === 'public' ? [followersUrl] : []
+
+      const createActivity = {
+        '@context': 'https://www.w3.org/ns/activitystreams',
+        id: activityId,
+        type: 'Create',
+        actor: actorUrl,
         published: publicEntry.published.toISOString(),
-        to: ['https://www.w3.org/ns/activitystreams#Public'],
-        cc: [followersUrl]
+        to,
+        cc,
+        object: {
+          id: `${env.SERVER_URL}/entries/${publicEntry.id}`,
+          type: 'Note',
+          attributedTo: actorUrl,
+          content: `<h1>${escapeHtml(title)}</h1>\n${markdownToHtml(content)}`,
+          published: publicEntry.published.toISOString(),
+          to,
+          cc
+        }
       }
+
+      // Deliver Create activity to followers (async, don't block response)
+      deliverToFollowers(
+        { id: user.id, username: user.username, publicKey: user.publicKey, privateKey: user.privateKey },
+        createActivity
+      ).catch(err => console.error('Failed to deliver to followers:', err))
     }
 
-    // Deliver Create activity to followers (async, don't block response)
-    deliverToFollowers(
-      { id: user.id, username: user.username, publicKey: user.publicKey, privateKey: user.privateKey },
-      createActivity
-    ).catch(err => console.error('Failed to deliver to followers:', err))
-
     res.status(201).json({
-      message: 'Entry published successfully',
+      message: 'Note published successfully',
       entry: {
         id: publicEntry.id,
         title: publicEntry.title,
+        content: publicEntry.content,
+        visibility: publicEntry.visibility,
         activityId: publicEntry.activityId,
         published: publicEntry.published,
         url: `${env.SERVER_URL}/entries/${publicEntry.id}`
@@ -293,7 +285,7 @@ federationRouter.post('/publish', async (req, res) => {
   }
 })
 
-// GET /api/federation/published - List user's published entries
+// GET /api/federation/published - List user's notes
 federationRouter.get('/published', async (req, res) => {
   try {
     const userId = req.user!.userId
@@ -308,6 +300,7 @@ federationRouter.get('/published', async (req, res) => {
         id: e.id,
         title: e.title,
         content: e.content,
+        visibility: e.visibility,
         activityId: e.activityId,
         published: e.published
       }))
@@ -315,6 +308,59 @@ federationRouter.get('/published', async (req, res) => {
   } catch (error) {
     console.error('Failed to get published entries:', error)
     res.status(500).json({ error: 'Failed to get entries' })
+  }
+})
+
+// PUT /api/federation/published/:id - Update a note
+federationRouter.put('/published/:id', async (req, res) => {
+  try {
+    const userId = req.user!.userId
+    const entryId = parseInt(req.params.id)
+
+    if (isNaN(entryId)) {
+      res.status(400).json({ error: 'Invalid entry ID' })
+      return
+    }
+
+    const updates = updateNoteSchema.parse(req.body)
+
+    // Verify ownership
+    const entry = await db.query.publicEntries.findFirst({
+      where: eq(publicEntries.id, entryId)
+    })
+
+    if (!entry || entry.userId !== userId) {
+      res.status(404).json({ error: 'Note not found' })
+      return
+    }
+
+    // Update the note
+    const [updatedEntry] = await db.update(publicEntries)
+      .set({
+        ...updates,
+        updatedAt: new Date()
+      })
+      .where(eq(publicEntries.id, entryId))
+      .returning()
+
+    res.json({
+      message: 'Note updated successfully',
+      entry: {
+        id: updatedEntry.id,
+        title: updatedEntry.title,
+        content: updatedEntry.content,
+        visibility: updatedEntry.visibility,
+        activityId: updatedEntry.activityId,
+        published: updatedEntry.published
+      }
+    })
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      res.status(400).json({ error: error.issues[0].message })
+      return
+    }
+    console.error('Failed to update note:', error)
+    res.status(500).json({ error: 'Failed to update note' })
   }
 })
 

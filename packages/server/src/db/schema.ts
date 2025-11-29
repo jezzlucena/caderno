@@ -86,12 +86,14 @@ export const following = pgTable('following', {
 })
 
 // Public entries - entries published via ActivityPub (plaintext, opt-in)
+// Visibility: 'public' = visible to everyone, 'followers' = only followers, 'private' = only the author
 export const publicEntries = pgTable('public_entries', {
   id: serial('id').primaryKey(),
   userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   entryId: integer('entry_id').references(() => entries.id, { onDelete: 'set null' }), // Link to original encrypted entry (optional)
   title: text('title').notNull(),                           // Plaintext title (user chose to publish)
   content: text('content').notNull(),                       // Plaintext content (user chose to publish)
+  visibility: text('visibility').default('public').notNull(), // 'public' | 'followers' | 'private'
   activityId: text('activity_id').notNull().unique(),       // ActivityPub activity ID (URL)
   published: timestamp('published').defaultNow().notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),

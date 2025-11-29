@@ -12,12 +12,10 @@ const envSchema = z.object({
   JWT_SECRET: z.string().min(32).default('development-secret-change-in-production-min-32-chars'),
   JWT_EXPIRES_IN: z.string().default('7d'),
 
-  // Email
-  SMTP_HOST: z.string().default('smtp.ethereal.email'),
-  SMTP_PORT: z.string().default('587'),
-  SMTP_USER: z.string().optional(),
-  SMTP_PASS: z.string().optional(),
-  SMTP_FROM: z.string().default('noreply@caderno.app'),
+  // Email (Mailgun)
+  MAILGUN_API_KEY: z.string().optional(),
+  MAILGUN_DOMAIN: z.string().optional(),
+  MAILGUN_FROM: z.string().default('Caderno <noreply@caderno.app>'),
   SUPPORT_EMAIL: z.string().email().default('jezzlucena@gmail.com'),
 
   // App
