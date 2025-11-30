@@ -365,10 +365,26 @@ activityPubRouter.post('/users/:username/inbox', requireHttpSignature, async (re
     const { username } = req.params
     const verifiedActor = (req as any).verifiedActor
 
+    // Log incoming request details for debugging
+    console.log(`[ActivityPub] Inbox request for ${username}`)
+    console.log(`[ActivityPub] Content-Type: ${req.get('Content-Type')}`)
+    console.log(`[ActivityPub] Body type: ${typeof req.body}`)
+    console.log(`[ActivityPub] Body is null/undefined: ${req.body == null}`)
+
+    // Check if body was parsed
+    if (req.body === undefined || req.body === null) {
+      console.error('[ActivityPub] Request body was not parsed!')
+      console.error('[ActivityPub] This usually means the Content-Type is not recognized by Express JSON parser')
+      console.error('[ActivityPub] Expected: application/activity+json, application/ld+json, or application/json')
+      res.status(400).json({ error: 'Request body not parsed - check Content-Type header' })
+      return
+    }
+
     // Validate incoming activity
     const parseResult = activitySchema.safeParse(req.body)
     if (!parseResult.success) {
       console.warn('[ActivityPub] Invalid activity received:', parseResult.error.issues)
+      console.warn('[ActivityPub] Raw body received:', JSON.stringify(req.body, null, 2))
       res.status(400).json({ error: 'Invalid activity format' })
       return
     }
@@ -603,28 +619,36 @@ export async function deliverActivity(
       body
     })
 
-    console.log(`[ActivityPub] Delivering activity to ${inboxUrl}`)
+    const activityType = activity?.type || 'Unknown'
+    console.log(`[ActivityPub] Delivering ${activityType} activity to ${inboxUrl}`)
+    console.log(`[ActivityPub] Activity payload:`, JSON.stringify(activity, null, 2))
+
+    const headers = {
+      ...signedHeaders,
+      'Content-Type': AP_CONTENT_TYPE,
+      Accept: AP_CONTENT_TYPE
+    }
 
     const response = await fetch(inboxUrl, {
       method: 'POST',
-      headers: {
-        ...signedHeaders,
-        'Content-Type': AP_CONTENT_TYPE,
-        Accept: AP_CONTENT_TYPE
-      },
+      headers,
       body
     })
 
     if (!response.ok) {
       const errorText = await response.text()
       console.error(`[ActivityPub] Delivery failed (${response.status}): ${errorText}`)
+      console.error(`[ActivityPub] Failed activity type: ${activityType}`)
+      console.error(`[ActivityPub] Failed activity payload:`, JSON.stringify(activity, null, 2))
+      console.error(`[ActivityPub] Request headers:`, JSON.stringify(headers, null, 2))
       return false
     }
 
-    console.log(`[ActivityPub] Activity delivered successfully to ${inboxUrl}`)
+    console.log(`[ActivityPub] ${activityType} activity delivered successfully to ${inboxUrl}`)
     return true
   } catch (error) {
     console.error(`[ActivityPub] Delivery error to ${inboxUrl}:`, error)
+    console.error(`[ActivityPub] Failed activity:`, JSON.stringify(activity, null, 2))
     return false
   }
 }
