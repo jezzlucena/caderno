@@ -43,8 +43,11 @@ app.use(cors({
   credentials: true
 }))
 
-// Body parsing
-app.use(express.json({ limit: '10mb' })) // Limit body size
+// Body parsing - include ActivityPub content types
+app.use(express.json({
+  limit: '10mb',
+  type: ['application/json', 'application/activity+json', 'application/ld+json']
+}))
 
 // Apply general rate limiting to all routes
 app.use('/api', generalLimiter)
