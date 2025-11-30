@@ -1,14 +1,20 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../stores/authStore'
-import { AuthFooter } from '../components/AuthFooter'
+import { usePlatformStore } from '../stores/platformStore'
+import { Footer } from '../components/Footer'
 
 export function Login() {
   const [emailOrUsername, setEmailOrUsername] = useState('')
   const [password, setPassword] = useState('')
   const { login, isLoading, error, clearError } = useAuthStore()
+  const { displayName, fetchSettings } = usePlatformStore()
   const navigate = useNavigate()
   const location = useLocation()
+
+  useEffect(() => {
+    fetchSettings()
+  }, [fetchSettings])
 
   const from = location.state?.from?.pathname || '/'
 
@@ -26,7 +32,7 @@ export function Login() {
     <div className="min-h-screen flex flex-col items-center justify-center bg-base-200 p-4 animate-fade-in">
       <div className="card bg-base-100 shadow-xl w-full max-w-md ios-card animate-fade-in-up">
         <div className="card-body">
-          <h1 className="card-title text-2xl justify-center mb-4">Sign in to Caderno</h1>
+          <h1 className="card-title text-2xl justify-center mb-4">Sign in to {displayName}</h1>
 
           {error && (
             <div className="alert alert-error mb-4">
@@ -87,7 +93,7 @@ export function Login() {
         </div>
       </div>
 
-      <AuthFooter />
+      <Footer />
     </div>
   )
 }

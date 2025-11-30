@@ -1,6 +1,6 @@
 import { Router, type Router as RouterType } from 'express'
 import { z } from 'zod'
-import { eq } from 'drizzle-orm'
+import { eq, and } from 'drizzle-orm'
 import { db } from '../db/index.js'
 import { users, followers, publicEntries } from '../db/schema.js'
 import { env } from '../config/env.js'
@@ -376,9 +376,17 @@ activityPubRouter.post('/users/:username/inbox', requireHttpSignature, async (re
 
     console.log(`[ActivityPub] Received verified activity for ${username} from ${verifiedActor?.actorUrl}:`, JSON.stringify(activity, null, 2))
 
-    // Find user
+    // Find user (include profileVisibility for follow request handling)
     const user = await db.query.users.findFirst({
-      where: eq(users.username, username)
+      where: eq(users.username, username),
+      columns: {
+        id: true,
+        username: true,
+        publicKey: true,
+        privateKey: true,
+        federationEnabled: true,
+        profileVisibility: true
+      }
     })
 
     if (!user || !user.federationEnabled) {
@@ -450,13 +458,16 @@ interface UserWithKeys {
   username: string | null
   publicKey: string | null
   privateKey: string | null
+  profileVisibility?: string
 }
 
 async function handleFollow(user: UserWithKeys, activity: any): Promise<void> {
   const followerActorUrl = activity.actor
+  const followActivityId = activity.id
 
   // Fetch follower's actor to get their inbox
   let followerInbox = `${followerActorUrl}/inbox` // Default fallback
+  let followerSharedInbox: string | undefined
 
   try {
     const actorResponse = await fetch(followerActorUrl, {
@@ -467,24 +478,36 @@ async function handleFollow(user: UserWithKeys, activity: any): Promise<void> {
       if (actorData.inbox) {
         followerInbox = actorData.inbox
       }
+      if (actorData.endpoints?.sharedInbox) {
+        followerSharedInbox = actorData.endpoints.sharedInbox
+      }
     }
   } catch (error) {
     console.warn(`[ActivityPub] Could not fetch follower actor: ${followerActorUrl}`, error)
   }
 
-  // Store the follower
+  // For restricted profiles, require approval before accepting
+  const autoAccept = user.profileVisibility === 'public'
+
+  // Store the follower (pending approval if restricted profile)
   await db.insert(followers).values({
     userId: user.id,
     followerActorUrl,
     followerInbox,
-    accepted: true
+    followerSharedInbox,
+    accepted: autoAccept,
+    followActivityId
   }).onConflictDoNothing()
 
-  console.log(`[ActivityPub] New follower: ${followerActorUrl}`)
-
-  // Send Accept activity back to follower
-  if (user.privateKey && user.username) {
-    await sendAcceptActivity(user, followerActorUrl, followerInbox, activity)
+  if (autoAccept) {
+    console.log(`[ActivityPub] New follower (auto-accepted): ${followerActorUrl}`)
+    // Send Accept activity back to follower
+    if (user.privateKey && user.username) {
+      await sendAcceptActivity(user, followerActorUrl, followerInbox, activity)
+    }
+  } else {
+    console.log(`[ActivityPub] New follow request (pending approval): ${followerActorUrl}`)
+    // Don't send Accept yet - wait for user approval
   }
 }
 
@@ -504,15 +527,15 @@ async function handleUnfollow(userId: number, activity: any): Promise<void> {
 /**
  * Send a signed Accept activity in response to a Follow request
  */
-async function sendAcceptActivity(
+export async function sendAcceptActivity(
   user: UserWithKeys,
   followerActorUrl: string,
   followerInbox: string,
   originalActivity: any
-): Promise<void> {
+): Promise<boolean> {
   if (!user.username || !user.privateKey) {
     console.warn('[ActivityPub] Cannot send Accept: missing username or private key')
-    return
+    return false
   }
 
   const actorUrl = getActorUrl(user.username)
@@ -524,7 +547,33 @@ async function sendAcceptActivity(
     object: originalActivity
   }
 
-  await deliverActivity(user, followerInbox, acceptActivity)
+  return await deliverActivity(user, followerInbox, acceptActivity)
+}
+
+/**
+ * Send a signed Reject activity in response to a Follow request
+ */
+export async function sendRejectActivity(
+  user: UserWithKeys,
+  followerActorUrl: string,
+  followerInbox: string,
+  originalActivity: any
+): Promise<boolean> {
+  if (!user.username || !user.privateKey) {
+    console.warn('[ActivityPub] Cannot send Reject: missing username or private key')
+    return false
+  }
+
+  const actorUrl = getActorUrl(user.username)
+  const rejectActivity = {
+    '@context': 'https://www.w3.org/ns/activitystreams',
+    id: `${env.SERVER_URL}/activities/${randomUUID()}`,
+    type: 'Reject',
+    actor: actorUrl,
+    object: originalActivity
+  }
+
+  return await deliverActivity(user, followerInbox, rejectActivity)
 }
 
 /**
@@ -581,14 +630,17 @@ export async function deliverActivity(
 }
 
 /**
- * Deliver an activity to all followers
+ * Deliver an activity to all accepted followers only
  */
 export async function deliverToFollowers(user: UserWithKeys, activity: any): Promise<void> {
   const followersList = await db.query.followers.findMany({
-    where: eq(followers.userId, user.id)
+    where: and(
+      eq(followers.userId, user.id),
+      eq(followers.accepted, true)
+    )
   })
 
-  console.log(`[ActivityPub] Delivering activity to ${followersList.length} followers`)
+  console.log(`[ActivityPub] Delivering activity to ${followersList.length} accepted followers`)
 
   // Deliver to each follower's inbox (in parallel with some concurrency limit)
   const deliveryPromises = followersList.map(follower =>

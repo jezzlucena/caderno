@@ -6,10 +6,19 @@ interface ApiOptions {
   token?: string | null
 }
 
+export interface ApiErrorData {
+  accountStatus?: 'banned' | 'suspended'
+  bannedOn?: string
+  suspendedUntil?: string
+}
+
 export class ApiError extends Error {
-  constructor(public status: number, message: string) {
+  public data?: ApiErrorData
+
+  constructor(public status: number, message: string, data?: ApiErrorData) {
     super(message)
     this.name = 'ApiError'
+    this.data = data
   }
 }
 
@@ -33,7 +42,11 @@ export async function api<T>(endpoint: string, options: ApiOptions = {}): Promis
   const data = await response.json()
 
   if (!response.ok) {
-    throw new ApiError(response.status, data.error || 'Request failed')
+    const errorData: ApiErrorData = {}
+    if (data.accountStatus) errorData.accountStatus = data.accountStatus
+    if (data.bannedOn) errorData.bannedOn = data.bannedOn
+    if (data.suspendedUntil) errorData.suspendedUntil = data.suspendedUntil
+    throw new ApiError(response.status, data.error || 'Request failed', errorData)
   }
 
   return data
@@ -47,7 +60,7 @@ export interface User {
   keySalt: string
   role: 'admin' | 'moderator' | 'user'
   username: string | null
-  profilePublic: boolean
+  profileVisibility: 'public' | 'restricted' | 'private'
   displayName: string | null
   bio: string | null
   avatarUrl: string | null
@@ -62,14 +75,14 @@ export interface AuthResponse {
 
 export interface UpdateProfileData {
   username?: string
-  profilePublic?: boolean
+  profileVisibility?: 'public' | 'restricted' | 'private'
   displayName?: string | null
   bio?: string | null
 }
 
 export const authApi = {
-  register: (email: string, password: string, username: string, profilePublic: boolean) =>
-    api<AuthResponse>('/auth/register', { method: 'POST', body: { email, password, username, profilePublic } }),
+  register: (email: string, password: string, username: string, profileVisibility: 'public' | 'restricted' | 'private') =>
+    api<AuthResponse>('/auth/register', { method: 'POST', body: { email, password, username, profileVisibility } }),
 
   login: (emailOrUsername: string, password: string) =>
     api<AuthResponse>('/auth/login', { method: 'POST', body: { emailOrUsername, password } }),
@@ -85,6 +98,15 @@ export const authApi = {
 
   checkUsername: (username: string) =>
     api<{ available: boolean; reason?: string }>(`/auth/check-username/${username}`, { token: getAuthToken() }),
+
+  checkUsernamePublic: (username: string) =>
+    api<{ available: boolean; reason?: string }>(`/auth/username-available/${username}`),
+
+  checkEmail: (email: string) =>
+    api<{ available: boolean; reason?: string }>(`/auth/check-email/${encodeURIComponent(email)}`, { token: getAuthToken() }),
+
+  updateEmail: (email: string) =>
+    api<{ user: User; message: string }>('/auth/email', { method: 'PUT', body: { email }, token: getAuthToken() }),
 
   resendVerificationEmail: () =>
     api<{ message: string }>('/auth/resend-verification', { method: 'POST', token: getAuthToken() })
@@ -245,13 +267,21 @@ export interface FeedEntry {
   id: string
   title: string
   content: string
+  visibility: NoteVisibility
   published: string
   author: {
     username: string
     displayName: string | null
     actorUrl: string
     isLocal: boolean
+    isOwnPost?: boolean
   }
+}
+
+export interface PaginatedFeedResponse {
+  entries: FeedEntry[]
+  nextCursor: string | null
+  hasMore: boolean
 }
 
 interface UpdateFederationProfile {
@@ -337,8 +367,16 @@ export const federationApi = {
       { token: getAuthToken() }
     ),
 
-  getFeed: () =>
-    api<{ entries: FeedEntry[] }>('/federation/feed', { token: getAuthToken() })
+  getFeed: (cursor?: string, limit?: number) => {
+    const params = new URLSearchParams()
+    if (cursor) params.append('cursor', cursor)
+    if (limit) params.append('limit', limit.toString())
+    const queryString = params.toString()
+    return api<PaginatedFeedResponse>(
+      `/federation/feed${queryString ? `?${queryString}` : ''}`,
+      { token: getAuthToken() }
+    )
+  }
 }
 
 // Profile API
@@ -347,11 +385,27 @@ export interface PublicProfile {
   displayName: string | null
   bio: string | null
   avatarUrl: string | null
-  entryCount: number
-  switchCount: number
+  entryCount: number | null
+  switchCount: number | null
   createdAt: string
-  isOwnProfile?: boolean
-  isPrivate?: boolean
+  isOwnProfile: boolean
+  profileVisibility: 'public' | 'restricted' | 'private'
+  isFollowing: boolean
+  isFollowPending: boolean
+  isRestricted: boolean
+}
+
+export interface FollowRequest {
+  id: number
+  type: 'local' | 'remote'
+  follower: {
+    id: number | null
+    username: string | null
+    displayName: string | null
+    avatarUrl: string | null
+    actorUrl: string | null
+  }
+  createdAt: string
 }
 
 export interface ProfileNote {
@@ -368,12 +422,39 @@ export interface ProfileNotesResponse {
   isFollower: boolean
 }
 
+export interface SingleNoteResponse {
+  note: ProfileNote
+  author: {
+    username: string
+    displayName: string | null
+  }
+  isOwner: boolean
+}
+
 export const profileApi = {
   getPublicProfile: (username: string) =>
     api<PublicProfile>(`/profile/${username}`, { token: getAuthToken() }),
 
   getNotes: (username: string) =>
-    api<ProfileNotesResponse>(`/profile/${username}/notes`, { token: getAuthToken() })
+    api<ProfileNotesResponse>(`/profile/${username}/notes`, { token: getAuthToken() }),
+
+  getNote: (username: string, noteId: number) =>
+    api<SingleNoteResponse>(`/profile/${username}/notes/${noteId}`, { token: getAuthToken() }),
+
+  follow: (username: string) =>
+    api<{ message: string; status: 'following' | 'pending' }>(`/profile/${username}/follow`, { method: 'POST', token: getAuthToken() }),
+
+  unfollow: (username: string) =>
+    api<{ message: string }>(`/profile/${username}/follow`, { method: 'DELETE', token: getAuthToken() }),
+
+  getFollowRequests: () =>
+    api<{ requests: FollowRequest[] }>('/profile/follow-requests', { token: getAuthToken() }),
+
+  acceptFollowRequest: (id: number, type: 'local' | 'remote' = 'local') =>
+    api<{ message: string }>(`/profile/follow-requests/${id}/accept?type=${type}`, { method: 'POST', token: getAuthToken() }),
+
+  rejectFollowRequest: (id: number, type: 'local' | 'remote' = 'local') =>
+    api<{ message: string }>(`/profile/follow-requests/${id}/reject?type=${type}`, { method: 'POST', token: getAuthToken() })
 }
 
 // Support API
@@ -388,4 +469,81 @@ export interface SupportRequestData {
 export const supportApi = {
   submit: (data: SupportRequestData) =>
     api<{ message: string }>('/support', { method: 'POST', body: data })
+}
+
+// Admin API
+export interface BannedNote {
+  id: number
+  title: string
+  content: string
+  bannedOn: string | null
+  published: string | null
+  userId: number
+  author: {
+    username: string | null
+    displayName: string | null
+    email: string
+  }
+}
+
+export interface ModerationUser {
+  id: number
+  username: string | null
+  email: string
+  displayName: string | null
+  role: 'admin' | 'moderator' | 'user'
+  bannedOn: string | null
+  suspendedUntil: string | null
+  createdAt: string
+}
+
+// Platform API (public)
+export interface PlatformSettingsData {
+  displayName: string
+}
+
+export const platformApi = {
+  getSettings: () =>
+    api<PlatformSettingsData>('/platform'),
+
+  updateSettings: (displayName: string) =>
+    api<{ message: string; displayName: string }>('/admin/platform', {
+      method: 'PUT',
+      body: { displayName },
+      token: getAuthToken()
+    })
+}
+
+export const adminApi = {
+  // Notes
+  getBannedNotes: () =>
+    api<{ notes: BannedNote[] }>('/admin/notes/banned', { token: getAuthToken() }),
+
+  banNote: (id: number) =>
+    api<{ message: string }>(`/admin/notes/${id}/ban`, { method: 'POST', token: getAuthToken() }),
+
+  unbanNote: (id: number) =>
+    api<{ message: string }>(`/admin/notes/${id}/unban`, { method: 'POST', token: getAuthToken() }),
+
+  // Users
+  getBannedUsers: () =>
+    api<{ users: ModerationUser[] }>('/admin/users/banned', { token: getAuthToken() }),
+
+  getSuspendedUsers: () =>
+    api<{ users: ModerationUser[] }>('/admin/users/suspended', { token: getAuthToken() }),
+
+  searchUser: (query: string) =>
+    api<{ user: ModerationUser | null }>(`/admin/users/search?q=${encodeURIComponent(query)}`, { token: getAuthToken() }),
+
+  banUser: (identifier: string) =>
+    api<{ message: string }>('/admin/users/ban', { method: 'POST', body: { identifier }, token: getAuthToken() }),
+
+  unbanUser: (identifier: string) =>
+    api<{ message: string }>('/admin/users/unban', { method: 'POST', body: { identifier }, token: getAuthToken() }),
+
+  suspendUser: (identifier: string, suspendedUntil: string) =>
+    api<{ message: string }>('/admin/users/suspend', { method: 'POST', body: { identifier, suspendedUntil }, token: getAuthToken() }),
+
+  unsuspendUser: (identifier: string) =>
+    api<{ message: string }>('/admin/users/unsuspend', { method: 'POST', body: { identifier }, token: getAuthToken() })
 }

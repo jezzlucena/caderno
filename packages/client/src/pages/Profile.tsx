@@ -1,16 +1,29 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { EyeSlashIcon, PencilIcon, TrashIcon, GlobeAltIcon, UserGroupIcon, LockClosedIcon, PlusIcon } from '@heroicons/react/24/outline'
+import { EyeSlashIcon, UserGroupIcon, LockClosedIcon, PlusIcon, NoSymbolIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { profileApi, federationApi, type PublicProfile, type ProfileNote, type NoteVisibility, ApiError } from '../lib/api'
+import { useAuthStore } from '../stores/authStore'
+import { FollowButton } from '../components/FollowButton'
+import { NoteCard } from '../components/NoteCard'
+import { Footer } from '../components/Footer'
+
+interface AccountStatus {
+  status: 'banned' | 'suspended'
+  bannedOn?: string
+  suspendedUntil?: string
+}
 
 export function Profile() {
   const { username } = useParams<{ username: string }>()
+  const { user: authUser } = useAuthStore()
   const [profile, setProfile] = useState<PublicProfile | null>(null)
   const [notes, setNotes] = useState<ProfileNote[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [notesLoading, setNotesLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
+  const [accountStatus, setAccountStatus] = useState<AccountStatus | null>(null)
   const [isOwner, setIsOwner] = useState(false)
+  const [refreshKey, setRefreshKey] = useState(0)
 
   // Create note state
   const [showCreateModal, setShowCreateModal] = useState(false)
@@ -39,10 +52,22 @@ export function Profile() {
       try {
         const data = await profileApi.getPublicProfile(username)
         setProfile(data)
-        setIsOwner(data.isOwnProfile || false)
+        setIsOwner(data.isOwnProfile)
+        setAccountStatus(null)
       } catch (error) {
-        if (error instanceof ApiError && error.status === 404) {
-          setNotFound(true)
+        if (error instanceof ApiError) {
+          if (error.status === 404) {
+            setNotFound(true)
+          } else if (error.status === 403 && error.data?.accountStatus) {
+            setAccountStatus({
+              status: error.data.accountStatus,
+              bannedOn: error.data.bannedOn,
+              suspendedUntil: error.data.suspendedUntil
+            })
+          } else {
+            console.error('Failed to load profile:', error)
+            setNotFound(true)
+          }
         } else {
           console.error('Failed to load profile:', error)
           setNotFound(true)
@@ -53,12 +78,13 @@ export function Profile() {
     }
 
     loadProfile()
-  }, [username])
+  }, [username, refreshKey])
 
   useEffect(() => {
     async function loadNotes() {
-      if (!username) return
+      if (!username || profile?.isRestricted) return
 
+      setNotesLoading(true)
       try {
         const data = await profileApi.getNotes(username)
         setNotes(data.notes)
@@ -71,7 +97,7 @@ export function Profile() {
     }
 
     loadNotes()
-  }, [username])
+  }, [username, refreshKey, profile?.isRestricted])
 
   const handleCreateNote = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -148,43 +174,68 @@ export function Profile() {
     setEditVisibility(note.visibility)
   }
 
-  const getVisibilityIcon = (visibility: NoteVisibility) => {
-    switch (visibility) {
-      case 'public':
-        return <GlobeAltIcon className="h-4 w-4" />
-      case 'followers':
-        return <UserGroupIcon className="h-4 w-4" />
-      case 'private':
-        return <LockClosedIcon className="h-4 w-4" />
-    }
-  }
-
-  const getVisibilityLabel = (visibility: NoteVisibility) => {
-    switch (visibility) {
-      case 'public':
-        return 'Public'
-      case 'followers':
-        return 'Followers'
-      case 'private':
-        return 'Only me'
-    }
-  }
-
-  const getVisibilityBadgeClass = (visibility: NoteVisibility) => {
-    switch (visibility) {
-      case 'public':
-        return 'badge-success'
-      case 'followers':
-        return 'badge-info'
-      case 'private':
-        return 'badge-warning'
-    }
-  }
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-base-200">
         <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    )
+  }
+
+  if (accountStatus) {
+    const isBanned = accountStatus.status === 'banned'
+    const formattedDate = isBanned && accountStatus.bannedOn
+      ? new Date(accountStatus.bannedOn).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        })
+      : accountStatus.suspendedUntil
+        ? new Date(accountStatus.suspendedUntil).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit'
+          })
+        : null
+
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-base-200 p-4">
+        <div className="card bg-base-100 shadow-xl w-full max-w-md">
+          <div className="card-body text-center">
+            {isBanned ? (
+              <>
+                <NoSymbolIcon className="h-16 w-16 mx-auto mb-4 text-error" />
+                <h2 className="card-title justify-center text-2xl mb-2">Account Banned</h2>
+                <p className="text-base-content/70 mb-2">
+                  This account has been permanently banned for violating our terms of service.
+                </p>
+                {formattedDate && (
+                  <p className="text-sm text-base-content/50 mb-6">
+                    Banned on {formattedDate}
+                  </p>
+                )}
+              </>
+            ) : (
+              <>
+                <ExclamationTriangleIcon className="h-16 w-16 mx-auto mb-4 text-warning" />
+                <h2 className="card-title justify-center text-2xl mb-2">Account Suspended</h2>
+                <p className="text-base-content/70 mb-2">
+                  This account is temporarily suspended.
+                </p>
+                {formattedDate && (
+                  <p className="text-sm text-base-content/50 mb-6">
+                    Suspension ends on {formattedDate}
+                  </p>
+                )}
+              </>
+            )}
+            <Link to="/" className="btn btn-primary">
+              Go Home
+            </Link>
+          </div>
+        </div>
       </div>
     )
   }
@@ -214,8 +265,8 @@ export function Profile() {
   })
 
   return (
-    <div className="min-h-screen bg-base-200 p-4 animate-fade-in">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen bg-base-200 p-4 animate-fade-in flex flex-col">
+      <div className="w-full min-w-[300px] sm:min-w-[500px] max-w-2xl mx-auto flex-1">
         {/* Error alert */}
         {error && (
           <div className="alert alert-error mb-4">
@@ -224,14 +275,25 @@ export function Profile() {
           </div>
         )}
 
-        {/* Private profile disclaimer */}
-        {profile.isOwnProfile && profile.isPrivate && (
+        {/* Private/Restricted profile disclaimer for owner */}
+        {profile.isOwnProfile && profile.profileVisibility === 'private' && (
           <div className="alert alert-warning mb-4 animate-fade-in-up">
             <EyeSlashIcon className="h-5 w-5" />
             <span>
               This profile is private. Only you can see this page.
               <Link to="/settings" className="link link-primary ml-1">
                 Change visibility in settings
+              </Link>
+            </span>
+          </div>
+        )}
+        {profile.isOwnProfile && profile.profileVisibility === 'restricted' && (
+          <div className="alert alert-info mb-4 animate-fade-in-up">
+            <UserGroupIcon className="h-5 w-5" />
+            <span>
+              This profile is restricted. Only approved followers can see your entries, switches, and notes.
+              <Link to="/settings" className="link link-primary ml-1">
+                Manage in settings
               </Link>
             </span>
           </div>
@@ -258,6 +320,20 @@ export function Profile() {
             </h1>
             <p className="text-base-content/60">@{profile.username}</p>
 
+            {/* Follow Button - show to non-owners (redirects to login if not authenticated) */}
+            {!profile.isOwnProfile && (
+              <div className="mt-4">
+                <FollowButton
+                  username={profile.username}
+                  isFollowing={profile.isFollowing}
+                  isPending={profile.isFollowPending}
+                  isRestricted={profile.isRestricted}
+                  isAuthenticated={!!authUser}
+                  onFollowChange={() => setRefreshKey(k => k + 1)}
+                />
+              </div>
+            )}
+
             {/* Bio */}
             {profile.bio && (
               <p className="mt-4 text-base-content/80 max-w-md">
@@ -265,17 +341,27 @@ export function Profile() {
               </p>
             )}
 
-            {/* Stats */}
-            <div className="stats stats-vertical sm:stats-horizontal shadow mt-6">
-              <div className="stat">
-                <div className="stat-title">Entries</div>
-                <div className="stat-value text-primary">{profile.entryCount}</div>
+            {/* Stats - only show when not restricted */}
+            {!profile.isRestricted && profile.entryCount !== null && (
+              <div className="stats stats-vertical sm:stats-horizontal shadow mt-6">
+                <div className="stat">
+                  <div className="stat-title">Entries</div>
+                  <div className="stat-value text-primary">{profile.entryCount}</div>
+                </div>
+                <div className="stat">
+                  <div className="stat-title">Switches</div>
+                  <div className="stat-value text-secondary">{profile.switchCount}</div>
+                </div>
               </div>
-              <div className="stat">
-                <div className="stat-title">Switches</div>
-                <div className="stat-value text-secondary">{profile.switchCount}</div>
+            )}
+
+            {/* Restricted notice for non-followers */}
+            {profile.isRestricted && (
+              <div className="alert alert-info mt-6 max-w-sm">
+                <LockClosedIcon className="h-5 w-5" />
+                <span>This profile is restricted. Follow to see more.</span>
               </div>
-            </div>
+            )}
 
             {/* Member Since */}
             <p className="mt-6 text-sm text-base-content/50">
@@ -284,7 +370,8 @@ export function Profile() {
           </div>
         </div>
 
-        {/* Notes Section */}
+        {/* Notes Section - hide when restricted */}
+        {!profile.isRestricted && (
         <div className="card bg-base-100 shadow-xl mt-6 animate-fade-in-up">
           <div className="card-body">
             <div className="flex justify-between items-center mb-4">
@@ -313,50 +400,30 @@ export function Profile() {
             ) : (
               <div className="space-y-4">
                 {notes.map((note) => (
-                  <div key={note.id} className="p-4 bg-base-200 rounded-lg">
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-semibold">{note.title}</h3>
-                        <span className={`badge badge-sm gap-1 ${getVisibilityBadgeClass(note.visibility)}`}>
-                          {getVisibilityIcon(note.visibility)}
-                          {getVisibilityLabel(note.visibility)}
-                        </span>
-                      </div>
-                      {isOwner && (
-                        <div className="flex gap-1">
-                          <button
-                            className="btn btn-ghost btn-xs"
-                            onClick={() => openEditModal(note)}
-                            title="Edit note"
-                          >
-                            <PencilIcon className="h-4 w-4" />
-                          </button>
-                          <button
-                            className="btn btn-ghost btn-xs text-error"
-                            onClick={() => handleDeleteNote(note.id)}
-                            title="Delete note"
-                          >
-                            <TrashIcon className="h-4 w-4" />
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                    <p className="text-sm text-base-content/80 whitespace-pre-wrap">
-                      {note.content}
-                    </p>
-                    <p className="text-xs text-base-content/50 mt-2">
-                      {new Date(note.published).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric'
-                      })}
-                    </p>
-                  </div>
+                  <NoteCard
+                    key={note.id}
+                    id={note.id}
+                    title={note.title}
+                    content={note.content}
+                    published={note.published}
+                    author={{
+                      username: profile.username,
+                      displayName: profile.displayName,
+                      isLocal: true
+                    }}
+                    visibility={note.visibility}
+                    showAuthor={true}
+                    showVisibilityBadge={true}
+                    isOwner={isOwner}
+                    onEdit={() => openEditModal(note)}
+                    onDelete={() => handleDeleteNote(note.id)}
+                  />
                 ))}
               </div>
             )}
           </div>
         </div>
+        )}
 
         {/* Back Link */}
         <div className="text-center mt-6">
@@ -523,6 +590,7 @@ export function Profile() {
           </div>
         </div>
       )}
+      <Footer />
     </div>
   )
 }

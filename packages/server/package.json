@@ -11,6 +11,7 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "@sendgrid/mail": "^8.1.6",
     "argon2": "^0.44.0",
     "cors": "^2.8.5",
     "drizzle-orm": "^0.38.0",

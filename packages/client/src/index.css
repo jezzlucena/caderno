@@ -419,7 +419,6 @@ html {
 .form-control:not(.form-control-compact) {
   position: relative;
   padding-top: 0.7em;
-  margin-top: 2em;
 }
 
 form label:not(.relative) {

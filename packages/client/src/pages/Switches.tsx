@@ -4,6 +4,7 @@ import { useSwitchesStore } from '../stores/switchesStore'
 import { useCryptoStore } from '../stores/cryptoStore'
 import { UnlockPrompt } from '../components/UnlockPrompt'
 import { Navbar } from '../components/Navbar'
+import { Footer } from '../components/Footer'
 import { CreateSwitchModal } from '../components/CreateSwitchModal'
 import { SwitchCard } from '../components/SwitchCard'
 import { EmailVerificationRequiredModal } from '../components/EmailVerificationRequiredModal'
@@ -62,7 +63,7 @@ export function Switches() {
   }
 
   return (
-    <div className="min-h-screen bg-base-200 animate-fade-in">
+    <div className="min-h-screen bg-base-200 animate-fade-in flex flex-col">
       <Navbar currentPage="switches" />
 
       <div className="container mx-auto p-3 sm:p-6 max-w-4xl">
@@ -145,6 +146,7 @@ export function Switches() {
       {showVerificationModal && (
         <EmailVerificationRequiredModal onClose={() => setShowVerificationModal(false)} />
       )}
+      <Footer />
     </div>
   )
 }

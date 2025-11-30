@@ -1,56 +1,53 @@
+import sgMail from '@sendgrid/mail'
 import { env } from '../config/env.js'
 
-interface MailgunResponse {
-  id?: string
-  message?: string
+// Initialize SendGrid client
+function initSendGrid(): boolean {
+  if (!env.SENDGRID_API_KEY) {
+    return false
+  }
+  sgMail.setApiKey(env.SENDGRID_API_KEY)
+  return true
 }
 
-async function sendEmail(options: {
+interface SendEmailOptions {
   to: string
   subject: string
   html: string
   replyTo?: string
-}): Promise<void> {
+}
+
+async function sendEmail(options: SendEmailOptions): Promise<void> {
   const { to, subject, html, replyTo } = options
 
-  // Check if Mailgun is configured
-  if (!env.MAILGUN_API_KEY || !env.MAILGUN_DOMAIN) {
-    console.warn('[Email] Mailgun not configured. Email not sent.')
+  // Check if SendGrid is configured
+  if (!initSendGrid()) {
     if (env.NODE_ENV === 'development') {
+      console.warn('[Email] SendGrid not configured. Email not sent.')
       console.log('[DEV] Would have sent email:')
       console.log(`  To: ${to}`)
       console.log(`  Subject: ${subject}`)
+      return
     }
-    return
+    throw new Error('Email service not configured. Please configure SendGrid.')
   }
 
-  const formData = new FormData()
-  formData.append('from', env.MAILGUN_FROM)
-  formData.append('to', to)
-  formData.append('subject', subject)
-  formData.append('html', html)
+  const msg: sgMail.MailDataRequired = {
+    to,
+    from: {
+      email: env.SENDGRID_FROM_EMAIL,
+      name: env.SENDGRID_FROM_NAME
+    },
+    subject,
+    html
+  }
+
   if (replyTo) {
-    formData.append('h:Reply-To', replyTo)
+    msg.replyTo = replyTo
   }
 
-  const response = await fetch(
-    `https://api.mailgun.net/v3/${env.MAILGUN_DOMAIN}/messages`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Basic ${Buffer.from(`api:${env.MAILGUN_API_KEY}`).toString('base64')}`
-      },
-      body: formData
-    }
-  )
-
-  if (!response.ok) {
-    const errorText = await response.text()
-    throw new Error(`Mailgun API error: ${response.status} - ${errorText}`)
-  }
-
-  const result: MailgunResponse = await response.json()
-  console.log(`[Email] Sent to ${to}: ${result.id || result.message}`)
+  const [response] = await sgMail.send(msg)
+  console.log(`[Email] Sent to ${to}: ${response.statusCode}`)
 }
 
 export async function sendVerificationEmail(email: string, token: string): Promise<void> {
@@ -78,26 +75,18 @@ export async function sendVerificationEmail(email: string, token: string): Promi
     </div>
   `
 
-  try {
-    await sendEmail({
-      to: email,
-      subject: 'Verify your Caderno account',
-      html
-    })
-    console.log(`Verification email sent to ${email}`)
-  } catch (error) {
-    console.error('Failed to send verification email:', error)
-    // In development, log the verification URL for testing
-    if (env.NODE_ENV === 'development') {
-      console.log(`[DEV] Verification URL: ${verificationUrl}`)
-    }
-  }
+  await sendEmail({
+    to: email,
+    subject: 'Verify your Caderno account',
+    html
+  })
+  console.log(`Verification email sent to ${email}`)
 }
 
 export async function sendSwitchTriggeredEmail(
   recipientEmail: string,
   recipientName: string,
-  switchId: number,
+  _switchId: number,
   message: string,
   senderEmail: string,
   payloadInfo?: { switchId: number; payloadKey: string }

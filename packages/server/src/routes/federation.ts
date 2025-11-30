@@ -1,8 +1,8 @@
 import { Router, type Router as RouterType } from 'express'
 import { z } from 'zod'
-import { eq, and } from 'drizzle-orm'
+import { eq, and, inArray } from 'drizzle-orm'
 import { db } from '../db/index.js'
-import { users, publicEntries, followers, following } from '../db/schema.js'
+import { users, publicEntries, followers, following, localFollowers } from '../db/schema.js'
 import { authMiddleware } from '../middleware/auth.js'
 import { generateRSAKeyPair, isValidUsername, normalizeUsername } from '../services/federation.service.js'
 import { env } from '../config/env.js'
@@ -641,24 +641,103 @@ federationRouter.delete('/follow', async (req, res) => {
   }
 })
 
-// GET /api/federation/feed - Get feed of entries from followed users
+// GET /api/federation/feed - Get feed of entries from followed users and own posts
+// Supports cursor-based pagination with query params:
+// - cursor: ISO timestamp string (optional, entries older than this)
+// - limit: number (default 20, max 50)
 federationRouter.get('/feed', async (req, res) => {
   try {
     const userId = req.user!.userId
+    const cursor = req.query.cursor as string | undefined
+    const limit = Math.min(Math.max(parseInt(req.query.limit as string) || 20, 1), 50)
 
-    // Get the list of users we follow
+    // Get current user for their own posts
+    const currentUser = await db.query.users.findFirst({
+      where: eq(users.id, userId)
+    })
+
+    // Get the list of users we follow (ActivityPub following)
     const followingList = await db.query.following.findMany({
       where: eq(following.userId, userId)
     })
 
-    if (followingList.length === 0) {
-      res.json({ entries: [] })
-      return
-    }
+    // Get local users we follow (from localFollowers where we are the follower)
+    const localFollowingList = await db.query.localFollowers.findMany({
+      where: and(
+        eq(localFollowers.followerId, userId),
+        eq(localFollowers.accepted, true)
+      ),
+      with: {
+        user: true
+      }
+    })
 
     const feedEntries: FeedEntry[] = []
 
-    // Process each followed user
+    // Track local user IDs we've already processed (to avoid duplicates)
+    const processedLocalUserIds = new Set<number>()
+
+    // Include current user's own posts first
+    if (currentUser && currentUser.username) {
+      processedLocalUserIds.add(currentUser.id)
+
+      const ownEntries = await db.query.publicEntries.findMany({
+        where: eq(publicEntries.userId, userId),
+        orderBy: (entries, { desc }) => [desc(entries.published)],
+        limit: 50
+      })
+
+      for (const entry of ownEntries) {
+        feedEntries.push({
+          id: entry.activityId,
+          title: entry.title,
+          content: entry.content,
+          visibility: entry.visibility as 'public' | 'followers' | 'private',
+          published: entry.published.toISOString(),
+          author: {
+            username: currentUser.username,
+            displayName: currentUser.displayName || currentUser.username,
+            actorUrl: `${env.SERVER_URL}/users/${currentUser.username}`,
+            isLocal: true,
+            isOwnPost: true
+          }
+        })
+      }
+    }
+
+    // Process local followers first (direct database query is faster)
+    for (const localFollow of localFollowingList) {
+      const localUser = localFollow.user
+      if (!localUser || processedLocalUserIds.has(localUser.id)) continue
+      processedLocalUserIds.add(localUser.id)
+
+      const entries = await db.query.publicEntries.findMany({
+        where: and(
+          eq(publicEntries.userId, localUser.id),
+          inArray(publicEntries.visibility, ['public', 'followers'])
+        ),
+        orderBy: (entries, { desc }) => [desc(entries.published)],
+        limit: 20
+      })
+
+      for (const entry of entries) {
+        feedEntries.push({
+          id: entry.activityId,
+          title: entry.title,
+          content: entry.content,
+          visibility: entry.visibility as 'public' | 'followers' | 'private',
+          published: entry.published.toISOString(),
+          author: {
+            username: localUser.username!,
+            displayName: localUser.displayName || localUser.username!,
+            actorUrl: `${env.SERVER_URL}/users/${localUser.username}`,
+            isLocal: true
+          }
+        })
+      }
+    }
+
+    // Process ActivityPub following
     for (const follow of followingList) {
       try {
         // Check if this is a local user
@@ -671,11 +750,16 @@ federationRouter.get('/feed', async (req, res) => {
             where: eq(users.username, localUsername)
           })
 
-          if (localUser) {
+          if (localUser && !processedLocalUserIds.has(localUser.id)) {
+            processedLocalUserIds.add(localUser.id)
+
             const entries = await db.query.publicEntries.findMany({
-              where: eq(publicEntries.userId, localUser.id),
+              where: and(
+                eq(publicEntries.userId, localUser.id),
+                inArray(publicEntries.visibility, ['public', 'followers'])
+              ),
               orderBy: (entries, { desc }) => [desc(entries.published)],
-              limit: 10
+              limit: 20
             })
 
             for (const entry of entries) {
@@ -683,6 +767,7 @@ federationRouter.get('/feed', async (req, res) => {
                 id: entry.activityId,
                 title: entry.title,
                 content: entry.content,
+                visibility: entry.visibility as 'public' | 'followers' | 'private',
                 published: entry.published.toISOString(),
                 author: {
                   username: localUser.username!,
@@ -710,7 +795,7 @@ federationRouter.get('/feed', async (req, res) => {
               const usernameMatch = follow.targetActorUrl.match(/\/users\/([^/]+)$/)
               const username = usernameMatch ? usernameMatch[1] : 'unknown'
 
-              for (const item of items.slice(0, 10)) {
+              for (const item of items.slice(0, 20)) {
                 if (item.type === 'Create' && item.object) {
                   const obj = item.object
                   // Extract title from content if it starts with <h1>
@@ -727,6 +812,7 @@ federationRouter.get('/feed', async (req, res) => {
                     id: item.id || obj.id,
                     title,
                     content,
+                    visibility: 'public', // Remote entries are always public in ActivityPub
                     published: obj.published || item.published,
                     author: {
                       username,
@@ -751,8 +837,28 @@ federationRouter.get('/feed', async (req, res) => {
     // Sort by published date (newest first)
     feedEntries.sort((a, b) => new Date(b.published).getTime() - new Date(a.published).getTime())
 
-    // Return top 50 entries
-    res.json({ entries: feedEntries.slice(0, 50) })
+    // Apply cursor-based pagination (filter entries older than cursor)
+    let filteredEntries = feedEntries
+    if (cursor) {
+      const cursorDate = new Date(cursor).getTime()
+      filteredEntries = feedEntries.filter(e => new Date(e.published).getTime() < cursorDate)
+    }
+
+    // Get one more than limit to check if there are more entries
+    const paginatedEntries = filteredEntries.slice(0, limit + 1)
+    const hasMore = paginatedEntries.length > limit
+    const resultEntries = paginatedEntries.slice(0, limit)
+
+    // Calculate next cursor (published date of last entry)
+    const nextCursor = resultEntries.length > 0 && hasMore
+      ? resultEntries[resultEntries.length - 1].published
+      : null
+
+    res.json({
+      entries: resultEntries,
+      nextCursor,
+      hasMore
+    })
   } catch (error) {
     console.error('Failed to get feed:', error)
     res.status(500).json({ error: 'Failed to get feed' })
@@ -763,12 +869,14 @@ interface FeedEntry {
   id: string
   title: string
   content: string
+  visibility: 'public' | 'followers' | 'private'
   published: string
   author: {
     username: string
     displayName: string
     actorUrl: string
     isLocal: boolean
+    isOwnPost?: boolean
   }
 }
 

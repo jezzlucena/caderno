@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Navbar } from '../components/Navbar'
+import { Footer } from '../components/Footer'
 import { supportApi, ApiError } from '../lib/api'
 
 type SupportCategory =
@@ -85,7 +86,7 @@ export function Support() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-base-200 animate-fade-in">
+      <div className="min-h-screen bg-base-200 animate-fade-in flex flex-col">
         <Navbar currentPage="support" />
         <div className="container mx-auto p-4 sm:p-6 max-w-4xl">
           <div className="card bg-base-100 shadow-xl">
@@ -121,12 +122,13 @@ export function Support() {
             </div>
           </div>
         </div>
+        <Footer />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-base-200 animate-fade-in">
+    <div className="min-h-screen bg-base-200 animate-fade-in flex flex-col">
       <Navbar currentPage="support" />
       <div className="container mx-auto p-4 sm:p-6 max-w-4xl">
         <div className="card bg-base-100 shadow-xl">
@@ -288,6 +290,7 @@ export function Support() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   )
 }

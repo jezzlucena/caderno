@@ -12,10 +12,10 @@ const envSchema = z.object({
   JWT_SECRET: z.string().min(32).default('development-secret-change-in-production-min-32-chars'),
   JWT_EXPIRES_IN: z.string().default('7d'),
 
-  // Email (Mailgun)
-  MAILGUN_API_KEY: z.string().optional(),
-  MAILGUN_DOMAIN: z.string().optional(),
-  MAILGUN_FROM: z.string().default('Caderno <noreply@caderno.app>'),
+  // Email (SendGrid)
+  SENDGRID_API_KEY: z.string().optional(),
+  SENDGRID_FROM_EMAIL: z.string().email().default('noreply@caderno.app'),
+  SENDGRID_FROM_NAME: z.string().default('Caderno'),
   SUPPORT_EMAIL: z.string().email().default('jezzlucena@gmail.com'),
 
   // App

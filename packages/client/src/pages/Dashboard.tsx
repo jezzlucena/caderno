@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { PencilSquareIcon } from '@heroicons/react/24/outline'
+import { Link } from 'react-router-dom'
+import { PencilSquareIcon, BookOpenIcon, RssIcon } from '@heroicons/react/24/outline'
 import { useAuthStore } from '../stores/authStore'
 import { useCryptoStore } from '../stores/cryptoStore'
 import { useUIStore } from '../stores/uiStore'
@@ -58,6 +59,22 @@ export function Dashboard() {
   return (
     <div className="min-h-screen bg-base-200 flex flex-col animate-fade-in">
       <Navbar currentPage="journal" />
+
+      {/* Tab Navigation */}
+      <div className="bg-base-100 border-b border-base-300">
+        <div className="container mx-auto px-4">
+          <div role="tablist" className="tabs tabs-bordered">
+            <button role="tab" className="tab tab-active gap-2">
+              <BookOpenIcon className="h-4 w-4" />
+              Journal
+            </button>
+            <Link to="/feed" role="tab" className="tab gap-2">
+              <RssIcon className="h-4 w-4" />
+              Feed
+            </Link>
+          </div>
+        </div>
+      </div>
 
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden relative">

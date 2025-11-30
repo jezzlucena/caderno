@@ -2,11 +2,12 @@ import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuthStore } from '../stores/authStore'
 import { useCryptoStore } from '../stores/cryptoStore'
-import { authApi, federationApi, type FederationProfile, type FeedEntry } from '../lib/api'
+import { authApi, federationApi, profileApi, type FederationProfile, type FollowRequest } from '../lib/api'
 import { Navbar } from '../components/Navbar'
+import { Footer } from '../components/Footer'
 import { UnlockPrompt } from '../components/UnlockPrompt'
 
-type TabType = 'profile' | 'notes'
+type TabType = 'profile' | 'followers'
 
 export function AccountSettings() {
   const { user, updateProfile, isLoading, error, clearError } = useAuthStore()
@@ -17,11 +18,22 @@ export function AccountSettings() {
   const [username, setUsername] = useState('')
   const [displayName, setDisplayName] = useState('')
   const [bio, setBio] = useState('')
-  const [profilePublic, setProfilePublic] = useState(false)
+  const [profileVisibility, setProfileVisibility] = useState<'public' | 'restricted' | 'private'>('private')
   const [validationError, setValidationError] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null)
   const [checkingUsername, setCheckingUsername] = useState(false)
+
+  // Follow requests state
+  const [followRequests, setFollowRequests] = useState<FollowRequest[]>([])
+  const [loadingRequests, setLoadingRequests] = useState(false)
+
+  // Email form state
+  const [email, setEmail] = useState('')
+  const [emailAvailable, setEmailAvailable] = useState<boolean | null>(null)
+  const [checkingEmail, setCheckingEmail] = useState(false)
+  const [emailError, setEmailError] = useState('')
+  const [isUpdatingEmail, setIsUpdatingEmail] = useState(false)
 
   // Federation state
   const [federationProfile, setFederationProfile] = useState<FederationProfile | null>(null)
@@ -38,17 +50,14 @@ export function AccountSettings() {
   const [lookupResult, setLookupResult] = useState<{ actorUrl: string; username: string; displayName: string | null; bio: string | null; isLocal: boolean } | null>(null)
   const [isLookingUp, setIsLookingUp] = useState(false)
 
-  // Feed state
-  const [feedEntries, setFeedEntries] = useState<FeedEntry[]>([])
-  const [isFeedLoading, setIsFeedLoading] = useState(false)
-
   // Initialize profile form with current user data
   useEffect(() => {
     if (user) {
       setUsername(user.username || '')
+      setEmail(user.email || '')
       setDisplayName(user.displayName || '')
       setBio(user.bio || '')
-      setProfilePublic(user.profilePublic)
+      setProfileVisibility(user.profileVisibility)
     }
   }, [user])
 
@@ -57,9 +66,43 @@ export function AccountSettings() {
     if (isKeyReady) {
       fetchFederationProfile()
       fetchFollowing()
-      fetchFeed()
+      fetchFollowRequests()
     }
   }, [isKeyReady])
+
+  // Fetch follow requests
+  const fetchFollowRequests = async () => {
+    setLoadingRequests(true)
+    try {
+      const { requests } = await profileApi.getFollowRequests()
+      setFollowRequests(requests)
+    } catch {
+      // Silently fail
+    } finally {
+      setLoadingRequests(false)
+    }
+  }
+
+  // Handle accept follow request
+  const handleAcceptRequest = async (id: number, type: 'local' | 'remote') => {
+    try {
+      await profileApi.acceptFollowRequest(id, type)
+      setFollowRequests(followRequests.filter(r => r.id !== id || r.type !== type))
+      setSuccessMessage('Follow request accepted')
+    } catch (err: any) {
+      setValidationError(err.message || 'Failed to accept request')
+    }
+  }
+
+  // Handle reject follow request
+  const handleRejectRequest = async (id: number, type: 'local' | 'remote') => {
+    try {
+      await profileApi.rejectFollowRequest(id, type)
+      setFollowRequests(followRequests.filter(r => r.id !== id || r.type !== type))
+    } catch (err: any) {
+      setValidationError(err.message || 'Failed to reject request')
+    }
+  }
 
   // Debounced username availability check
   const checkUsername = useCallback(async (value: string) => {
@@ -96,6 +139,69 @@ export function AccountSettings() {
     return () => clearTimeout(timer)
   }, [username, checkUsername])
 
+  // Debounced email availability check
+  const checkEmail = useCallback(async (value: string) => {
+    if (!value || value === user?.email) {
+      setEmailAvailable(null)
+      setEmailError('')
+      return
+    }
+
+    // Basic email format check
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(value)) {
+      setEmailAvailable(null)
+      setEmailError('')
+      return
+    }
+
+    setCheckingEmail(true)
+    try {
+      const result = await authApi.checkEmail(value)
+      setEmailAvailable(result.available)
+      if (!result.available && result.reason) {
+        setEmailError(result.reason)
+      } else {
+        setEmailError('')
+      }
+    } catch {
+      setEmailAvailable(null)
+      setEmailError('')
+    } finally {
+      setCheckingEmail(false)
+    }
+  }, [user?.email])
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      checkEmail(email)
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [email, checkEmail])
+
+  // Email update handler
+  const handleEmailUpdate = async () => {
+    if (!email || email === user?.email) return
+    if (emailAvailable === false) {
+      setEmailError('This email is not available')
+      return
+    }
+
+    setIsUpdatingEmail(true)
+    setEmailError('')
+    try {
+      const { user: updatedUser, message } = await authApi.updateEmail(email)
+      // Update the user in the auth store
+      useAuthStore.getState().setUser(updatedUser)
+      setSuccessMessage(message)
+      setEmailAvailable(null)
+    } catch (err: any) {
+      setEmailError(err.message || 'Failed to update email')
+    } finally {
+      setIsUpdatingEmail(false)
+    }
+  }
+
   // Federation API calls
   const fetchFederationProfile = async () => {
     try {
@@ -114,18 +220,6 @@ export function AccountSettings() {
       setFollowingList(following)
     } catch {
       // Silently fail
-    }
-  }
-
-  const fetchFeed = async () => {
-    setIsFeedLoading(true)
-    try {
-      const { entries } = await federationApi.getFeed()
-      setFeedEntries(entries)
-    } catch {
-      // Silently fail
-    } finally {
-      setIsFeedLoading(false)
     }
   }
 
@@ -161,7 +255,7 @@ export function AccountSettings() {
         username,
         displayName: displayName || null,
         bio: bio || null,
-        profilePublic
+        profileVisibility
       })
       setSuccessMessage('Profile updated successfully!')
       setUsernameAvailable(null)
@@ -259,16 +353,10 @@ export function AccountSettings() {
   }
 
   return (
-    <div className="min-h-screen bg-base-200">
+    <div className="min-h-screen bg-base-200 flex flex-col">
       <Navbar currentPage="settings" />
 
       <div className="container mx-auto px-4 py-8 max-w-4xl animate-fade-in">
-        <div className="mb-6">
-          <Link to="/" className="link link-primary">
-            &larr; Back to Dashboard
-          </Link>
-        </div>
-
         {/* Tabs */}
         {import.meta.env.VITE_FEDERATION_ENABLED === 'true' && (
           <div className="tabs tabs-boxed mb-6 bg-base-100 p-1">
@@ -279,10 +367,10 @@ export function AccountSettings() {
               Profile
             </button>
             <button
-              className={`tab flex-1 ${activeTab === 'notes' ? 'tab-active' : ''}`}
-              onClick={() => setActiveTab('notes')}
+              className={`tab flex-1 ${activeTab === 'followers' ? 'tab-active' : ''}`}
+              onClick={() => setActiveTab('followers')}
             >
-              Notes
+              Followers
             </button>
           </div>
         )}
@@ -317,16 +405,85 @@ export function AccountSettings() {
                 </div>
               )}
 
+              {/* Email - separate from main form since it has its own update flow */}
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-medium">Email Address</span>
+                  {user && !user.emailVerified && (
+                    <span className="label-text-alt text-warning">Not verified</span>
+                  )}
+                </label>
+                <div className="relative flex items-center">
+                  <input
+                    type="email"
+                    className={`input input-bordered w-full ${
+                      emailAvailable === true ? 'input-success' :
+                      emailAvailable === false ? 'input-error' : ''
+                    }`}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value.toLowerCase())}
+                    required
+                    disabled={isUpdatingEmail}
+                    placeholder="your@email.com"
+                  />
+                  {checkingEmail && (
+                    <span className="absolute right-3 top-3 loading loading-spinner loading-sm"></span>
+                  )}
+                  {!checkingEmail && emailAvailable === true && (
+                    <span className="absolute right-3 top-3 text-success">&#10003;</span>
+                  )}
+                  {!checkingEmail && emailAvailable === false && (
+                    <span className="absolute right-3 top-3 text-error">&#10007;</span>
+                  )}
+                </div>
+                <div className="flex justify-between items-center">
+                  {checkingEmail && email !== user?.email && (
+                    <span className="label py-2">
+                      {checkingEmail ? (
+                        <span className="label-text-alt text-base-content/70">Checking availability...</span>
+                      ) : emailAvailable === true ? (
+                        <span className="label-text-alt text-success">Email is available</span>
+                      ) : emailAvailable === false ? (
+                        <span className="label-text-alt text-error">{emailError}</span>
+                      ) : email !== user?.email ? (
+                        <span className="label-text-alt text-base-content/70">Enter a valid email address</span>
+                      ) : null}
+                    </span>
+                  )}
+                  {email !== user?.email && emailAvailable === true && (
+                    <button
+                      type="button"
+                      className="btn btn-primary btn-sm"
+                      onClick={handleEmailUpdate}
+                      disabled={isUpdatingEmail || checkingEmail}
+                    >
+                      {isUpdatingEmail ? <span className="loading loading-spinner loading-sm"></span> : 'Update Email'}
+                    </button>
+                  )}
+                </div>
+                {email !== user?.email && emailAvailable === true && (
+                  <div className="alert alert-info mt-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span className="text-sm">Changing your email will require re-verification. A verification link will be sent to your new email address.</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="divider"></div>
+
               <form onSubmit={handleProfileSubmit} className="space-y-6">
                 {/* Username */}
                 <div className="form-control">
                   <label className="label">
                     <span className="label-text font-medium">Username</span>
                   </label>
-                  <div className="relative">
+                  <div className="relative flex items-center">
+                    <span className="flex items-center justify-center px-3 h-10 bg-base-200 border border-r-0 border-base-300 rounded-l-lg text-base-content/70 font-medium">@</span>
                     <input
                       type="text"
-                      className={`input input-bordered w-full ${
+                      className={`input input-bordered w-full rounded-l-none ${
                         usernameAvailable === true ? 'input-success' :
                         usernameAvailable === false ? 'input-error' : ''
                       }`}
@@ -349,13 +506,24 @@ export function AccountSettings() {
                       <span className="absolute right-3 top-3 text-error">&#10007;</span>
                     )}
                   </div>
-                  {user?.username && profilePublic && (
-                    <span className="label pt-2">
-                      <span className="label-text-alt">
-                        Your profile URL: <Link to={`/${user.username}`} className="font-mono text-primary underline">{import.meta.env.VITE_APP_URL}/{user.username}</Link>
+                  <div className="flex justify-between">
+                    {user?.username && profileVisibility !== 'private' && (
+                      <span className="label pt-2">
+                        <span className="label-text-alt">
+                          Your profile URL: <Link to={`/${user.username}`} className="font-mono text-primary underline">/{user.username}</Link>
+                        </span>
                       </span>
+                    )}
+                    <span className="label pt-2">
+                      {checkingUsername ? (
+                        <span className="label-text-alt text-base-content/70">Checking availability...</span>
+                      ) : usernameAvailable === true ? (
+                        <span className="label-text-alt text-success">Username is available</span>
+                      ) : (
+                        <span className="label-text-alt text-error">{validationError}</span>
+                      )}
                     </span>
-                  )}
+                  </div>
                 </div>
 
                 {/* Display Name */}
@@ -396,22 +564,24 @@ export function AccountSettings() {
 
                 {/* Profile Visibility */}
                 <div className="form-control">
-                  <label className="label cursor-pointer justify-start gap-3">
-                    <input
-                      type="checkbox"
-                      className="toggle toggle-primary"
-                      checked={profilePublic}
-                      onChange={(e) => setProfilePublic(e.target.checked)}
-                      disabled={isLoading}
-                    />
-                    <span className="label-text font-medium">Public Profile</span>
+                  <label className="label">
+                    <span className="label-text font-medium">Profile Visibility</span>
                   </label>
-                  <span className="label pt-0">
+                  <select
+                    className="select select-bordered w-full"
+                    value={profileVisibility}
+                    onChange={(e) => setProfileVisibility(e.target.value as 'public' | 'restricted' | 'private')}
+                    disabled={isLoading}
+                  >
+                    <option value="public">Public - Visible to everyone</option>
+                    <option value="restricted">Restricted - Visible, but data only to approved followers</option>
+                    <option value="private">Private - Hidden from everyone</option>
+                  </select>
+                  <span className="label pt-2">
                     <span className="label-text-alt">
-                      {profilePublic
-                        ? 'Your profile is visible to everyone at /' + username
-                        : 'Your profile is private and hidden from others'
-                      }
+                      {profileVisibility === 'public' && `Your profile is visible to everyone at /${username}`}
+                      {profileVisibility === 'restricted' && 'Your profile is visible, but entries, switches, and notes are only visible to approved followers'}
+                      {profileVisibility === 'private' && 'Your profile is hidden from everyone except you'}
                     </span>
                   </span>
                 </div>
@@ -430,8 +600,8 @@ export function AccountSettings() {
           </div>
         )}
 
-        {/* Notes Tab */}
-        {activeTab === 'notes' && (
+        {/* Followers Tab */}
+        {activeTab === 'followers' && (
           <div className="space-y-6 animate-fade-in-up">
             {federationError && (
               <div className="alert alert-error">
@@ -439,6 +609,98 @@ export function AccountSettings() {
                 <button className="btn btn-ghost btn-sm" onClick={() => setFederationError(null)}>Dismiss</button>
               </div>
             )}
+
+            {/* Pending Follow Requests Card */}
+            <div className="card bg-base-100 shadow-xl">
+              <div className="card-body">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-bold">Pending Follow Requests</h3>
+                  {followRequests.length > 0 && (
+                    <span className="badge badge-primary">{followRequests.length}</span>
+                  )}
+                </div>
+                <p className="text-sm text-base-content/70">
+                  People who want to follow you
+                </p>
+
+                {loadingRequests ? (
+                  <div className="flex justify-center py-4">
+                    <span className="loading loading-spinner loading-sm"></span>
+                  </div>
+                ) : followRequests.length === 0 ? (
+                  <div className="text-center text-base-content/60 py-6">
+                    No pending follow requests
+                  </div>
+                ) : (
+                  <div className="space-y-2 mt-4 max-h-96 overflow-y-auto">
+                    {followRequests.map((req) => {
+                      const canLinkToProfile = req.type === 'local' && req.follower.username
+                      return (
+                        <div key={`${req.type}-${req.id}`} className="flex items-center justify-between p-3 bg-base-200 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            {canLinkToProfile ? (
+                              <Link to={`/${req.follower.username}`} className="avatar placeholder">
+                                <div className="flex items-center justify-center bg-neutral text-neutral-content rounded-full w-10 hover:ring-2 hover:ring-primary transition-all">
+                                  <span>{(req.follower.displayName || req.follower.username || '?').charAt(0).toUpperCase()}</span>
+                                </div>
+                              </Link>
+                            ) : (
+                              <div className="avatar placeholder">
+                                <div className="flex items-center justify-center bg-neutral text-neutral-content rounded-full w-10">
+                                  <span>{(req.follower.displayName || req.follower.username || '?').charAt(0).toUpperCase()}</span>
+                                </div>
+                              </div>
+                            )}
+                            <div>
+                              <div className="flex items-center gap-2">
+                                {canLinkToProfile ? (
+                                  <Link to={`/${req.follower.username}`} className="font-medium hover:underline">
+                                    {req.follower.displayName || req.follower.username}
+                                  </Link>
+                                ) : (
+                                  <p className="font-medium">{req.follower.displayName || req.follower.username}</p>
+                                )}
+                                {req.type === 'remote' && (
+                                  <span className="badge badge-info badge-xs">Remote</span>
+                                )}
+                              </div>
+                              {req.follower.username && (
+                                canLinkToProfile ? (
+                                  <Link to={`/${req.follower.username}`} className="text-xs text-base-content/60 hover:underline">
+                                    @{req.follower.username}
+                                  </Link>
+                                ) : (
+                                  <p className="text-xs text-base-content/60">@{req.follower.username}</p>
+                                )
+                              )}
+                              {req.follower.actorUrl && (
+                                <p className="text-xs text-base-content/40 truncate max-w-[200px]" title={req.follower.actorUrl}>
+                                  {req.follower.actorUrl}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <button
+                              className="btn btn-success btn-sm"
+                              onClick={() => handleAcceptRequest(req.id, req.type)}
+                            >
+                              Accept
+                            </button>
+                            <button
+                              className="btn btn-ghost btn-sm"
+                              onClick={() => handleRejectRequest(req.id, req.type)}
+                            >
+                              Reject
+                            </button>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
 
             {federationLoading ? (
               <div className="flex justify-center py-12">
@@ -635,73 +897,12 @@ export function AccountSettings() {
                     )}
                   </div>
                 </div>
-
-                {/* Feed */}
-                <div className="card bg-base-100 shadow-xl">
-                  <div className="card-body">
-                    <div className="flex justify-between items-center">
-                      <h3 className="text-lg font-bold">Feed</h3>
-                      <button
-                        className="btn btn-ghost btn-sm"
-                        onClick={fetchFeed}
-                        disabled={isFeedLoading}
-                      >
-                        {isFeedLoading ? <span className="loading loading-spinner loading-sm"></span> : 'Refresh'}
-                      </button>
-                    </div>
-                    <p className="text-sm text-base-content/70">
-                      Recent entries from users you follow
-                    </p>
-
-                    {!federationProfile.federationEnabled ? (
-                      <div className="alert alert-warning mt-4">
-                        <span>Enable notes to see your feed.</span>
-                      </div>
-                    ) : isFeedLoading ? (
-                      <div className="flex justify-center py-8">
-                        <span className="loading loading-spinner loading-md"></span>
-                      </div>
-                    ) : feedEntries.length === 0 ? (
-                      <p className="text-center text-base-content/60 py-8">
-                        No entries in your feed yet. Follow some users to see their published entries here.
-                      </p>
-                    ) : (
-                      <div className="space-y-4 mt-4">
-                        {feedEntries.map((entry) => (
-                          <div key={entry.id} className="p-4 bg-base-200 rounded-lg">
-                            <div className="flex items-center gap-2 mb-2">
-                              <div className="avatar placeholder">
-                                <div className="bg-neutral text-neutral-content rounded-full w-8">
-                                  <span className="text-xs">{(entry.author.displayName || entry.author.username).charAt(0).toUpperCase()}</span>
-                                </div>
-                              </div>
-                              <div>
-                                <p className="font-medium text-sm">{entry.author.displayName || entry.author.username}</p>
-                                <p className="text-xs text-base-content/50">
-                                  @{entry.author.username}
-                                  {entry.author.isLocal ? '' : ' (remote)'}
-                                </p>
-                              </div>
-                              <span className="ml-auto text-xs text-base-content/50">
-                                {new Date(entry.published).toLocaleDateString()}
-                              </span>
-                            </div>
-                            <h4 className="font-semibold">{entry.title}</h4>
-                            <p className="text-sm text-base-content/80 mt-1 whitespace-pre-wrap line-clamp-4">
-                              {entry.content}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
               </>
             )}
           </div>
         )}
       </div>
-
+      <Footer />
     </div>
   )
 }

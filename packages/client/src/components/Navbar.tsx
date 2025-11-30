@@ -1,10 +1,12 @@
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRightStartOnRectangleIcon, ArrowLeftEndOnRectangleIcon, LockClosedIcon, Bars3Icon, Cog6ToothIcon } from '@heroicons/react/24/outline'
 import { useAuthStore } from '../stores/authStore'
 import { useUIStore } from '../stores/uiStore'
+import { usePlatformStore } from '../stores/platformStore'
 import logoUrl from '../assets/logo.svg'
 
-type Page = 'journal' | 'switches' | 'settings' | 'about' | 'terms' | 'privacy' | 'support'
+type Page = 'journal' | 'feed' | 'switches' | 'settings' | 'platform' | 'about' | 'terms' | 'privacy' | 'support'
 
 interface NavbarProps {
   currentPage: Page
@@ -13,14 +15,24 @@ interface NavbarProps {
 export function Navbar({ currentPage }: NavbarProps) {
   const { user, logout } = useAuthStore()
   const { toggleSidebar, isSidebarOpen } = useUIStore()
+  const { displayName, fetchSettings } = usePlatformStore()
 
   const isAuthenticated = !!user
+
+  useEffect(() => {
+    fetchSettings()
+  }, [fetchSettings])
 
   // App navigation links (only shown when authenticated)
   const appNavLinks: { to: string; label: string; page: Page }[] = [
     { to: '/', label: 'Journal', page: 'journal' },
+    { to: '/feed', label: 'Feed', page: 'feed' },
     { to: '/switches', label: 'Switches', page: 'switches' },
-    { to: '/settings', label: 'Settings', page: 'settings' }
+    { to: '/settings', label: 'Account', page: 'settings' },
+    // Platform link only visible to admins/moderators
+    ...(user?.role === 'admin' || user?.role === 'moderator'
+      ? [{ to: '/platform', label: 'Platform', page: 'platform' as Page }]
+      : [])
   ]
 
   return (
@@ -41,8 +53,8 @@ export function Navbar({ currentPage }: NavbarProps) {
       {/* Logo/Title */}
       <div className="flex-1">
         <Link to="/" className="flex items-center gap-2 text-xl font-bold px-2 sm:px-4">
-          <img src={logoUrl} alt="Caderno logo" className="h-10 w-10" />
-          <span className="inline leading-none">Caderno</span>
+          <img src={logoUrl} alt={`${displayName} logo`} className="h-10 w-10" />
+          <span className="inline leading-none">{displayName}</span>
         </Link>
       </div>
 

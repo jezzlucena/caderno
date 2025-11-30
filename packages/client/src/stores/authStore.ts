@@ -10,12 +10,13 @@ interface AuthState {
   error: string | null
 
   // Actions
-  register: (email: string, password: string, username: string, profilePublic: boolean) => Promise<void>
+  register: (email: string, password: string, username: string, profileVisibility: 'public' | 'restricted' | 'private') => Promise<void>
   login: (emailOrUsername: string, password: string) => Promise<void>
   unlock: (password: string) => Promise<void>
   logout: () => void
   checkAuth: () => Promise<void>
   updateProfile: (data: UpdateProfileData) => Promise<void>
+  setUser: (user: User) => void
   clearError: () => void
 }
 
@@ -27,10 +28,10 @@ export const useAuthStore = create<AuthState>()(
       isLoading: false,
       error: null,
 
-      register: async (email: string, password: string, username: string, profilePublic: boolean) => {
+      register: async (email: string, password: string, username: string, profileVisibility: 'public' | 'restricted' | 'private') => {
         set({ isLoading: true, error: null })
         try {
-          const { user, token } = await authApi.register(email, password, username, profilePublic)
+          const { user, token } = await authApi.register(email, password, username, profileVisibility)
           // Derive encryption key from password
           await useCryptoStore.getState().deriveAndSetKey(password, user.keySalt)
           set({ user, token, isLoading: false })
@@ -102,6 +103,8 @@ export const useAuthStore = create<AuthState>()(
           throw error
         }
       },
+
+      setUser: (user: User) => set({ user }),
 
       clearError: () => set({ error: null })
     }),

@@ -1,8 +1,9 @@
 import { Navbar } from '../components/Navbar'
+import { Footer } from '../components/Footer'
 
 export function Privacy() {
   return (
-    <div className="min-h-screen bg-base-200 animate-fade-in">
+    <div className="min-h-screen bg-base-200 animate-fade-in flex flex-col">
       <Navbar currentPage="privacy" />
       <div className="container mx-auto p-4 sm:p-6 max-w-4xl">
         <div className="card bg-base-100 shadow-xl">
@@ -172,6 +173,7 @@ export function Privacy() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   )
 }

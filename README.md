@@ -133,11 +133,10 @@ For development without Docker:
 | `NODE_ENV` | Environment (`development`, `production`, `test`) | `development` |
 | `JWT_SECRET` | Secret key for JWT tokens (min 32 chars) | Required |
 | `JWT_EXPIRES_IN` | JWT token expiration | `7d` |
-| `SMTP_HOST` | SMTP server host | `smtp.ethereal.email` |
-| `SMTP_PORT` | SMTP server port | `587` |
-| `SMTP_USER` | SMTP username | - |
-| `SMTP_PASS` | SMTP password | - |
-| `SMTP_FROM` | Email sender address | `noreply@caderno.app` |
+| `SENDGRID_API_KEY` | SendGrid API key | - |
+| `SENDGRID_FROM_EMAIL` | Sender email address | `noreply@caderno.app` |
+| `SENDGRID_FROM_NAME` | Sender display name | `Caderno` |
+| `SUPPORT_EMAIL` | Support email address | `support@caderno.app` |
 | `VITE_APP_URL` | Frontend application URL, used for backend and frontend | `http://localhost:8085` |
 | `CLIENT_URL` | Client URL for CORS | `http://localhost:8085` |
 | `FEDERATION_ENABLED` | Enable ActivityPub federation | `true` |

@@ -1,6 +1,6 @@
 import { Router, type Router as RouterType } from 'express'
 import { z } from 'zod'
-import { register, login, verifyEmail, getUserById, updateProfile, checkUsernameAvailability, resendVerificationEmail } from '../services/auth.service.js'
+import { register, login, verifyEmail, getUserById, updateProfile, checkUsernameAvailability, checkEmailAvailability, updateEmail, resendVerificationEmail } from '../services/auth.service.js'
 import { authMiddleware } from '../middleware/auth.js'
 import { authLimiter, emailLimiter } from '../middleware/rateLimit.js'
 
@@ -17,7 +17,7 @@ const registerSchema = z.object({
     .min(3, 'Username must be at least 3 characters')
     .max(20, 'Username must be at most 20 characters')
     .regex(/^[a-z0-9_]+$/, 'Username can only contain lowercase letters, numbers, and underscores'),
-  profilePublic: z.boolean().default(false)
+  profileVisibility: z.enum(['public', 'restricted', 'private']).default('private')
 })
 
 const loginSchema = z.object({
@@ -28,8 +28,8 @@ const loginSchema = z.object({
 // POST /api/auth/register
 authRouter.post('/register', async (req, res) => {
   try {
-    const { email, password, username, profilePublic } = registerSchema.parse(req.body)
-    const result = await register(email, password, username, profilePublic)
+    const { email, password, username, profileVisibility } = registerSchema.parse(req.body)
+    const result = await register(email, password, username, profileVisibility)
     res.status(201).json(result)
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -41,6 +41,17 @@ authRouter.post('/register', async (req, res) => {
       return
     }
     res.status(500).json({ error: 'Registration failed' })
+  }
+})
+
+// GET /api/auth/username-available/:username (public) - Check username availability for registration
+authRouter.get('/username-available/:username', async (req, res) => {
+  try {
+    const { username } = req.params
+    const result = await checkUsernameAvailability(username)
+    res.json(result)
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to check username' })
   }
 })
 
@@ -111,7 +122,7 @@ const updateProfileSchema = z.object({
     .max(20, 'Username must be at most 20 characters')
     .regex(/^[a-z0-9_]+$/, 'Username can only contain lowercase letters, numbers, and underscores')
     .optional(),
-  profilePublic: z.boolean().optional(),
+  profileVisibility: z.enum(['public', 'restricted', 'private']).optional(),
   displayName: z.string().max(50, 'Display name must be at most 50 characters').nullable().optional(),
   bio: z.string().max(500, 'Bio must be at most 500 characters').nullable().optional()
 })
@@ -153,6 +164,46 @@ authRouter.get('/check-username/:username', authMiddleware, async (req, res) => 
     res.json(result)
   } catch (error) {
     res.status(500).json({ error: 'Failed to check username' })
+  }
+})
+
+// GET /api/auth/check-email/:email (protected) - Check email availability
+authRouter.get('/check-email/:email', authMiddleware, async (req, res) => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ error: 'Not authenticated' })
+      return
+    }
+
+    const { email } = req.params
+    const result = await checkEmailAvailability(email, req.user.userId)
+    res.json(result)
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to check email' })
+  }
+})
+
+// PUT /api/auth/email (protected) - Update user email
+authRouter.put('/email', authMiddleware, emailLimiter, async (req, res) => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ error: 'Not authenticated' })
+      return
+    }
+
+    const { email } = z.object({ email: z.string().email() }).parse(req.body)
+    const user = await updateEmail(req.user.userId, email)
+    res.json({ user, message: 'Email updated. Please check your inbox to verify your new email address.' })
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      res.status(400).json({ error: error.issues[0].message })
+      return
+    }
+    if (error instanceof Error) {
+      res.status(400).json({ error: error.message })
+      return
+    }
+    res.status(500).json({ error: 'Failed to update email' })
   }
 })
 

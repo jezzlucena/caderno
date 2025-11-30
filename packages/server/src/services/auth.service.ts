@@ -12,15 +12,15 @@ export interface AuthResult {
 
 // Reserved usernames that match system routes
 const RESERVED_USERNAMES = [
-  'login', 'register', 'verify-email', 'unlock', 'about', 'terms', 'privacy',
-  'switches', 'federation', 'api', 'admin', 'settings', 'profile', 'user', 'users'
+  'login', 'register', 'verify-email', 'unlock', 'about', 'terms', 'privacy', 'support',
+  'dashboard', 'switches', 'federation', 'api', 'admin', 'settings', 'profile', 'user', 'users'
 ]
 
 export async function register(
   email: string,
   password: string,
   username: string,
-  profilePublic: boolean = false
+  profileVisibility: 'public' | 'restricted' | 'private' = 'private'
 ): Promise<AuthResult> {
   // Normalize username
   const normalizedUsername = username.toLowerCase().trim()
@@ -60,13 +60,20 @@ export async function register(
     passwordHash,
     keySalt,
     username: normalizedUsername,
-    profilePublic,
+    profileVisibility,
     emailVerificationToken,
     emailVerificationExpires
   }).returning()
 
-  // Send verification email
-  await sendVerificationEmail(newUser.email, emailVerificationToken)
+  // Send verification email - rollback user creation if it fails
+  try {
+    await sendVerificationEmail(newUser.email, emailVerificationToken)
+  } catch (error) {
+    // Delete the user we just created
+    await db.delete(users).where(eq(users.id, newUser.id))
+    console.error('[Auth] Failed to send verification email, rolled back user creation:', error)
+    throw new Error('Failed to send verification email. Please try again.')
+  }
 
   // Generate JWT
   const token = await signToken({ userId: newUser.id, email: newUser.email, role: newUser.role })
@@ -93,6 +100,23 @@ export async function login(emailOrUsername: string, password: string): Promise<
   if (!user) {
     console.log('[AuthService] User not found, throwing error')
     throw new Error('Invalid email/username or password')
+  }
+
+  // Check if user is banned
+  if (user.bannedOn) {
+    console.log('[AuthService] User is banned, throwing error')
+    throw new Error('This account has been permanently banned')
+  }
+
+  // Check if user is suspended
+  if (user.suspendedUntil && new Date(user.suspendedUntil) > new Date()) {
+    console.log('[AuthService] User is suspended until:', user.suspendedUntil)
+    const suspendedDate = new Date(user.suspendedUntil).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
+    throw new Error(`This account is suspended until ${suspendedDate}`)
   }
 
   // Verify password
@@ -170,7 +194,7 @@ export async function getUserById(id: number): Promise<Omit<User, 'passwordHash'
 
 export interface UpdateProfileData {
   username?: string
-  profilePublic?: boolean
+  profileVisibility?: 'public' | 'restricted' | 'private'
   displayName?: string | null
   bio?: string | null
 }
@@ -270,4 +294,95 @@ export async function resendVerificationEmail(userId: number): Promise<void> {
 
   // Send verification email
   await sendVerificationEmail(user.email, emailVerificationToken)
+}
+
+export async function checkEmailAvailability(
+  email: string,
+  currentUserId?: number
+): Promise<{ available: boolean; reason?: string }> {
+  const normalizedEmail = email.toLowerCase().trim()
+
+  // Basic email format validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(normalizedEmail)) {
+    return { available: false, reason: 'Invalid email format' }
+  }
+
+  // Check if email is already taken
+  const existingUser = await db.query.users.findFirst({
+    where: eq(users.email, normalizedEmail)
+  })
+
+  if (existingUser && existingUser.id !== currentUserId) {
+    return { available: false, reason: 'Email already registered' }
+  }
+
+  return { available: true }
+}
+
+export async function updateEmail(
+  userId: number,
+  newEmail: string
+): Promise<Omit<User, 'passwordHash' | 'emailVerificationToken'>> {
+  const normalizedEmail = newEmail.toLowerCase().trim()
+
+  // Check if email is already taken by another user
+  const existingUser = await db.query.users.findFirst({
+    where: eq(users.email, normalizedEmail)
+  })
+
+  if (existingUser && existingUser.id !== userId) {
+    throw new Error('Email already registered')
+  }
+
+  // Get current user
+  const currentUser = await db.query.users.findFirst({
+    where: eq(users.id, userId)
+  })
+
+  if (!currentUser) {
+    throw new Error('User not found')
+  }
+
+  // If email is the same, no need to update
+  if (currentUser.email === normalizedEmail) {
+    const { passwordHash: _, emailVerificationToken: __, ...safeUser } = currentUser
+    return safeUser
+  }
+
+  // Generate new verification token
+  const emailVerificationToken = generateToken()
+  const emailVerificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
+
+  // Update user with new email, mark as unverified
+  const [updatedUser] = await db.update(users)
+    .set({
+      email: normalizedEmail,
+      emailVerified: false,
+      emailVerificationToken,
+      emailVerificationExpires,
+      updatedAt: new Date()
+    })
+    .where(eq(users.id, userId))
+    .returning()
+
+  // Send verification email to new address
+  try {
+    await sendVerificationEmail(normalizedEmail, emailVerificationToken)
+  } catch (error) {
+    // Rollback email change if verification email fails
+    await db.update(users)
+      .set({
+        email: currentUser.email,
+        emailVerified: currentUser.emailVerified,
+        emailVerificationToken: currentUser.emailVerificationToken,
+        emailVerificationExpires: currentUser.emailVerificationExpires,
+        updatedAt: new Date()
+      })
+      .where(eq(users.id, userId))
+    throw new Error('Failed to send verification email. Email not updated.')
+  }
+
+  const { passwordHash: _, emailVerificationToken: __, ...safeUser } = updatedUser
+  return safeUser
 }

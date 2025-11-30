@@ -7,13 +7,16 @@ import { Register } from './pages/Register'
 import { VerifyEmail } from './pages/VerifyEmail'
 import { Dashboard } from './pages/Dashboard'
 import { Switches } from './pages/Switches'
+import { Feed } from './pages/Feed'
 import { Unlock } from './pages/Unlock'
 import { About } from './pages/About'
 import { Terms } from './pages/Terms'
 import { Privacy } from './pages/Privacy'
 import { Support } from './pages/Support'
 import { Profile } from './pages/Profile'
+import { NotePage } from './pages/NotePage'
 import { AccountSettings } from './pages/AccountSettings'
+import { PlatformSettings } from './pages/PlatformSettings'
 
 function App() {
   const { token, checkAuth } = useAuthStore()
@@ -44,6 +47,14 @@ function App() {
           }
         />
         <Route
+          path="/feed"
+          element={
+            <ProtectedRoute>
+              <Feed />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/switches"
           element={
             <ProtectedRoute>
@@ -59,6 +70,16 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/platform"
+          element={
+            <ProtectedRoute>
+              <PlatformSettings />
+            </ProtectedRoute>
+          }
+        />
+        {/* Note permalink route - must be before /:username */}
+        <Route path="/:username/notes/:noteId" element={<NotePage />} />
         {/* Profile route - must be last to catch /:username */}
         <Route path="/:username" element={<Profile />} />
       </Routes>
