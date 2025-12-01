@@ -320,6 +320,18 @@ export async function checkEmailAvailability(
   return { available: true }
 }
 
+export async function verifyUserPassword(userId: number, password: string): Promise<boolean> {
+  const user = await db.query.users.findFirst({
+    where: eq(users.id, userId)
+  })
+
+  if (!user) {
+    throw new Error('User not found')
+  }
+
+  return verifyPassword(password, user.passwordHash)
+}
+
 export async function updateEmail(
   userId: number,
   newEmail: string

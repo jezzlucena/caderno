@@ -109,7 +109,10 @@ export const authApi = {
     api<{ user: User; message: string }>('/auth/email', { method: 'PUT', body: { email }, token: getAuthToken() }),
 
   resendVerificationEmail: () =>
-    api<{ message: string }>('/auth/resend-verification', { method: 'POST', token: getAuthToken() })
+    api<{ message: string }>('/auth/resend-verification', { method: 'POST', token: getAuthToken() }),
+
+  verifyPassword: (password: string) =>
+    api<{ valid: boolean }>('/auth/verify-password', { method: 'POST', body: { password }, token: getAuthToken() })
 }
 
 // Entries API

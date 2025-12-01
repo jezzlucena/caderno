@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { toast } from 'react-toastify'
 import { useAuthStore } from '../stores/authStore'
 import { usePlatformStore } from '../stores/platformStore'
 import { Footer } from '../components/Footer'
@@ -7,7 +8,7 @@ import { Footer } from '../components/Footer'
 export function Login() {
   const [emailOrUsername, setEmailOrUsername] = useState('')
   const [password, setPassword] = useState('')
-  const { login, isLoading, error, clearError } = useAuthStore()
+  const { login, isLoading } = useAuthStore()
   const { displayName, fetchSettings } = usePlatformStore()
   const navigate = useNavigate()
   const location = useLocation()
@@ -22,9 +23,10 @@ export function Login() {
     e.preventDefault()
     try {
       await login(emailOrUsername, password)
+      toast.success('Welcome back!')
       navigate(from, { replace: true })
-    } catch {
-      // Error is handled in store
+    } catch (err: any) {
+      toast.error(err.message || 'Login failed')
     }
   }
 
@@ -33,15 +35,6 @@ export function Login() {
       <div className="card bg-base-100 shadow-xl w-full max-w-md ios-card animate-fade-in-up">
         <div className="card-body">
           <h1 className="card-title text-2xl justify-center mb-4">Sign in to {displayName}</h1>
-
-          {error && (
-            <div className="alert alert-error mb-4">
-              <span>{error}</span>
-              <button className="btn btn-ghost btn-sm" onClick={clearError}>
-                &times;
-              </button>
-            </div>
-          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="form-control">

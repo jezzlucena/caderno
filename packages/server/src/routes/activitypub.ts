@@ -2,7 +2,7 @@ import { Router, type Router as RouterType } from 'express'
 import { z } from 'zod'
 import { eq, and } from 'drizzle-orm'
 import { db } from '../db/index.js'
-import { users, followers, publicEntries } from '../db/schema.js'
+import { users, followers, following, publicEntries } from '../db/schema.js'
 import { env } from '../config/env.js'
 import { requireHttpSignature } from '../middleware/httpSignature.js'
 import { signRequest, generateDigest } from '../services/httpSignature.service.js'
@@ -422,12 +422,27 @@ activityPubRouter.post('/users/:username/inbox', requireHttpSignature, async (re
         }
         break
       case 'Accept':
-        // Handle accepted follow request
-        console.log(`[ActivityPub] Follow request accepted by ${activity.actor}`)
+        // Handle accepted follow request - update our following status
+        await handleAccept(user, activity)
         break
       case 'Reject':
-        // Handle rejected follow request
-        console.log(`[ActivityPub] Follow request rejected by ${activity.actor}`)
+        // Handle rejected follow request - remove our pending follow
+        await handleReject(user, activity)
+        break
+      case 'Update':
+        // Handle updated note from remote user
+        console.log(`[ActivityPub] Received Update activity from ${activity.actor}`)
+        // Remote feeds are fetched dynamically, so updates are handled on next fetch
+        break
+      case 'Delete':
+        // Handle deleted note from remote user
+        console.log(`[ActivityPub] Received Delete activity from ${activity.actor} for ${typeof activity.object === 'string' ? activity.object : activity.object?.id}`)
+        // Remote feeds are fetched dynamically, so deletes are handled on next fetch
+        break
+      case 'Create':
+        // Handle new note from remote user (usually delivered when following)
+        console.log(`[ActivityPub] Received Create activity from ${activity.actor}`)
+        // Remote feeds are fetched dynamically from outbox
         break
       default:
         console.log(`[ActivityPub] Unhandled activity type: ${activity.type}`)
@@ -534,6 +549,115 @@ async function handleUnfollow(userId: number, activity: any): Promise<void> {
     .where(eq(followers.followerActorUrl, followerActorUrl))
 
   console.log(`[ActivityPub] Unfollowed by: ${followerActorUrl}`)
+}
+
+/**
+ * Handle an Accept activity - our follow request was accepted
+ * The Accept's object contains the original Follow activity we sent
+ */
+async function handleAccept(user: UserWithKeys, activity: any): Promise<void> {
+  const acceptingActor = activity.actor // The remote user who accepted our follow
+
+  // The object should be the original Follow activity
+  const followObject = activity.object
+
+  // Extract the actor who sent the original Follow (should be a local user)
+  let originalFollowActor: string | undefined
+  if (typeof followObject === 'object' && followObject !== null) {
+    originalFollowActor = followObject.actor
+  } else if (typeof followObject === 'string') {
+    // Sometimes the object is just the Follow activity ID
+    console.log(`[ActivityPub] Accept object is a string (activity ID): ${followObject}`)
+  }
+
+  console.log(`[ActivityPub] Follow request accepted by ${acceptingActor}`)
+  console.log(`[ActivityPub] Original follow actor: ${originalFollowActor}`)
+
+  // Find the local user who sent the follow request
+  // The original follow actor should be a local user URL like https://our-server/users/username
+  const localUserMatch = originalFollowActor?.match(new RegExp(`^${env.SERVER_URL}/users/([^/]+)$`))
+
+  if (localUserMatch) {
+    const localUsername = localUserMatch[1]
+
+    // Find the local user
+    const localUser = await db.query.users.findFirst({
+      where: eq(users.username, localUsername)
+    })
+
+    if (localUser) {
+      // Update the following record to mark it as accepted (not pending)
+      const result = await db.update(following)
+        .set({ pending: false })
+        .where(and(
+          eq(following.userId, localUser.id),
+          eq(following.targetActorUrl, acceptingActor)
+        ))
+
+      console.log(`[ActivityPub] Updated follow status for ${localUsername} -> ${acceptingActor} to accepted`)
+    } else {
+      console.warn(`[ActivityPub] Could not find local user ${localUsername} to update follow status`)
+    }
+  } else {
+    // Fallback: try to find any pending follow to this actor and accept it
+    // This handles cases where the Accept doesn't include full Follow object
+    console.log(`[ActivityPub] Trying fallback: finding any pending follow to ${acceptingActor}`)
+
+    const result = await db.update(following)
+      .set({ pending: false })
+      .where(and(
+        eq(following.targetActorUrl, acceptingActor),
+        eq(following.pending, true)
+      ))
+
+    console.log(`[ActivityPub] Fallback: Updated pending follows to ${acceptingActor}`)
+  }
+}
+
+/**
+ * Handle a Reject activity - our follow request was rejected
+ */
+async function handleReject(user: UserWithKeys, activity: any): Promise<void> {
+  const rejectingActor = activity.actor
+  const followObject = activity.object
+
+  let originalFollowActor: string | undefined
+  if (typeof followObject === 'object' && followObject !== null) {
+    originalFollowActor = followObject.actor
+  }
+
+  console.log(`[ActivityPub] Follow request rejected by ${rejectingActor}`)
+
+  // Find the local user who sent the follow request
+  const localUserMatch = originalFollowActor?.match(new RegExp(`^${env.SERVER_URL}/users/([^/]+)$`))
+
+  if (localUserMatch) {
+    const localUsername = localUserMatch[1]
+
+    const localUser = await db.query.users.findFirst({
+      where: eq(users.username, localUsername)
+    })
+
+    if (localUser) {
+      // Remove the rejected follow
+      await db.delete(following)
+        .where(and(
+          eq(following.userId, localUser.id),
+          eq(following.targetActorUrl, rejectingActor)
+        ))
+
+      console.log(`[ActivityPub] Removed rejected follow for ${localUsername} -> ${rejectingActor}`)
+    }
+  } else {
+    // Fallback: remove any pending follow to this actor
+    await db.delete(following)
+      .where(and(
+        eq(following.targetActorUrl, rejectingActor),
+        eq(following.pending, true)
+      ))
+
+    console.log(`[ActivityPub] Fallback: Removed pending follows to ${rejectingActor}`)
+  }
 }
 
 // ============================================

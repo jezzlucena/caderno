@@ -1,8 +1,13 @@
 import { Router, type Router as RouterType } from 'express'
 import { z } from 'zod'
-import { register, login, verifyEmail, getUserById, updateProfile, checkUsernameAvailability, checkEmailAvailability, updateEmail, resendVerificationEmail } from '../services/auth.service.js'
+import { eq } from 'drizzle-orm'
+import { register, login, verifyEmail, getUserById, updateProfile, checkUsernameAvailability, checkEmailAvailability, updateEmail, resendVerificationEmail, verifyUserPassword } from '../services/auth.service.js'
 import { authMiddleware } from '../middleware/auth.js'
 import { authLimiter, emailLimiter } from '../middleware/rateLimit.js'
+import { db } from '../db/index.js'
+import { users, followers, localFollowers } from '../db/schema.js'
+import { sendAcceptActivity } from './activitypub.js'
+import { env } from '../config/env.js'
 
 export const authRouter: RouterType = Router()
 
@@ -136,7 +141,57 @@ authRouter.put('/profile', authMiddleware, async (req, res) => {
     }
 
     const data = updateProfileSchema.parse(req.body)
+
+    // Get current user to check if visibility is changing
+    const currentUser = await db.query.users.findFirst({
+      where: eq(users.id, req.user.userId)
+    })
+
+    const oldVisibility = currentUser?.profileVisibility
+    const newVisibility = data.profileVisibility
+
     const user = await updateProfile(req.user.userId, data)
+
+    // Handle visibility change from private/restricted to public
+    if (newVisibility === 'public' && oldVisibility !== 'public' && currentUser) {
+      console.log(`[Auth] Profile visibility changed to public for user ${currentUser.username}, auto-accepting pending followers`)
+
+      // Auto-accept all pending local followers
+      await db.update(localFollowers)
+        .set({ accepted: true })
+        .where(eq(localFollowers.userId, currentUser.id))
+
+      // Auto-accept all pending remote followers and send Accept activities
+      const pendingRemoteFollowers = await db.query.followers.findMany({
+        where: eq(followers.userId, currentUser.id)
+      })
+
+      for (const follower of pendingRemoteFollowers) {
+        if (!follower.accepted && currentUser.privateKey && currentUser.username && follower.followActivityId) {
+          // Update to accepted
+          await db.update(followers)
+            .set({ accepted: true })
+            .where(eq(followers.id, follower.id))
+
+          // Send Accept activity
+          const originalFollowActivity = {
+            '@context': 'https://www.w3.org/ns/activitystreams',
+            id: follower.followActivityId,
+            type: 'Follow',
+            actor: follower.followerActorUrl,
+            object: `${env.SERVER_URL}/users/${currentUser.username}`
+          }
+
+          sendAcceptActivity(
+            { id: currentUser.id, username: currentUser.username, publicKey: currentUser.publicKey, privateKey: currentUser.privateKey },
+            follower.followerActorUrl,
+            follower.followerInbox,
+            originalFollowActivity
+          ).catch(err => console.error(`Failed to send Accept to ${follower.followerActorUrl}:`, err))
+        }
+      }
+    }
+
     res.json({ user, message: 'Profile updated successfully' })
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -223,5 +278,35 @@ authRouter.post('/resend-verification', authMiddleware, emailLimiter, async (req
       return
     }
     res.status(500).json({ error: 'Failed to send verification email' })
+  }
+})
+
+// POST /api/auth/verify-password (protected) - Verify user's password
+authRouter.post('/verify-password', authMiddleware, async (req, res) => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ error: 'Not authenticated' })
+      return
+    }
+
+    const { password } = z.object({ password: z.string().min(1) }).parse(req.body)
+    const isValid = await verifyUserPassword(req.user.userId, password)
+
+    if (!isValid) {
+      res.status(401).json({ error: 'Invalid password' })
+      return
+    }
+
+    res.json({ valid: true })
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      res.status(400).json({ error: error.issues[0].message })
+      return
+    }
+    if (error instanceof Error) {
+      res.status(400).json({ error: error.message })
+      return
+    }
+    res.status(500).json({ error: 'Failed to verify password' })
   }
 })

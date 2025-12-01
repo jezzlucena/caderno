@@ -334,6 +334,9 @@ federationRouter.put('/published/:id', async (req, res) => {
       return
     }
 
+    const oldVisibility = entry.visibility
+    const newVisibility = updates.visibility || oldVisibility
+
     // Update the note
     const [updatedEntry] = await db.update(publicEntries)
       .set({
@@ -342,6 +345,98 @@ federationRouter.put('/published/:id', async (req, res) => {
       })
       .where(eq(publicEntries.id, entryId))
       .returning()
+
+    // Get user for ActivityPub delivery
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, userId)
+    })
+
+    // Send appropriate ActivityPub activities to followers
+    if (user?.federationEnabled && user.username && user.privateKey) {
+      const actorUrl = `${env.SERVER_URL}/users/${user.username}`
+      const followersUrl = `${actorUrl}/followers`
+      const noteUrl = `${env.SERVER_URL}/entries/${entry.id}`
+
+      // Determine what activity to send based on visibility change
+      if (newVisibility === 'private' && oldVisibility !== 'private') {
+        // Changed to private - send Delete to remove from followers' feeds
+        const deleteActivity = {
+          '@context': 'https://www.w3.org/ns/activitystreams',
+          id: `${env.SERVER_URL}/activities/${randomUUID()}`,
+          type: 'Delete',
+          actor: actorUrl,
+          object: noteUrl,
+          to: ['https://www.w3.org/ns/activitystreams#Public'],
+          cc: [followersUrl]
+        }
+
+        deliverToFollowers(
+          { id: user.id, username: user.username, publicKey: user.publicKey, privateKey: user.privateKey },
+          deleteActivity
+        ).catch(err => console.error('Failed to deliver Delete activity:', err))
+      } else if (newVisibility !== 'private' && oldVisibility === 'private') {
+        // Changed FROM private TO public/followers - send Create (note is now visible for first time)
+        const to = newVisibility === 'public'
+          ? ['https://www.w3.org/ns/activitystreams#Public']
+          : [followersUrl]
+        const cc = newVisibility === 'public' ? [followersUrl] : []
+
+        const createActivity = {
+          '@context': 'https://www.w3.org/ns/activitystreams',
+          id: `${env.SERVER_URL}/activities/${randomUUID()}`,
+          type: 'Create',
+          actor: actorUrl,
+          published: new Date().toISOString(),
+          to,
+          cc,
+          object: {
+            id: noteUrl,
+            type: 'Note',
+            attributedTo: actorUrl,
+            content: `<h1>${escapeHtml(updatedEntry.title)}</h1>\n${markdownToHtml(updatedEntry.content)}`,
+            published: updatedEntry.published.toISOString(),
+            to,
+            cc
+          }
+        }
+
+        deliverToFollowers(
+          { id: user.id, username: user.username, publicKey: user.publicKey, privateKey: user.privateKey },
+          createActivity
+        ).catch(err => console.error('Failed to deliver Create activity:', err))
+      } else if (newVisibility !== 'private') {
+        // Note was already visible and is still visible - send Update
+        const to = newVisibility === 'public'
+          ? ['https://www.w3.org/ns/activitystreams#Public']
+          : [followersUrl]
+        const cc = newVisibility === 'public' ? [followersUrl] : []
+
+        const updateActivity = {
+          '@context': 'https://www.w3.org/ns/activitystreams',
+          id: `${env.SERVER_URL}/activities/${randomUUID()}`,
+          type: 'Update',
+          actor: actorUrl,
+          published: new Date().toISOString(),
+          to,
+          cc,
+          object: {
+            id: noteUrl,
+            type: 'Note',
+            attributedTo: actorUrl,
+            content: `<h1>${escapeHtml(updatedEntry.title)}</h1>\n${markdownToHtml(updatedEntry.content)}`,
+            published: updatedEntry.published.toISOString(),
+            updated: new Date().toISOString(),
+            to,
+            cc
+          }
+        }
+
+        deliverToFollowers(
+          { id: user.id, username: user.username, publicKey: user.publicKey, privateKey: user.privateKey },
+          updateActivity
+        ).catch(err => console.error('Failed to deliver Update activity:', err))
+      }
+    }
 
     res.json({
       message: 'Note updated successfully',
@@ -385,10 +480,36 @@ federationRouter.delete('/published/:id', async (req, res) => {
       return
     }
 
+    // Get user for ActivityPub delivery before deleting
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, userId)
+    })
+
+    const noteUrl = `${env.SERVER_URL}/entries/${entry.id}`
+
     await db.delete(publicEntries)
       .where(eq(publicEntries.id, entryId))
 
-    // TODO: Send Delete activity to followers
+    // Send Delete activity to followers
+    if (user?.federationEnabled && user.username && user.privateKey && entry.visibility !== 'private') {
+      const actorUrl = `${env.SERVER_URL}/users/${user.username}`
+      const followersUrl = `${actorUrl}/followers`
+
+      const deleteActivity = {
+        '@context': 'https://www.w3.org/ns/activitystreams',
+        id: `${env.SERVER_URL}/activities/${randomUUID()}`,
+        type: 'Delete',
+        actor: actorUrl,
+        object: noteUrl,
+        to: ['https://www.w3.org/ns/activitystreams#Public'],
+        cc: [followersUrl]
+      }
+
+      deliverToFollowers(
+        { id: user.id, username: user.username, publicKey: user.publicKey, privateKey: user.privateKey },
+        deleteActivity
+      ).catch(err => console.error('Failed to deliver Delete activity:', err))
+    }
 
     res.json({ message: 'Entry unpublished successfully' })
   } catch (error) {
@@ -656,9 +777,12 @@ federationRouter.get('/feed', async (req, res) => {
       where: eq(users.id, userId)
     })
 
-    // Get the list of users we follow (ActivityPub following)
+    // Get the list of users we follow (ActivityPub following) - only accepted, not pending
     const followingList = await db.query.following.findMany({
-      where: eq(following.userId, userId)
+      where: and(
+        eq(following.userId, userId),
+        eq(following.pending, false)
+      )
     })
 
     // Get local users we follow (from localFollowers where we are the follower)

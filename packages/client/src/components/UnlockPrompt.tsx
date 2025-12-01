@@ -1,22 +1,22 @@
 import { useState } from 'react'
 import { LockClosedIcon } from '@heroicons/react/24/outline'
+import { toast } from 'react-toastify'
 import { useAuthStore } from '../stores/authStore'
 
 export function UnlockPrompt() {
   const { user, logout, unlock } = useAuthStore()
   const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
   const handleUnlock = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError(null)
     setIsLoading(true)
 
     try {
       await unlock(password)
+      toast.success('Vault unlocked!')
     } catch {
-      setError('Invalid password. Please try again.')
+      toast.error('Invalid password. Please try again.')
     } finally {
       setIsLoading(false)
     }
@@ -36,12 +36,6 @@ export function UnlockPrompt() {
           <p className="text-center text-sm text-base-content/50 mb-4">
             Logged in as: {user?.email}
           </p>
-
-          {error && (
-            <div className="alert alert-error mb-4">
-              <span>{error}</span>
-            </div>
-          )}
 
           <form onSubmit={handleUnlock}>
             <div className="form-control mb-4">

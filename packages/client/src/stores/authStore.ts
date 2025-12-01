@@ -63,6 +63,9 @@ export const useAuthStore = create<AuthState>()(
 
         set({ isLoading: true, error: null })
         try {
+          // Verify password with server first
+          await authApi.verifyPassword(password)
+          // If password is correct, derive the encryption key
           await useCryptoStore.getState().deriveAndSetKey(password, user.keySalt)
           set({ isLoading: false })
         } catch (error) {

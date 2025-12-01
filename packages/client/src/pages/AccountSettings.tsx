@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
+import { toast } from 'react-toastify'
 import { useAuthStore } from '../stores/authStore'
 import { useCryptoStore } from '../stores/cryptoStore'
 import { authApi, federationApi, profileApi, type FederationProfile, type FollowRequest } from '../lib/api'
@@ -10,7 +11,7 @@ import { UnlockPrompt } from '../components/UnlockPrompt'
 type TabType = 'profile' | 'followers'
 
 export function AccountSettings() {
-  const { user, updateProfile, isLoading, error, clearError } = useAuthStore()
+  const { user, updateProfile, isLoading, clearError } = useAuthStore()
   const { isKeyReady } = useCryptoStore()
   const [activeTab, setActiveTab] = useState<TabType>('profile')
 
@@ -20,7 +21,6 @@ export function AccountSettings() {
   const [bio, setBio] = useState('')
   const [profileVisibility, setProfileVisibility] = useState<'public' | 'restricted' | 'private'>('private')
   const [validationError, setValidationError] = useState('')
-  const [successMessage, setSuccessMessage] = useState('')
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null)
   const [checkingUsername, setCheckingUsername] = useState(false)
 
@@ -38,7 +38,6 @@ export function AccountSettings() {
   // Federation state
   const [federationProfile, setFederationProfile] = useState<FederationProfile | null>(null)
   const [federationLoading, setFederationLoading] = useState(true)
-  const [federationError, setFederationError] = useState<string | null>(null)
 
   // Setup state
   const [isSettingUp, setIsSettingUp] = useState(false)
@@ -88,9 +87,9 @@ export function AccountSettings() {
     try {
       await profileApi.acceptFollowRequest(id, type)
       setFollowRequests(followRequests.filter(r => r.id !== id || r.type !== type))
-      setSuccessMessage('Follow request accepted')
+      toast.success('Follow request accepted')
     } catch (err: any) {
-      setValidationError(err.message || 'Failed to accept request')
+      toast.error(err.message || 'Failed to accept request')
     }
   }
 
@@ -99,8 +98,9 @@ export function AccountSettings() {
     try {
       await profileApi.rejectFollowRequest(id, type)
       setFollowRequests(followRequests.filter(r => r.id !== id || r.type !== type))
+      toast.success('Follow request rejected')
     } catch (err: any) {
-      setValidationError(err.message || 'Failed to reject request')
+      toast.error(err.message || 'Failed to reject request')
     }
   }
 
@@ -183,7 +183,7 @@ export function AccountSettings() {
   const handleEmailUpdate = async () => {
     if (!email || email === user?.email) return
     if (emailAvailable === false) {
-      setEmailError('This email is not available')
+      toast.error('This email is not available')
       return
     }
 
@@ -193,10 +193,10 @@ export function AccountSettings() {
       const { user: updatedUser, message } = await authApi.updateEmail(email)
       // Update the user in the auth store
       useAuthStore.getState().setUser(updatedUser)
-      setSuccessMessage(message)
+      toast.success(message)
       setEmailAvailable(null)
     } catch (err: any) {
-      setEmailError(err.message || 'Failed to update email')
+      toast.error(err.message || 'Failed to update email')
     } finally {
       setIsUpdatingEmail(false)
     }
@@ -208,7 +208,7 @@ export function AccountSettings() {
       const { profile } = await federationApi.getProfile()
       setFederationProfile(profile)
     } catch {
-      setFederationError('Failed to load federation profile')
+      toast.error('Failed to load federation profile')
     } finally {
       setFederationLoading(false)
     }
@@ -227,26 +227,25 @@ export function AccountSettings() {
   const handleProfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setValidationError('')
-    setSuccessMessage('')
     clearError()
 
     if (username.length < 3) {
-      setValidationError('Username must be at least 3 characters')
+      toast.error('Username must be at least 3 characters')
       return
     }
 
     if (username.length > 20) {
-      setValidationError('Username must be at most 20 characters')
+      toast.error('Username must be at most 20 characters')
       return
     }
 
     if (!/^[a-z0-9_]+$/.test(username)) {
-      setValidationError('Username can only contain lowercase letters, numbers, and underscores')
+      toast.error('Username can only contain lowercase letters, numbers, and underscores')
       return
     }
 
     if (usernameAvailable === false) {
-      setValidationError('This username is not available')
+      toast.error('This username is not available')
       return
     }
 
@@ -257,7 +256,7 @@ export function AccountSettings() {
         bio: bio || null,
         profileVisibility
       })
-      setSuccessMessage('Profile updated successfully!')
+      toast.success('Profile updated successfully!')
       setUsernameAvailable(null)
     } catch {
       // Error handled in store
@@ -267,28 +266,15 @@ export function AccountSettings() {
   // Federation handlers
   const handleSetup = async () => {
     setIsSettingUp(true)
-    setFederationError(null)
 
     try {
       const { profile } = await federationApi.setup()
       setFederationProfile(profile)
+      toast.success('Notes enabled successfully!')
     } catch (err: any) {
-      setFederationError(err.message || 'Failed to setup federation')
+      toast.error(err.message || 'Failed to setup federation')
     } finally {
       setIsSettingUp(false)
-    }
-  }
-
-  const handleToggleFederation = async () => {
-    if (!federationProfile) return
-
-    try {
-      await federationApi.updateProfile({
-        federationEnabled: !federationProfile.federationEnabled
-      })
-      setFederationProfile({ ...federationProfile, federationEnabled: !federationProfile.federationEnabled })
-    } catch (err: any) {
-      setFederationError(err.message || 'Failed to update profile')
     }
   }
 
@@ -297,13 +283,12 @@ export function AccountSettings() {
 
     setIsLookingUp(true)
     setLookupResult(null)
-    setFederationError(null)
 
     try {
       const { user } = await federationApi.lookup(followHandle.trim())
       setLookupResult(user)
     } catch (err: any) {
-      setFederationError(err.message || 'User not found')
+      toast.error(err.message || 'User not found')
     } finally {
       setIsLookingUp(false)
     }
@@ -313,7 +298,6 @@ export function AccountSettings() {
     if (!followHandle.trim()) return
 
     setIsFollowing(true)
-    setFederationError(null)
 
     try {
       const result = await federationApi.follow(followHandle.trim())
@@ -326,8 +310,9 @@ export function AccountSettings() {
       if (federationProfile) {
         setFederationProfile({ ...federationProfile, followingCount: federationProfile.followingCount + 1 })
       }
+      toast.success(result.following.pending ? 'Follow request sent!' : 'Now following!')
     } catch (err: any) {
-      setFederationError(err.message || 'Failed to follow user')
+      toast.error(err.message || 'Failed to follow user')
     } finally {
       setIsFollowing(false)
     }
@@ -340,13 +325,13 @@ export function AccountSettings() {
       if (federationProfile) {
         setFederationProfile({ ...federationProfile, followingCount: Math.max(0, federationProfile.followingCount - 1) })
       }
+      toast.success('Unfollowed successfully')
     } catch (err: any) {
-      setFederationError(err.message || 'Failed to unfollow user')
+      toast.error(err.message || 'Failed to unfollow user')
     }
   }
 
   const isAlreadyFollowing = lookupResult && followingList.some(f => f.actorUrl === lookupResult.actorUrl)
-  const displayError = validationError || error
 
   if (!isKeyReady) {
     return <UnlockPrompt />
@@ -380,30 +365,6 @@ export function AccountSettings() {
           <div className="card bg-base-100 shadow-xl animate-fade-in-up">
             <div className="card-body">
               <h1 className="card-title text-2xl mb-6">Profile Settings</h1>
-
-              {displayError && (
-                <div className="alert alert-error mb-4">
-                  <span>{displayError}</span>
-                  <button
-                    className="btn btn-ghost btn-sm"
-                    onClick={() => {
-                      setValidationError('')
-                      clearError()
-                    }}
-                  >
-                    &times;
-                  </button>
-                </div>
-              )}
-
-              {successMessage && (
-                <div className="alert alert-success mb-4">
-                  <span>{successMessage}</span>
-                  <button className="btn btn-ghost btn-sm" onClick={() => setSuccessMessage('')}>
-                    &times;
-                  </button>
-                </div>
-              )}
 
               {/* Email - separate from main form since it has its own update flow */}
               <div className="form-control">
@@ -603,13 +564,6 @@ export function AccountSettings() {
         {/* Followers Tab */}
         {activeTab === 'followers' && (
           <div className="space-y-6 animate-fade-in-up">
-            {federationError && (
-              <div className="alert alert-error">
-                <span>{federationError}</span>
-                <button className="btn btn-ghost btn-sm" onClick={() => setFederationError(null)}>Dismiss</button>
-              </div>
-            )}
-
             {/* Pending Follow Requests Card */}
             <div className="card bg-base-100 shadow-xl">
               <div className="card-body">
@@ -745,26 +699,12 @@ export function AccountSettings() {
                 {/* Notes Profile Card */}
                 <div className="card bg-base-100 shadow-xl">
                   <div className="card-body p-4 sm:p-6">
-                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
-                      <div>
-                        <h2 className="card-title text-base sm:text-lg">{federationProfile.displayName || federationProfile.username}</h2>
-                        <p className="text-primary font-mono text-sm break-all">{federationProfile.handle}</p>
-                        {federationProfile.bio && (
-                          <p className="mt-2 text-sm text-base-content/70">{federationProfile.bio}</p>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className={`badge badge-sm sm:badge-md ${federationProfile.federationEnabled ? 'badge-success' : 'badge-ghost'}`}>
-                          {federationProfile.federationEnabled ? 'Active' : 'Paused'}
-                        </span>
-                        <input
-                          type="checkbox"
-                          className="toggle toggle-sm sm:toggle-md toggle-success"
-                          checked={federationProfile.federationEnabled}
-                          onChange={handleToggleFederation}
-                          aria-label="Toggle notes"
-                        />
-                      </div>
+                    <div>
+                      <h2 className="card-title text-base sm:text-lg">{federationProfile.displayName || federationProfile.username}</h2>
+                      <p className="text-primary font-mono text-sm break-all">{federationProfile.handle}</p>
+                      {federationProfile.bio && (
+                        <p className="mt-2 text-sm text-base-content/70">{federationProfile.bio}</p>
+                      )}
                     </div>
 
                     <div className="divider"></div>
@@ -801,13 +741,7 @@ export function AccountSettings() {
                       Follow users from this instance or other Caderno instances
                     </p>
 
-                    {!federationProfile.federationEnabled ? (
-                      <div className="alert alert-warning mt-4">
-                        <span>Enable notes to follow users.</span>
-                      </div>
-                    ) : (
-                      <>
-                        <div className="flex gap-2 mt-4">
+                    <div className="flex gap-2 mt-4">
                           <input
                             type="text"
                             className="input input-bordered flex-1"
@@ -892,9 +826,7 @@ export function AccountSettings() {
                               })}
                             </div>
                           )}
-                        </div>
-                      </>
-                    )}
+                    </div>
                   </div>
                 </div>
               </>

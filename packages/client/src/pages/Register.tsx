@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 import { useAuthStore } from '../stores/authStore'
 import { authApi } from '../lib/api'
 import { Footer } from '../components/Footer'
@@ -10,11 +11,10 @@ export function Register() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [profileVisibility, setProfileVisibility] = useState<'public' | 'restricted' | 'private'>('private')
-  const [validationError, setValidationError] = useState('')
   const [checkingUsername, setCheckingUsername] = useState(false)
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null)
   const [usernameError, setUsernameError] = useState('')
-  const { register, isLoading, error, clearError } = useAuthStore()
+  const { register, isLoading } = useAuthStore()
   const navigate = useNavigate()
 
   // Debounced username availability check
@@ -57,69 +57,52 @@ export function Register() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setValidationError('')
 
     // Username validation
     if (username.length < 3) {
-      setValidationError('Username must be at least 3 characters')
+      toast.error('Username must be at least 3 characters')
       return
     }
 
     if (username.length > 20) {
-      setValidationError('Username must be at most 20 characters')
+      toast.error('Username must be at most 20 characters')
       return
     }
 
     if (!/^[a-z0-9_]+$/.test(username)) {
-      setValidationError('Username can only contain lowercase letters, numbers, and underscores')
+      toast.error('Username can only contain lowercase letters, numbers, and underscores')
       return
     }
 
     if (usernameAvailable === false) {
-      setValidationError(usernameError || 'Username is not available')
+      toast.error(usernameError || 'Username is not available')
       return
     }
 
     if (password !== confirmPassword) {
-      setValidationError('Passwords do not match')
+      toast.error('Passwords do not match')
       return
     }
 
     if (password.length < 8) {
-      setValidationError('Password must be at least 8 characters')
+      toast.error('Password must be at least 8 characters')
       return
     }
 
     try {
       await register(email, password, username, profileVisibility)
+      toast.success('Account created successfully!')
       navigate('/', { replace: true })
-    } catch {
-      // Error is handled in store
+    } catch (err: any) {
+      toast.error(err.message || 'Registration failed')
     }
   }
-
-  const displayError = validationError || error
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-base-200 p-4 animate-fade-in">
       <div className="card bg-base-100 shadow-xl w-full max-w-md ios-card animate-fade-in-up">
         <div className="card-body">
           <h1 className="card-title text-2xl justify-center mb-4">Create Account</h1>
-
-          {displayError && (
-            <div className="alert alert-error mb-4">
-              <span>{displayError}</span>
-              <button
-                className="btn btn-ghost btn-sm"
-                onClick={() => {
-                  setValidationError('')
-                  clearError()
-                }}
-              >
-                &times;
-              </button>
-            </div>
-          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="form-control">
