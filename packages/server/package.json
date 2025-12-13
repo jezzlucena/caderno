@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@sendgrid/mail": "^8.1.6",
+    "@simplewebauthn/server": "^13.2.2",
     "argon2": "^0.44.0",
     "cors": "^2.8.5",
     "drizzle-orm": "^0.38.0",
@@ -20,6 +21,7 @@
     "helmet": "^8.0.0",
     "jose": "^6.1.2",
     "postgres": "^3.4.5",
+    "socket.io": "^4.8.1",
     "zod": "^4.1.13"
   },
   "devDependencies": {

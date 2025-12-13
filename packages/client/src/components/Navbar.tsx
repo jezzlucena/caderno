@@ -4,9 +4,10 @@ import { ArrowRightStartOnRectangleIcon, ArrowLeftEndOnRectangleIcon, LockClosed
 import { useAuthStore } from '../stores/authStore'
 import { useUIStore } from '../stores/uiStore'
 import { usePlatformStore } from '../stores/platformStore'
+import { NotificationBell } from './NotificationBell'
 import logoUrl from '../assets/logo.svg'
 
-type Page = 'journal' | 'feed' | 'switches' | 'settings' | 'platform' | 'about' | 'terms' | 'privacy' | 'support'
+type Page = 'journal' | 'feed' | 'switches' | 'settings' | 'platform' | 'about' | 'terms' | 'privacy' | 'support' | 'compare' | 'notifications'
 
 interface NavbarProps {
   currentPage: Page
@@ -66,6 +67,9 @@ export function Navbar({ currentPage }: NavbarProps) {
             @{user.username}
           </Link>
         )}
+
+        {/* Notifications bell (only when authenticated) */}
+        {isAuthenticated && <NotificationBell />}
 
         {/* Settings link (only when authenticated) */}
         {isAuthenticated && (

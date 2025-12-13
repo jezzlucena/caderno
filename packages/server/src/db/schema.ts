@@ -124,7 +124,10 @@ export const usersRelations = relations(users, ({ many }) => ({
   following: many(following),
   localFollowers: many(localFollowers, { relationName: 'userFollowers' }),
   localFollowing: many(localFollowers, { relationName: 'userFollowing' }),
-  switches: many(deadManSwitches)
+  switches: many(deadManSwitches),
+  notifications: many(notifications, { relationName: 'userNotifications' }),
+  actedNotifications: many(notifications, { relationName: 'actorNotifications' }),
+  passkeys: many(passkeys)
 }))
 
 export const deadManSwitchesRelations = relations(deadManSwitches, ({ one, many }) => ({
@@ -187,6 +190,59 @@ export const platformSettings = pgTable('platform_settings', {
   updatedAt: timestamp('updated_at').defaultNow().notNull()
 })
 
+// Notifications - user notifications for follows, posts, etc.
+export const notifications = pgTable('notifications', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }), // Recipient
+  type: text('type').notNull(), // 'new_post' | 'follow_request' | 'follow_accepted'
+  actorId: integer('actor_id').references(() => users.id, { onDelete: 'cascade' }), // Local user who triggered it
+  actorActorUrl: text('actor_actor_url'), // For remote ActivityPub actors
+  referenceId: integer('reference_id'), // ID of related entity (publicEntry.id, localFollower.id, etc.)
+  referenceType: text('reference_type'), // 'public_entry' | 'local_follower' | 'remote_follower'
+  isRead: boolean('is_read').default(false).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull()
+})
+
+export const notificationsRelations = relations(notifications, ({ one }) => ({
+  user: one(users, {
+    fields: [notifications.userId],
+    references: [users.id],
+    relationName: 'userNotifications'
+  }),
+  actor: one(users, {
+    fields: [notifications.actorId],
+    references: [users.id],
+    relationName: 'actorNotifications'
+  })
+}))
+
+// Passkeys - WebAuthn credentials for passwordless authentication
+export const passkeys = pgTable('passkeys', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  credentialId: text('credential_id').notNull().unique(), // Base64URL encoded credential ID
+  publicKey: text('public_key').notNull(), // Base64URL encoded public key
+  counter: bigint('counter', { mode: 'number' }).notNull().default(0), // Signature counter for replay attack prevention
+  deviceType: text('device_type').notNull(), // 'singleDevice' | 'multiDevice'
+  backedUp: boolean('backed_up').notNull().default(false), // Whether credential is backed up
+  transports: text('transports'), // JSON array of transports (usb, ble, nfc, internal, etc.)
+  name: text('name'), // User-provided name for the passkey
+  // PRF extension support for E2EE key derivation
+  prfSupported: boolean('prf_supported').default(false).notNull(), // Whether passkey supports PRF extension
+  prfSalt: text('prf_salt'), // Salt used for PRF evaluation (base64url)
+  encryptedMasterKey: text('encrypted_master_key'), // User's master encryption key encrypted with PRF-derived key
+  masterKeyIv: text('master_key_iv'), // IV for master key encryption
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  lastUsedAt: timestamp('last_used_at')
+})
+
+export const passkeysRelations = relations(passkeys, ({ one }) => ({
+  user: one(users, {
+    fields: [passkeys.userId],
+    references: [users.id]
+  })
+}))
+
 export type User = typeof users.$inferSelect
 export type NewUser = typeof users.$inferInsert
 export type Entry = typeof entries.$inferSelect
@@ -205,3 +261,7 @@ export type PublicEntry = typeof publicEntries.$inferSelect
 export type NewPublicEntry = typeof publicEntries.$inferInsert
 export type PlatformSettings = typeof platformSettings.$inferSelect
 export type NewPlatformSettings = typeof platformSettings.$inferInsert
+export type Notification = typeof notifications.$inferSelect
+export type NewNotification = typeof notifications.$inferInsert
+export type Passkey = typeof passkeys.$inferSelect
+export type NewPasskey = typeof passkeys.$inferInsert

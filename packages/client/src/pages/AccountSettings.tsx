@@ -1,12 +1,16 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import { startRegistration, startAuthentication, browserSupportsWebAuthn } from '@simplewebauthn/browser'
+import { FingerPrintIcon, TrashIcon, PencilIcon } from '@heroicons/react/24/outline'
 import { useAuthStore } from '../stores/authStore'
 import { useCryptoStore } from '../stores/cryptoStore'
-import { authApi, federationApi, profileApi, type FederationProfile, type FollowRequest } from '../lib/api'
+import { authApi, federationApi, profileApi, passkeyApi, type FederationProfile, type FollowRequest, type PasskeyInfo } from '../lib/api'
+import { deriveKeyFromPrf, encryptMasterKeyWithPrf, base64UrlToBuffer } from '../lib/crypto'
 import { Navbar } from '../components/Navbar'
 import { Footer } from '../components/Footer'
 import { UnlockPrompt } from '../components/UnlockPrompt'
+import { useDebouncedValidation } from '../hooks/useDebouncedValidation'
 
 type TabType = 'profile' | 'followers'
 
@@ -20,9 +24,6 @@ export function AccountSettings() {
   const [displayName, setDisplayName] = useState('')
   const [bio, setBio] = useState('')
   const [profileVisibility, setProfileVisibility] = useState<'public' | 'restricted' | 'private'>('private')
-  const [validationError, setValidationError] = useState('')
-  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null)
-  const [checkingUsername, setCheckingUsername] = useState(false)
 
   // Follow requests state
   const [followRequests, setFollowRequests] = useState<FollowRequest[]>([])
@@ -30,9 +31,6 @@ export function AccountSettings() {
 
   // Email form state
   const [email, setEmail] = useState('')
-  const [emailAvailable, setEmailAvailable] = useState<boolean | null>(null)
-  const [checkingEmail, setCheckingEmail] = useState(false)
-  const [emailError, setEmailError] = useState('')
   const [isUpdatingEmail, setIsUpdatingEmail] = useState(false)
 
   // Federation state
@@ -49,6 +47,45 @@ export function AccountSettings() {
   const [lookupResult, setLookupResult] = useState<{ actorUrl: string; username: string; displayName: string | null; bio: string | null; isLocal: boolean } | null>(null)
   const [isLookingUp, setIsLookingUp] = useState(false)
 
+  // Passkey state
+  const [passkeys, setPasskeys] = useState<PasskeyInfo[]>([])
+  const [passkeysLoading, setPasskeysLoading] = useState(true)
+  const [isAddingPasskey, setIsAddingPasskey] = useState(false)
+  const [newPasskeyName, setNewPasskeyName] = useState('')
+  const [editingPasskeyId, setEditingPasskeyId] = useState<number | null>(null)
+  const [editingPasskeyName, setEditingPasskeyName] = useState('')
+  const supportsPasskey = browserSupportsWebAuthn()
+
+  // Debounced username availability check
+  const {
+    isChecking: checkingUsername,
+    isAvailable: usernameAvailable,
+    error: validationError,
+    checkValue: checkUsername,
+    reset: resetUsernameValidation
+  } = useDebouncedValidation({
+    validate: async (value) => authApi.checkUsername(value),
+    minLength: 3,
+    pattern: /^[a-z0-9_]+$/,
+    debounceMs: 500,
+    skipValue: user?.username ?? undefined
+  })
+
+  // Debounced email availability check
+  const {
+    isChecking: checkingEmail,
+    isAvailable: emailAvailable,
+    error: emailError,
+    checkValue: checkEmail,
+    reset: resetEmailValidation
+  } = useDebouncedValidation({
+    validate: async (value) => authApi.checkEmail(value),
+    minLength: 5,
+    pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+    debounceMs: 500,
+    skipValue: user?.email ?? undefined
+  })
+
   // Initialize profile form with current user data
   useEffect(() => {
     if (user) {
@@ -57,17 +94,162 @@ export function AccountSettings() {
       setDisplayName(user.displayName || '')
       setBio(user.bio || '')
       setProfileVisibility(user.profileVisibility)
+      resetUsernameValidation()
+      resetEmailValidation()
     }
-  }, [user])
+  }, [user, resetUsernameValidation, resetEmailValidation])
 
-  // Fetch federation data when key is ready
+  // Fetch federation data and passkeys when key is ready
   useEffect(() => {
     if (isKeyReady) {
       fetchFederationProfile()
       fetchFollowing()
       fetchFollowRequests()
+      fetchPasskeys()
     }
   }, [isKeyReady])
+
+  // Fetch passkeys
+  const fetchPasskeys = useCallback(async () => {
+    setPasskeysLoading(true)
+    try {
+      const { passkeys: passkeyList } = await passkeyApi.list()
+      setPasskeys(passkeyList)
+    } catch {
+      // Silently fail
+    } finally {
+      setPasskeysLoading(false)
+    }
+  }, [])
+
+  // Add passkey handler with PRF support for E2EE key encryption
+  const handleAddPasskey = async () => {
+    if (!supportsPasskey) {
+      toast.error('Passkeys are not supported on this device')
+      return
+    }
+
+    const masterKey = useCryptoStore.getState().getKey()
+    if (!masterKey) {
+      toast.error('Encryption key not available. Please unlock first.')
+      return
+    }
+
+    setIsAddingPasskey(true)
+    try {
+      // Get registration options from server (includes PRF extension)
+      const { options, challengeKey, prfSalt } = await passkeyApi.getRegistrationOptions()
+
+      // Start WebAuthn registration with PRF extension
+      const regResponse = await startRegistration({
+        optionsJSON: options as Parameters<typeof startRegistration>[0]['optionsJSON']
+      })
+
+      // Verify with server and check PRF support
+      const { passkey, prfSupported } = await passkeyApi.verifyRegistration(
+        challengeKey,
+        regResponse,
+        newPasskeyName || 'Passkey'
+      )
+
+      if (!passkey) {
+        throw new Error('Failed to register passkey')
+      }
+
+      // If PRF is supported, encrypt the master key with passkey
+      if (prfSupported && prfSalt) {
+        try {
+          // Need to authenticate with PRF to get the secret
+          // Build authentication options with PRF eval
+          const prfSaltBuffer = base64UrlToBuffer(prfSalt)
+
+          const authOptions = {
+            rpId: (options as any).rp?.id || window.location.hostname,
+            challenge: crypto.getRandomValues(new Uint8Array(32)),
+            allowCredentials: [{
+              id: passkey.id.toString(),
+              type: 'public-key' as const,
+              transports: ['internal' as const]
+            }],
+            userVerification: 'preferred' as const,
+            extensions: {
+              prf: {
+                eval: {
+                  first: prfSaltBuffer
+                }
+              }
+            }
+          }
+
+          // Get PRF output through authentication
+          const authResponse = await startAuthentication({
+            optionsJSON: authOptions as any
+          })
+
+          // Get PRF result from client extension results
+          const prfResult = (authResponse as any).clientExtensionResults?.prf?.results?.first
+          if (prfResult) {
+            // Derive encryption key from PRF output
+            const prfKey = await deriveKeyFromPrf(prfResult)
+
+            // Encrypt master key with PRF-derived key
+            const { encryptedKey, iv } = await encryptMasterKeyWithPrf(masterKey, prfKey)
+
+            // Store encrypted key on server
+            await passkeyApi.storeEncryptedKey(passkey.id, encryptedKey, iv)
+
+            toast.success('Passkey added with E2EE key backup!')
+          } else {
+            toast.success('Passkey added (without E2EE key backup)')
+          }
+        } catch (prfError) {
+          console.warn('PRF key encryption failed:', prfError)
+          toast.success('Passkey added (E2EE key backup not available)')
+        }
+      } else {
+        toast.success('Passkey added successfully!')
+      }
+
+      setPasskeys([...passkeys, passkey])
+      setNewPasskeyName('')
+    } catch (err: any) {
+      if (err.name === 'NotAllowedError') {
+        toast.error('Passkey registration was cancelled')
+      } else {
+        toast.error(err.message || 'Failed to add passkey')
+      }
+    } finally {
+      setIsAddingPasskey(false)
+    }
+  }
+
+  // Delete passkey handler
+  const handleDeletePasskey = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this passkey?')) return
+
+    try {
+      await passkeyApi.delete(id)
+      setPasskeys(passkeys.filter(p => p.id !== id))
+      toast.success('Passkey deleted')
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to delete passkey')
+    }
+  }
+
+  // Rename passkey handler
+  const handleRenamePasskey = async (id: number) => {
+    if (!editingPasskeyName.trim()) return
+
+    try {
+      const { passkey } = await passkeyApi.rename(id, editingPasskeyName.trim())
+      setPasskeys(passkeys.map(p => p.id === id ? passkey : p))
+      setEditingPasskeyId(null)
+      setEditingPasskeyName('')
+      toast.success('Passkey renamed')
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to rename passkey')
+    }
+  }
 
   // Fetch follow requests
   const fetchFollowRequests = async () => {
@@ -104,79 +286,14 @@ export function AccountSettings() {
     }
   }
 
-  // Debounced username availability check
-  const checkUsername = useCallback(async (value: string) => {
-    if (!value || value.length < 3 || value === user?.username) {
-      setUsernameAvailable(null)
-      return
-    }
-
-    if (!/^[a-z0-9_]+$/.test(value)) {
-      setUsernameAvailable(null)
-      return
-    }
-
-    setCheckingUsername(true)
-    try {
-      const result = await authApi.checkUsername(value)
-      setUsernameAvailable(result.available)
-      if (!result.available && result.reason) {
-        setValidationError(result.reason)
-      } else {
-        setValidationError('')
-      }
-    } catch {
-      setUsernameAvailable(null)
-    } finally {
-      setCheckingUsername(false)
-    }
-  }, [user?.username])
-
+  // Trigger username validation on change
   useEffect(() => {
-    const timer = setTimeout(() => {
-      checkUsername(username)
-    }, 500)
-    return () => clearTimeout(timer)
+    checkUsername(username)
   }, [username, checkUsername])
 
-  // Debounced email availability check
-  const checkEmail = useCallback(async (value: string) => {
-    if (!value || value === user?.email) {
-      setEmailAvailable(null)
-      setEmailError('')
-      return
-    }
-
-    // Basic email format check
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(value)) {
-      setEmailAvailable(null)
-      setEmailError('')
-      return
-    }
-
-    setCheckingEmail(true)
-    try {
-      const result = await authApi.checkEmail(value)
-      setEmailAvailable(result.available)
-      if (!result.available && result.reason) {
-        setEmailError(result.reason)
-      } else {
-        setEmailError('')
-      }
-    } catch {
-      setEmailAvailable(null)
-      setEmailError('')
-    } finally {
-      setCheckingEmail(false)
-    }
-  }, [user?.email])
-
+  // Trigger email validation on change
   useEffect(() => {
-    const timer = setTimeout(() => {
-      checkEmail(email)
-    }, 500)
-    return () => clearTimeout(timer)
+    checkEmail(email)
   }, [email, checkEmail])
 
   // Email update handler
@@ -188,13 +305,12 @@ export function AccountSettings() {
     }
 
     setIsUpdatingEmail(true)
-    setEmailError('')
     try {
       const { user: updatedUser, message } = await authApi.updateEmail(email)
       // Update the user in the auth store
       useAuthStore.getState().setUser(updatedUser)
       toast.success(message)
-      setEmailAvailable(null)
+      resetEmailValidation()
     } catch (err: any) {
       toast.error(err.message || 'Failed to update email')
     } finally {
@@ -226,7 +342,6 @@ export function AccountSettings() {
   // Profile handlers
   const handleProfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setValidationError('')
     clearError()
 
     if (username.length < 3) {
@@ -257,7 +372,7 @@ export function AccountSettings() {
         profileVisibility
       })
       toast.success('Profile updated successfully!')
-      setUsernameAvailable(null)
+      resetUsernameValidation()
     } catch {
       // Error handled in store
     }
@@ -557,6 +672,130 @@ export function AccountSettings() {
                   {isLoading ? <span className="loading loading-spinner"></span> : 'Save Changes'}
                 </button>
               </form>
+
+              {/* Passkeys Section */}
+              <div className="divider mt-8"></div>
+
+              <h2 className="card-title text-xl mb-4">
+                <FingerPrintIcon className="h-6 w-6" />
+                Passkeys
+              </h2>
+              <p className="text-sm text-base-content/70 mb-4">
+                Passkeys let you sign in quickly and securely using biometrics like Face ID or Touch ID.
+                {!supportsPasskey && (
+                  <span className="text-warning ml-1">Your browser doesn't support passkeys.</span>
+                )}
+              </p>
+
+              {passkeysLoading ? (
+                <div className="flex justify-center py-4">
+                  <span className="loading loading-spinner loading-sm"></span>
+                </div>
+              ) : (
+                <>
+                  {passkeys.length > 0 && (
+                    <div className="space-y-2 mb-4">
+                      {passkeys.map((pk) => (
+                        <div key={pk.id} className="flex items-center justify-between p-3 bg-base-200 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <FingerPrintIcon className="h-5 w-5 text-primary" />
+                            <div>
+                              {editingPasskeyId === pk.id ? (
+                                <div className="flex items-center gap-2">
+                                  <input
+                                    type="text"
+                                    className="input input-bordered input-sm w-40"
+                                    value={editingPasskeyName}
+                                    onChange={(e) => setEditingPasskeyName(e.target.value)}
+                                    onKeyDown={(e) => e.key === 'Enter' && handleRenamePasskey(pk.id)}
+                                    autoFocus
+                                  />
+                                  <button
+                                    className="btn btn-primary btn-sm"
+                                    onClick={() => handleRenamePasskey(pk.id)}
+                                  >
+                                    Save
+                                  </button>
+                                  <button
+                                    className="btn btn-ghost btn-sm"
+                                    onClick={() => {
+                                      setEditingPasskeyId(null)
+                                      setEditingPasskeyName('')
+                                    }}
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              ) : (
+                                <>
+                                  <p className="font-medium">{pk.name || 'Passkey'}</p>
+                                  <p className="text-xs text-base-content/60">
+                                    {pk.deviceType === 'multiDevice' ? 'Synced' : 'Device-bound'}
+                                    {pk.backedUp && ' • Backed up'}
+                                    {pk.lastUsedAt && ` • Last used ${new Date(pk.lastUsedAt).toLocaleDateString()}`}
+                                  </p>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                          {editingPasskeyId !== pk.id && (
+                            <div className="flex gap-1">
+                              <button
+                                className="btn btn-ghost btn-sm btn-square"
+                                onClick={() => {
+                                  setEditingPasskeyId(pk.id)
+                                  setEditingPasskeyName(pk.name || '')
+                                }}
+                                title="Rename"
+                              >
+                                <PencilIcon className="h-4 w-4" />
+                              </button>
+                              <button
+                                className="btn btn-ghost btn-sm btn-square text-error"
+                                onClick={() => handleDeletePasskey(pk.id)}
+                                title="Delete"
+                              >
+                                <TrashIcon className="h-4 w-4" />
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {supportsPasskey && (
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        className="input input-bordered flex-1"
+                        placeholder="Passkey name (optional)"
+                        value={newPasskeyName}
+                        onChange={(e) => setNewPasskeyName(e.target.value)}
+                        disabled={isAddingPasskey}
+                      />
+                      <button
+                        className="btn btn-primary gap-2"
+                        onClick={handleAddPasskey}
+                        disabled={isAddingPasskey}
+                      >
+                        {isAddingPasskey ? (
+                          <span className="loading loading-spinner loading-sm"></span>
+                        ) : (
+                          <FingerPrintIcon className="h-5 w-5" />
+                        )}
+                        Add Passkey
+                      </button>
+                    </div>
+                  )}
+
+                  {passkeys.length === 0 && !supportsPasskey && (
+                    <div className="text-center text-base-content/60 py-4">
+                      Passkeys are not available on this device.
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           </div>
         )}

@@ -3,9 +3,11 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useAuthStore } from './stores/authStore'
+import { useSetupStore } from './stores/setupStore'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { Login } from './pages/Login'
 import { Register } from './pages/Register'
+import { Setup } from './pages/Setup'
 import { VerifyEmail } from './pages/VerifyEmail'
 import { Dashboard } from './pages/Dashboard'
 import { Switches } from './pages/Switches'
@@ -15,19 +17,58 @@ import { About } from './pages/About'
 import { Terms } from './pages/Terms'
 import { Privacy } from './pages/Privacy'
 import { Support } from './pages/Support'
+import { Compare } from './pages/Compare'
 import { Profile } from './pages/Profile'
 import { NotePage } from './pages/NotePage'
 import { AccountSettings } from './pages/AccountSettings'
 import { PlatformSettings } from './pages/PlatformSettings'
+import { Notifications } from './pages/Notifications'
 
 function App() {
   const { token, checkAuth } = useAuthStore()
+  const { needsSetup, isLoading: setupLoading, checkSetupStatus } = useSetupStore()
+
+  useEffect(() => {
+    checkSetupStatus()
+  }, [checkSetupStatus])
 
   useEffect(() => {
     if (token) {
       checkAuth()
     }
   }, [token, checkAuth])
+
+  // Show loading while checking setup status
+  if (needsSetup === null || setupLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-base-200">
+        <span className="loading loading-spinner loading-lg text-primary"></span>
+      </div>
+    )
+  }
+
+  // If setup is needed, show only the setup route
+  if (needsSetup) {
+    return (
+      <BrowserRouter>
+        <ToastContainer
+          position="top-right"
+          autoClose={4000}
+          hideProgressBar={false}
+          newestOnTop
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
+        <Routes>
+          <Route path="/setup" element={<Setup />} />
+          <Route path="*" element={<Navigate to="/setup" replace />} />
+        </Routes>
+      </BrowserRouter>
+    )
+  }
 
   return (
     <BrowserRouter>
@@ -51,6 +92,8 @@ function App() {
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/support" element={<Support />} />
+        <Route path="/compare" element={<Compare />} />
+        <Route path="/setup" element={<Navigate to="/" replace />} />
         <Route
           path="/"
           element={
@@ -88,6 +131,14 @@ function App() {
           element={
             <ProtectedRoute>
               <PlatformSettings />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/notifications"
+          element={
+            <ProtectedRoute>
+              <Notifications />
             </ProtectedRoute>
           }
         />

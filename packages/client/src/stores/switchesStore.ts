@@ -1,7 +1,8 @@
 import { create } from 'zustand'
-import { switchesApi, type DeadManSwitch, type SwitchRecipient, ApiError } from '../lib/api'
-import { useCryptoStore } from './cryptoStore'
+import { switchesApi, type DeadManSwitch, type SwitchRecipient } from '../lib/api'
 import { encrypt, decrypt } from '../lib/crypto'
+import { getErrorMessage } from '../lib/storeUtils'
+import { getEncryptionKeyOrError, requireEncryptionKey } from '../hooks/useCryptoGuard'
 
 // Decrypted switch for UI display
 export interface DecryptedSwitch {
@@ -61,11 +62,8 @@ export const useSwitchesStore = create<SwitchesState>((set, get) => ({
   fetchSwitches: async () => {
     if (isFetching || get().isLoading) return
 
-    const cryptoStore = useCryptoStore.getState()
-    if (!cryptoStore.encryptionKey) {
-      set({ error: 'Encryption key not available' })
-      return
-    }
+    const encryptionKey = getEncryptionKeyOrError((err) => set({ error: err }))
+    if (!encryptionKey) return
 
     isFetching = true
     set({ isLoading: true, error: null })
@@ -75,11 +73,7 @@ export const useSwitchesStore = create<SwitchesState>((set, get) => ({
       // Decrypt all switch names
       const decryptedSwitches: DecryptedSwitch[] = await Promise.all(
         switches.map(async (sw: DeadManSwitch) => {
-          const name = await decrypt(
-            cryptoStore.encryptionKey!,
-            sw.encryptedName,
-            sw.iv
-          )
+          const name = await decrypt(encryptionKey, sw.encryptedName, sw.iv)
           return {
             id: sw.id,
             userId: sw.userId,
@@ -102,27 +96,19 @@ export const useSwitchesStore = create<SwitchesState>((set, get) => ({
 
       set({ switches: decryptedSwitches, isLoading: false })
     } catch (error) {
-      const message = error instanceof ApiError ? error.message : 'Failed to fetch switches'
-      set({ error: message, isLoading: false })
-      console.error('Failed to fetch switches:', error)
+      set({ error: getErrorMessage(error, 'Failed to fetch switches'), isLoading: false })
     } finally {
       isFetching = false
     }
   },
 
   createSwitch: async (data) => {
-    const cryptoStore = useCryptoStore.getState()
-    if (!cryptoStore.encryptionKey) {
-      throw new Error('Encryption key not available')
-    }
+    const encryptionKey = requireEncryptionKey()
 
     set({ isLoading: true, error: null })
     try {
       // Encrypt the switch name client-side
-      const { ciphertext: encryptedName, iv } = await encrypt(
-        cryptoStore.encryptionKey,
-        data.name
-      )
+      const { ciphertext: encryptedName, iv } = await encrypt(encryptionKey, data.name)
 
       // Send encrypted data to server
       const result = await switchesApi.create({
@@ -161,17 +147,13 @@ export const useSwitchesStore = create<SwitchesState>((set, get) => ({
       }))
       return decryptedSwitch
     } catch (error) {
-      const message = error instanceof ApiError ? error.message : 'Failed to create switch'
-      set({ error: message, isLoading: false })
+      set({ error: getErrorMessage(error, 'Failed to create switch'), isLoading: false })
       throw error
     }
   },
 
   updateSwitch: async (id, data) => {
-    const cryptoStore = useCryptoStore.getState()
-    if (!cryptoStore.encryptionKey) {
-      throw new Error('Encryption key not available')
-    }
+    const encryptionKey = requireEncryptionKey()
 
     set({ isLoading: true, error: null })
     try {
@@ -186,10 +168,7 @@ export const useSwitchesStore = create<SwitchesState>((set, get) => ({
       } = {}
 
       if (data.name !== undefined) {
-        const { ciphertext: encryptedName, iv } = await encrypt(
-          cryptoStore.encryptionKey,
-          data.name
-        )
+        const { ciphertext: encryptedName, iv } = await encrypt(encryptionKey, data.name)
         updateData.encryptedName = encryptedName
         updateData.iv = iv
       }
@@ -201,11 +180,7 @@ export const useSwitchesStore = create<SwitchesState>((set, get) => ({
       const result = await switchesApi.update(id, updateData)
 
       // Decrypt the returned switch name
-      const name = await decrypt(
-        cryptoStore.encryptionKey,
-        result.switch.encryptedName,
-        result.switch.iv
-      )
+      const name = await decrypt(encryptionKey, result.switch.encryptedName, result.switch.iv)
 
       const decryptedSwitch: DecryptedSwitch = {
         id: result.switch.id,
@@ -230,8 +205,7 @@ export const useSwitchesStore = create<SwitchesState>((set, get) => ({
         isLoading: false
       }))
     } catch (error) {
-      const message = error instanceof ApiError ? error.message : 'Failed to update switch'
-      set({ error: message, isLoading: false })
+      set({ error: getErrorMessage(error, 'Failed to update switch'), isLoading: false })
       throw error
     }
   },
@@ -245,27 +219,19 @@ export const useSwitchesStore = create<SwitchesState>((set, get) => ({
         isLoading: false
       }))
     } catch (error) {
-      const message = error instanceof ApiError ? error.message : 'Failed to delete switch'
-      set({ error: message, isLoading: false })
+      set({ error: getErrorMessage(error, 'Failed to delete switch'), isLoading: false })
       throw error
     }
   },
 
   checkIn: async (id) => {
-    const cryptoStore = useCryptoStore.getState()
-    if (!cryptoStore.encryptionKey) {
-      throw new Error('Encryption key not available')
-    }
+    const encryptionKey = requireEncryptionKey()
 
     try {
       const result = await switchesApi.checkIn(id)
 
       // Decrypt the returned switch name
-      const name = await decrypt(
-        cryptoStore.encryptionKey,
-        result.switch.encryptedName,
-        result.switch.iv
-      )
+      const name = await decrypt(encryptionKey, result.switch.encryptedName, result.switch.iv)
 
       const decryptedSwitch: DecryptedSwitch = {
         id: result.switch.id,
@@ -290,8 +256,7 @@ export const useSwitchesStore = create<SwitchesState>((set, get) => ({
       }))
       return { nextDeadline: result.nextDeadline }
     } catch (error) {
-      const message = error instanceof ApiError ? error.message : 'Failed to check in'
-      set({ error: message })
+      set({ error: getErrorMessage(error, 'Failed to check in') })
       throw error
     }
   },
@@ -303,8 +268,7 @@ export const useSwitchesStore = create<SwitchesState>((set, get) => ({
       await get().fetchSwitches()
       return result.switches.length
     } catch (error) {
-      const message = error instanceof ApiError ? error.message : 'Failed to check in'
-      set({ error: message })
+      set({ error: getErrorMessage(error, 'Failed to check in') })
       throw error
     }
   },

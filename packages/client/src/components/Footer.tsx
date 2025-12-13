@@ -2,14 +2,15 @@ import { Link } from 'react-router-dom'
 
 export function Footer() {
   return (
-    <footer className="footer footer-center p-6 bg-base-200 text-base-content mt-auto">
+    <footer className="footer footer-center p-6 text-base-content mt-auto">
       <div className="flex flex-col items-center gap-4">
         {/* Main footer content */}
-        <nav className="flex flex-wrap justify-center gap-4 text-sm">
+        <nav className="flex flex-wrap justify-center gap-4 text-sm bg-base-200 p-2 rounded-md shadow-sm underline">
           <Link to="/about" className="link link-hover">About</Link>
           <Link to="/terms" className="link link-hover">Terms</Link>
           <Link to="/privacy" className="link link-hover">Privacy</Link>
           <Link to="/support" className="link link-hover">Support</Link>
+          <Link to="/compare" className="link link-hover">Compare</Link>
         </nav>
 
         {/* Powered by Caderno disclaimer */}

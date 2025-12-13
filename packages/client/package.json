@@ -10,14 +10,17 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
+    "@simplewebauthn/browser": "^13.2.2",
     "@uiw/react-md-editor": "^4.0.8",
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.4",
     "marked": "^17.0.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-helmet-async": "^2.0.5",
     "react-router-dom": "^7.9.6",
     "react-toastify": "^11.0.5",
+    "socket.io-client": "^4.8.1",
     "zustand": "^5.0.0"
   },
   "devDependencies": {

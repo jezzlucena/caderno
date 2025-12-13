@@ -1,0 +1,165 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" fill="none">
+  <!-- Full gradient background -->
+  <rect width="1080" height="1920" fill="url(#gradient)" />
+
+  <!-- Subtle pattern overlay for depth -->
+  <defs>
+    <pattern id="dots" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="20" cy="20" r="1.5" fill="rgba(255,255,255,0.08)"/>
+    </pattern>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea"/>
+      <stop offset="100%" style="stop-color:#764ba2"/>
+    </linearGradient>
+    <linearGradient id="cardGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:rgba(255,255,255,0.15)"/>
+      <stop offset="100%" style="stop-color:rgba(255,255,255,0.05)"/>
+    </linearGradient>
+  </defs>
+  <rect width="1080" height="1920" fill="url(#dots)" />
+
+  <!-- Header with Logo -->
+  <g transform="translate(540, 150)">
+    <!-- Notebook logo centered -->
+    <g transform="translate(0, -30)">
+      <rect x="-33" y="-42" width="66" height="84" rx="6" fill="#ffffff" stroke="#4a5568" stroke-width="2"/>
+      <line x1="-21" y1="-24" x2="21" y2="-24" stroke="#cbd5e0" stroke-width="2" stroke-linecap="round"/>
+      <line x1="-21" y1="-12" x2="15" y2="-12" stroke="#cbd5e0" stroke-width="2" stroke-linecap="round"/>
+      <line x1="-21" y1="0" x2="24" y2="0" stroke="#cbd5e0" stroke-width="2" stroke-linecap="round"/>
+      <g transform="translate(-12, 8) scale(2.25)">
+        <rect x="0" y="6" width="16" height="12" rx="2" fill="url(#gradient)"/>
+        <path d="M3 6V4a5 5 0 0 1 10 0v2" fill="none" stroke="url(#gradient)" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="8" cy="10.5" r="2.5" fill="#ffffff"/>
+        <rect x="7" y="12" width="2" height="4" rx="0.5" fill="#ffffff"/>
+      </g>
+    </g>
+    <text x="0" y="90" text-anchor="middle" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="64" font-weight="700" fill="#ffffff">Caderno</text>
+  </g>
+
+  <!-- Main headline -->
+  <text x="540" y="340" text-anchor="middle" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="48" font-weight="700" fill="#ffffff">Privacy That</text>
+  <text x="540" y="400" text-anchor="middle" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="48" font-weight="700" fill="#ffffff">Others Can't Match</text>
+
+  <!-- Caderno Card (Top) -->
+  <g transform="translate(70, 480)">
+    <rect x="0" y="0" width="940" height="500" rx="32" fill="url(#cardGradient)" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+    <text x="470" y="60" text-anchor="middle" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="40" font-weight="700" fill="#ffffff">Caderno</text>
+
+    <!-- Feature rows - 2 columns -->
+    <g transform="translate(50, 100)">
+      <!-- Left column -->
+      <g transform="translate(0, 0)">
+        <circle cx="20" cy="20" r="20" fill="#22c55e"/>
+        <path d="M10 20l8 8 14-14" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="56" y="28" font-family="system-ui, -apple-system, sans-serif" font-size="26" fill="#ffffff">E2E Encryption</text>
+      </g>
+      <g transform="translate(0, 70)">
+        <circle cx="20" cy="20" r="20" fill="#22c55e"/>
+        <path d="M10 20l8 8 14-14" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="56" y="28" font-family="system-ui, -apple-system, sans-serif" font-size="26" fill="#ffffff">Zero-Knowledge</text>
+      </g>
+      <g transform="translate(0, 140)">
+        <circle cx="20" cy="20" r="20" fill="#22c55e"/>
+        <path d="M10 20l8 8 14-14" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="56" y="28" font-family="system-ui, -apple-system, sans-serif" font-size="26" fill="#ffffff">Dead Man's Switch</text>
+      </g>
+      <g transform="translate(0, 210)">
+        <circle cx="20" cy="20" r="20" fill="#22c55e"/>
+        <path d="M10 20l8 8 14-14" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="56" y="28" font-family="system-ui, -apple-system, sans-serif" font-size="26" fill="#ffffff">Open Source</text>
+      </g>
+      <!-- Right column -->
+      <g transform="translate(470, 0)">
+        <circle cx="20" cy="20" r="20" fill="#22c55e"/>
+        <path d="M10 20l8 8 14-14" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="56" y="28" font-family="system-ui, -apple-system, sans-serif" font-size="26" fill="#ffffff">Self-Hostable</text>
+      </g>
+      <g transform="translate(470, 70)">
+        <circle cx="20" cy="20" r="20" fill="#22c55e"/>
+        <path d="M10 20l8 8 14-14" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="56" y="28" font-family="system-ui, -apple-system, sans-serif" font-size="26" fill="#ffffff">Federated</text>
+      </g>
+      <g transform="translate(470, 140)">
+        <circle cx="20" cy="20" r="20" fill="#22c55e"/>
+        <path d="M10 20l8 8 14-14" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="56" y="28" font-family="system-ui, -apple-system, sans-serif" font-size="26" fill="#ffffff">No Ads Ever</text>
+      </g>
+      <g transform="translate(470, 210)">
+        <circle cx="20" cy="20" r="20" fill="#22c55e"/>
+        <path d="M10 20l8 8 14-14" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="56" y="28" font-family="system-ui, -apple-system, sans-serif" font-size="26" fill="#ffffff">Free Forever</text>
+      </g>
+    </g>
+
+    <!-- Unique badge -->
+    <g transform="translate(470, 420)">
+      <rect x="-140" y="-20" width="280" height="40" rx="20" fill="rgba(255,255,255,0.2)"/>
+      <text x="0" y="8" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="600" fill="#ffffff">Only Caderno has Dead Man's Switch</text>
+    </g>
+  </g>
+
+  <!-- Others Card (Bottom) -->
+  <g transform="translate(70, 1020)">
+    <rect x="0" y="0" width="940" height="400" rx="32" fill="rgba(0,0,0,0.2)" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
+    <text x="470" y="55" text-anchor="middle" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="36" font-weight="600" fill="rgba(255,255,255,0.7)">Google Keep, Notion, Evernote...</text>
+
+    <!-- Feature rows - 2 columns -->
+    <g transform="translate(50, 95)">
+      <!-- Left column -->
+      <g transform="translate(0, 0)">
+        <circle cx="20" cy="20" r="20" fill="#ef4444"/>
+        <path d="M12 12l16 16M28 12l-16 16" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
+        <text x="56" y="28" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="rgba(255,255,255,0.6)">No True E2E</text>
+      </g>
+      <g transform="translate(0, 60)">
+        <circle cx="20" cy="20" r="20" fill="#ef4444"/>
+        <path d="M12 12l16 16M28 12l-16 16" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
+        <text x="56" y="28" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="rgba(255,255,255,0.6)">Can Read Your Data</text>
+      </g>
+      <g transform="translate(0, 120)">
+        <circle cx="20" cy="20" r="20" fill="#ef4444"/>
+        <path d="M12 12l16 16M28 12l-16 16" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
+        <text x="56" y="28" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="rgba(255,255,255,0.6)">No Dead Man's Switch</text>
+      </g>
+      <g transform="translate(0, 180)">
+        <circle cx="20" cy="20" r="20" fill="#ef4444"/>
+        <path d="M12 12l16 16M28 12l-16 16" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
+        <text x="56" y="28" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="rgba(255,255,255,0.6)">Closed Source</text>
+      </g>
+      <!-- Right column -->
+      <g transform="translate(470, 0)">
+        <circle cx="20" cy="20" r="20" fill="#ef4444"/>
+        <path d="M12 12l16 16M28 12l-16 16" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
+        <text x="56" y="28" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="rgba(255,255,255,0.6)">Vendor Lock-in</text>
+      </g>
+      <g transform="translate(470, 60)">
+        <circle cx="20" cy="20" r="20" fill="#ef4444"/>
+        <path d="M12 12l16 16M28 12l-16 16" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
+        <text x="56" y="28" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="rgba(255,255,255,0.6)">Centralized</text>
+      </g>
+      <g transform="translate(470, 120)">
+        <circle cx="20" cy="20" r="20" fill="#f59e0b"/>
+        <path d="M10 20h20" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
+        <text x="56" y="28" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="rgba(255,255,255,0.6)">Ads or Paid Plans</text>
+      </g>
+      <g transform="translate(470, 180)">
+        <circle cx="20" cy="20" r="20" fill="#ef4444"/>
+        <path d="M12 12l16 16M28 12l-16 16" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
+        <text x="56" y="28" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="rgba(255,255,255,0.6)">Data Monetization</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Call to Action -->
+  <g transform="translate(540, 1550)">
+    <rect x="-240" y="-45" width="480" height="90" rx="45" fill="#ffffff"/>
+    <text x="0" y="15" text-anchor="middle" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="36" font-weight="700" fill="url(#gradient)">Try Caderno Free</text>
+  </g>
+
+  <!-- Target audience message -->
+  <text x="540" y="1700" text-anchor="middle" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="28" fill="rgba(255,255,255,0.9)">Built for Journalists, Activists,</text>
+  <text x="540" y="1745" text-anchor="middle" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="28" fill="rgba(255,255,255,0.9)">and Anyone Who Values Real Privacy</text>
+
+  <!-- Website -->
+  <text x="540" y="1840" text-anchor="middle" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="32" font-weight="600" fill="#ffffff">caderno.app</text>
+</svg>

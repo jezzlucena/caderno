@@ -2,6 +2,10 @@ import { Router, type Router as RouterType } from 'express'
 import { z } from 'zod'
 import { sendSupportRequestEmail } from '../services/email.service.js'
 import { emailLimiter } from '../middleware/rateLimit.js'
+import { asyncHandler } from '../middleware/errorHandler.js'
+import { createLogger } from '../utils/logger.js'
+
+const logger = createLogger('Support')
 
 export const supportRouter: RouterType = Router()
 
@@ -30,26 +34,18 @@ const supportRequestSchema = z.object({
 })
 
 // POST /api/support
-supportRouter.post('/', async (req, res) => {
-  try {
-    const data = supportRequestSchema.parse(req.body)
+supportRouter.post('/', asyncHandler(async (req, res) => {
+  const data = supportRequestSchema.parse(req.body)
 
-    await sendSupportRequestEmail({
-      category: data.category,
-      categoryLabel: categoryLabels[data.category],
-      email: data.email,
-      subject: data.subject,
-      message: data.message,
-      isUrgent: data.isUrgent
-    })
+  await sendSupportRequestEmail({
+    category: data.category,
+    categoryLabel: categoryLabels[data.category],
+    email: data.email,
+    subject: data.subject,
+    message: data.message,
+    isUrgent: data.isUrgent
+  })
 
-    res.status(200).json({ message: 'Support request submitted successfully' })
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      res.status(400).json({ error: error.issues[0].message })
-      return
-    }
-    console.error('Support request failed:', error)
-    res.status(500).json({ error: 'Failed to submit support request. Please try again later.' })
-  }
-})
+  logger.debug('Support request submitted', { category: data.category, isUrgent: data.isUrgent })
+  res.status(200).json({ message: 'Support request submitted successfully' })
+}))

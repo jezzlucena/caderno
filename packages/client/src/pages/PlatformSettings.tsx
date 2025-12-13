@@ -51,7 +51,6 @@ export function PlatformSettings() {
   // Platform settings state (admin only)
   const { displayName: currentDisplayName, fetchSettings: fetchPlatformSettings, setDisplayName: updateStoreDisplayName } = usePlatformStore()
   const [platformDisplayName, setPlatformDisplayName] = useState('')
-  const [platformLoading, setPlatformLoading] = useState(false)
   const [platformSaving, setPlatformSaving] = useState(false)
 
   const isAdmin = user?.role === 'admin'
@@ -170,20 +169,6 @@ export function PlatformSettings() {
   }
 
   // Moderation actions
-  const handleBanNote = async (noteId: number) => {
-    setActionLoading(true)
-    setErrorMessage('')
-    try {
-      await adminApi.banNote(noteId)
-      setSuccessMessage('Note banned successfully')
-      fetchBannedNotes()
-    } catch (err: any) {
-      setErrorMessage(err.message || 'Failed to ban note')
-    } finally {
-      setActionLoading(false)
-    }
-  }
-
   const handleUnbanNote = async (noteId: number) => {
     setActionLoading(true)
     setErrorMessage('')

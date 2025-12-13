@@ -7,10 +7,12 @@ interface CryptoState {
 
   // Actions
   deriveAndSetKey: (password: string, keySalt: string) => Promise<void>
+  setKey: (key: CryptoKey) => void
+  getKey: () => CryptoKey | null
   clearKey: () => void
 }
 
-export const useCryptoStore = create<CryptoState>((set) => ({
+export const useCryptoStore = create<CryptoState>((set, get) => ({
   encryptionKey: null,
   isKeyReady: false,
 
@@ -23,6 +25,14 @@ export const useCryptoStore = create<CryptoState>((set) => ({
       throw error
     }
   },
+
+  // Set key directly (used for passkey-decrypted keys)
+  setKey: (key: CryptoKey) => {
+    set({ encryptionKey: key, isKeyReady: true })
+  },
+
+  // Get current key (for passkey encryption)
+  getKey: () => get().encryptionKey,
 
   clearKey: () => {
     set({ encryptionKey: null, isKeyReady: false })

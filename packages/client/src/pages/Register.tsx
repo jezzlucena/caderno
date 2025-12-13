@@ -1,9 +1,11 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { useAuthStore } from '../stores/authStore'
 import { authApi } from '../lib/api'
 import { Footer } from '../components/Footer'
+import { ParticleBackground } from '../components/ParticleBackground'
+import { useDebouncedValidation } from '../hooks/useDebouncedValidation'
 
 export function Register() {
   const [email, setEmail] = useState('')
@@ -11,48 +13,24 @@ export function Register() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [profileVisibility, setProfileVisibility] = useState<'public' | 'restricted' | 'private'>('private')
-  const [checkingUsername, setCheckingUsername] = useState(false)
-  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null)
-  const [usernameError, setUsernameError] = useState('')
   const { register, isLoading } = useAuthStore()
   const navigate = useNavigate()
 
-  // Debounced username availability check
-  const checkUsername = useCallback(async (value: string) => {
-    if (!value || value.length < 3) {
-      setUsernameAvailable(null)
-      setUsernameError('')
-      return
-    }
-
-    if (!/^[a-z0-9_]+$/.test(value)) {
-      setUsernameAvailable(null)
-      setUsernameError('')
-      return
-    }
-
-    setCheckingUsername(true)
-    try {
-      const result = await authApi.checkUsernamePublic(value)
-      setUsernameAvailable(result.available)
-      if (!result.available && result.reason) {
-        setUsernameError(result.reason)
-      } else {
-        setUsernameError('')
-      }
-    } catch {
-      setUsernameAvailable(null)
-      setUsernameError('')
-    } finally {
-      setCheckingUsername(false)
-    }
-  }, [])
+  // Debounced username availability check using hook
+  const {
+    isChecking: checkingUsername,
+    isAvailable: usernameAvailable,
+    error: usernameError,
+    checkValue: checkUsername
+  } = useDebouncedValidation({
+    validate: async (value) => authApi.checkUsernamePublic(value),
+    minLength: 3,
+    pattern: /^[a-z0-9_]+$/,
+    debounceMs: 300
+  })
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      checkUsername(username)
-    }, 300)
-    return () => clearTimeout(timer)
+    checkUsername(username)
   }, [username, checkUsername])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -99,8 +77,9 @@ export function Register() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-base-200 p-4 animate-fade-in">
-      <div className="card bg-base-100 shadow-xl w-full max-w-md ios-card animate-fade-in-up">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-base-200/10 p-4 animate-fade-in relative">
+      <ParticleBackground colorScheme="purple" />
+      <div className="card bg-base-100/90 backdrop-blur-lg shadow-xl w-full max-w-md ios-card animate-fade-in-up relative z-10">
         <div className="card-body">
           <h1 className="card-title text-2xl justify-center mb-4">Create Account</h1>
 
@@ -240,7 +219,9 @@ export function Register() {
         </div>
       </div>
 
-      <Footer />
+      <div className="relative z-10">
+        <Footer />
+      </div>
     </div>
   )
 }

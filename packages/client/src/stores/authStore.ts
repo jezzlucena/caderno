@@ -1,7 +1,8 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { authApi, type User, type UpdateProfileData, ApiError } from '../lib/api'
+import { authApi, setupApi, type User, type UpdateProfileData, type PasskeyAuthResponse } from '../lib/api'
 import { useCryptoStore } from './cryptoStore'
+import { getErrorMessage } from '../lib/storeUtils'
 
 interface AuthState {
   user: User | null
@@ -11,7 +12,9 @@ interface AuthState {
 
   // Actions
   register: (email: string, password: string, username: string, profileVisibility: 'public' | 'restricted' | 'private') => Promise<void>
+  setupAdmin: (email: string, password: string, username: string) => Promise<void>
   login: (emailOrUsername: string, password: string) => Promise<void>
+  loginWithPasskey: (authResponse: PasskeyAuthResponse) => void
   unlock: (password: string) => Promise<void>
   logout: () => void
   checkAuth: () => Promise<void>
@@ -36,8 +39,20 @@ export const useAuthStore = create<AuthState>()(
           await useCryptoStore.getState().deriveAndSetKey(password, user.keySalt)
           set({ user, token, isLoading: false })
         } catch (error) {
-          const message = error instanceof ApiError ? error.message : 'Registration failed'
-          set({ error: message, isLoading: false })
+          set({ error: getErrorMessage(error, 'Registration failed'), isLoading: false })
+          throw error
+        }
+      },
+
+      setupAdmin: async (email: string, password: string, username: string) => {
+        set({ isLoading: true, error: null })
+        try {
+          const { user, token } = await setupApi.createAdmin(email, password, username)
+          // Derive encryption key from password
+          await useCryptoStore.getState().deriveAndSetKey(password, user.keySalt)
+          set({ user, token, isLoading: false })
+        } catch (error) {
+          set({ error: getErrorMessage(error, 'Setup failed'), isLoading: false })
           throw error
         }
       },
@@ -50,10 +65,16 @@ export const useAuthStore = create<AuthState>()(
           await useCryptoStore.getState().deriveAndSetKey(password, user.keySalt)
           set({ user, token, isLoading: false })
         } catch (error) {
-          const message = error instanceof ApiError ? error.message : 'Login failed'
-          set({ error: message, isLoading: false })
+          set({ error: getErrorMessage(error, 'Login failed'), isLoading: false })
           throw error
         }
+      },
+
+      // Login with passkey - key may be decrypted via PRF or user needs to unlock
+      loginWithPasskey: ({ user, token }: PasskeyAuthResponse) => {
+        // Don't clear key here - it may have been set by PRF decryption in Login.tsx
+        // If PRF decryption failed, the key will still be null
+        set({ user, token, isLoading: false, error: null })
       },
 
       // Unlock encryption after page refresh (re-derive key from password)
@@ -101,8 +122,7 @@ export const useAuthStore = create<AuthState>()(
           const { user } = await authApi.updateProfile(data)
           set({ user, isLoading: false })
         } catch (error) {
-          const message = error instanceof ApiError ? error.message : 'Failed to update profile'
-          set({ error: message, isLoading: false })
+          set({ error: getErrorMessage(error, 'Failed to update profile'), isLoading: false })
           throw error
         }
       },

@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useState, useMemo, useCallback, memo } from 'react'
 import { Link } from 'react-router-dom'
 import { GlobeAltIcon, UserGroupIcon, LockClosedIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline'
 import type { NoteVisibility } from '../lib/api'
+import { formatRelativeTime } from '../lib/formatters'
+import { getVisibilityConfig, type VisibilityIconType } from '../lib/visibility'
 
 export interface NoteAuthor {
   username: string
@@ -24,64 +26,15 @@ export interface NoteCardProps {
   onDelete?: () => void
 }
 
-// Format relative time (e.g., "2 hours ago")
-function formatRelativeTime(dateString: string): string {
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffSec = Math.floor(diffMs / 1000)
-  const diffMin = Math.floor(diffSec / 60)
-  const diffHour = Math.floor(diffMin / 60)
-  const diffDay = Math.floor(diffHour / 24)
-
-  if (diffSec < 60) return 'just now'
-  if (diffMin < 60) return `${diffMin} minute${diffMin !== 1 ? 's' : ''} ago`
-  if (diffHour < 24) return `${diffHour} hour${diffHour !== 1 ? 's' : ''} ago`
-  if (diffDay < 7) return `${diffDay} day${diffDay !== 1 ? 's' : ''} ago`
-
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-  })
-}
-
 const MAX_CONTENT_LENGTH = 300
 
-const getVisibilityIcon = (visibility: NoteVisibility) => {
-  switch (visibility) {
-    case 'public':
-      return <GlobeAltIcon className="h-3 w-3" />
-    case 'followers':
-      return <UserGroupIcon className="h-3 w-3" />
-    case 'private':
-      return <LockClosedIcon className="h-3 w-3" />
-  }
+const VISIBILITY_ICONS: Record<VisibilityIconType, React.ReactNode> = {
+  globe: <GlobeAltIcon className="h-3 w-3" />,
+  users: <UserGroupIcon className="h-3 w-3" />,
+  lock: <LockClosedIcon className="h-3 w-3" />
 }
 
-const getVisibilityLabel = (visibility: NoteVisibility) => {
-  switch (visibility) {
-    case 'public':
-      return 'Public'
-    case 'followers':
-      return 'Followers'
-    case 'private':
-      return 'Only me'
-  }
-}
-
-const getVisibilityBadgeClass = (visibility: NoteVisibility) => {
-  switch (visibility) {
-    case 'public':
-      return 'badge-success'
-    case 'followers':
-      return 'badge-info'
-    case 'private':
-      return 'badge-warning'
-  }
-}
-
-export function NoteCard({
+function NoteCardComponent({
   id,
   title,
   content,
@@ -96,10 +49,19 @@ export function NoteCard({
 }: NoteCardProps) {
   const [isExpanded, setIsExpanded] = useState(false)
 
-  const contentNeedsExpansion = content.length > MAX_CONTENT_LENGTH
-  const displayContent = isExpanded || !contentNeedsExpansion
-    ? content
-    : content.slice(0, MAX_CONTENT_LENGTH) + '...'
+  const contentNeedsExpansion = useMemo(() => content.length > MAX_CONTENT_LENGTH, [content])
+  const displayContent = useMemo(
+    () => isExpanded || !contentNeedsExpansion ? content : content.slice(0, MAX_CONTENT_LENGTH) + '...',
+    [content, isExpanded, contentNeedsExpansion]
+  )
+
+  const toggleExpanded = useCallback(() => setIsExpanded((prev) => !prev), [])
+
+  // Get visibility config using centralized utility
+  const visibilityConfig = useMemo(
+    () => visibility ? getVisibilityConfig(visibility) : null,
+    [visibility]
+  )
 
   // Determine if we can link to profile (only local users)
   const canLinkToProfile = author.isLocal !== false
@@ -149,10 +111,10 @@ export function NoteCard({
             </div>
 
             {/* Visibility badge */}
-            {showVisibilityBadge && visibility && (
-              <span className={`badge badge-sm gap-1 ${getVisibilityBadgeClass(visibility)}`}>
-                {getVisibilityIcon(visibility)}
-                {getVisibilityLabel(visibility)}
+            {showVisibilityBadge && visibilityConfig && (
+              <span className={`badge badge-sm gap-1 ${visibilityConfig.badgeClass}`}>
+                {VISIBILITY_ICONS[visibilityConfig.icon]}
+                {visibilityConfig.label}
               </span>
             )}
 
@@ -194,7 +156,7 @@ export function NoteCard({
         {contentNeedsExpansion && (
           <button
             className="btn btn-ghost btn-xs self-start mt-1 text-primary"
-            onClick={() => setIsExpanded(!isExpanded)}
+            onClick={toggleExpanded}
           >
             {isExpanded ? 'Show less' : 'Read more'}
           </button>
@@ -219,3 +181,5 @@ export function NoteCard({
     </div>
   )
 }
+
+export const NoteCard = memo(NoteCardComponent)

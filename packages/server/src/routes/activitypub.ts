@@ -6,6 +6,7 @@ import { users, followers, following, publicEntries } from '../db/schema.js'
 import { env } from '../config/env.js'
 import { requireHttpSignature } from '../middleware/httpSignature.js'
 import { signRequest, generateDigest } from '../services/httpSignature.service.js'
+import { createNotification } from '../services/notification.service.js'
 import { randomUUID } from 'crypto'
 
 // ActivityPub activity validation schema
@@ -442,7 +443,8 @@ activityPubRouter.post('/users/:username/inbox', requireHttpSignature, async (re
       case 'Create':
         // Handle new note from remote user (usually delivered when following)
         console.log(`[ActivityPub] Received Create activity from ${activity.actor}`)
-        // Remote feeds are fetched dynamically from outbox
+        // Create notifications for local users following this remote actor
+        await handleRemoteCreate(user, activity)
         break
       default:
         console.log(`[ActivityPub] Unhandled activity type: ${activity.type}`)
@@ -658,6 +660,38 @@ async function handleReject(user: UserWithKeys, activity: any): Promise<void> {
 
     console.log(`[ActivityPub] Fallback: Removed pending follows to ${rejectingActor}`)
   }
+}
+
+/**
+ * Handle a Create activity - notify local users following this remote actor about new posts
+ */
+async function handleRemoteCreate(user: UserWithKeys, activity: any): Promise<void> {
+  const remoteActorUrl = activity.actor
+
+  // Find local users who follow this remote actor
+  const localFollowersOfRemote = await db.query.following.findMany({
+    where: and(
+      eq(following.targetActorUrl, remoteActorUrl),
+      eq(following.pending, false) // Only accepted follows
+    )
+  })
+
+  if (localFollowersOfRemote.length === 0) {
+    console.log(`[ActivityPub] No local followers for ${remoteActorUrl}, skipping notifications`)
+    return
+  }
+
+  // Create notifications for each local follower
+  for (const follow of localFollowersOfRemote) {
+    createNotification({
+      userId: follow.userId,
+      type: 'new_post',
+      actorActorUrl: remoteActorUrl, // Remote actor URL instead of local actorId
+      referenceType: 'public_entry'
+    }).catch(err => console.error('Failed to create remote post notification:', err))
+  }
+
+  console.log(`[ActivityPub] Created notifications for ${localFollowersOfRemote.length} local followers of ${remoteActorUrl}`)
 }
 
 // ============================================

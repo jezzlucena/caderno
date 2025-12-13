@@ -550,3 +550,176 @@ export const adminApi = {
   unsuspendUser: (identifier: string) =>
     api<{ message: string }>('/admin/users/unsuspend', { method: 'POST', body: { identifier }, token: getAuthToken() })
 }
+
+// Setup API (for initial admin creation)
+export interface SetupStatus {
+  needsSetup: boolean
+}
+
+export const setupApi = {
+  getStatus: () =>
+    api<SetupStatus>('/setup/status'),
+
+  createAdmin: (email: string, password: string, username: string) =>
+    api<AuthResponse>('/setup/admin', { method: 'POST', body: { email, password, username } })
+}
+
+// Notifications API
+export type NotificationType = 'new_post' | 'follow_request' | 'follow_accepted'
+
+export interface NotificationActor {
+  id: number
+  username: string | null
+  displayName: string | null
+  avatarUrl: string | null
+}
+
+export interface Notification {
+  id: number
+  type: NotificationType
+  isRead: boolean
+  createdAt: string
+  referenceId: number | null
+  referenceType: 'public_entry' | 'local_follower' | 'remote_follower' | null
+  actorActorUrl: string | null
+  actor: NotificationActor | null
+}
+
+export interface NotificationListResponse {
+  notifications: Notification[]
+  nextCursor: string | null
+  hasMore: boolean
+}
+
+export const notificationApi = {
+  list: (cursor?: string, limit?: number) => {
+    const params = new URLSearchParams()
+    if (cursor) params.append('cursor', cursor)
+    if (limit) params.append('limit', limit.toString())
+    const queryString = params.toString()
+    return api<NotificationListResponse>(
+      `/notifications${queryString ? `?${queryString}` : ''}`,
+      { token: getAuthToken() }
+    )
+  },
+
+  getUnreadCount: () =>
+    api<{ count: number }>('/notifications/unread-count', { token: getAuthToken() }),
+
+  toggleRead: (id: number, isRead: boolean) =>
+    api<{ notification: Notification }>(`/notifications/${id}/read`, {
+      method: 'PUT',
+      body: { isRead },
+      token: getAuthToken()
+    }),
+
+  markAllAsRead: () =>
+    api<{ message: string; count: number }>('/notifications/read-all', {
+      method: 'PUT',
+      token: getAuthToken()
+    }),
+
+  delete: (id: number) =>
+    api<{ message: string }>(`/notifications/${id}`, {
+      method: 'DELETE',
+      token: getAuthToken()
+    })
+}
+
+// Passkey API (WebAuthn)
+export interface PasskeyInfo {
+  id: number
+  name: string | null
+  deviceType: string
+  backedUp: boolean
+  createdAt: string
+  lastUsedAt: string | null
+  prfSupported?: boolean
+}
+
+export interface PasskeyRegistrationOptions {
+  options: unknown // WebAuthn options from server
+  challengeKey: string
+  prfSalt: string // Salt for PRF evaluation
+}
+
+export interface PasskeyRegistrationResult {
+  success: boolean
+  passkey: PasskeyInfo | null
+  prfSupported: boolean
+  prfSalt?: string
+}
+
+export interface PasskeyAuthenticationOptions {
+  options: unknown // WebAuthn options from server
+  challengeKey: string
+  prfSalts?: { [credentialId: string]: string } // PRF salts per credential
+}
+
+export interface PasskeyAuthResponse extends AuthResponse {
+  encryptedMasterKey?: string
+  masterKeyIv?: string
+  prfSalt?: string
+}
+
+export const passkeyApi = {
+  // Check if user has passkeys (public)
+  checkHasPasskeys: (emailOrUsername: string) =>
+    api<{ hasPasskeys: boolean }>(`/passkey/check/${encodeURIComponent(emailOrUsername)}`),
+
+  // Get registration options (protected - for adding passkey to existing account)
+  getRegistrationOptions: () =>
+    api<PasskeyRegistrationOptions>('/passkey/register/options', {
+      method: 'POST',
+      token: getAuthToken()
+    }),
+
+  // Verify registration (protected)
+  verifyRegistration: (challengeKey: string, response: unknown, name?: string) =>
+    api<PasskeyRegistrationResult>('/passkey/register/verify', {
+      method: 'POST',
+      body: { challengeKey, response, name },
+      token: getAuthToken()
+    }),
+
+  // Store encrypted master key for a passkey (protected)
+  storeEncryptedKey: (passkeyId: number, encryptedMasterKey: string, masterKeyIv: string) =>
+    api<{ success: boolean }>(`/passkey/${passkeyId}/encrypted-key`, {
+      method: 'POST',
+      body: { encryptedMasterKey, masterKeyIv },
+      token: getAuthToken()
+    }),
+
+  // Get authentication options (public - for login)
+  getAuthenticationOptions: (emailOrUsername?: string) =>
+    api<PasskeyAuthenticationOptions>('/passkey/authenticate/options', {
+      method: 'POST',
+      body: { emailOrUsername }
+    }),
+
+  // Verify authentication (public - login with passkey)
+  verifyAuthentication: (challengeKey: string, response: unknown) =>
+    api<PasskeyAuthResponse>('/passkey/authenticate/verify', {
+      method: 'POST',
+      body: { challengeKey, response }
+    }),
+
+  // List user's passkeys (protected)
+  list: () =>
+    api<{ passkeys: PasskeyInfo[] }>('/passkey/list', { token: getAuthToken() }),
+
+  // Delete a passkey (protected)
+  delete: (id: number) =>
+    api<{ success: boolean; message: string }>(`/passkey/${id}`, {
+      method: 'DELETE',
+      token: getAuthToken()
+    }),
+
+  // Rename a passkey (protected)
+  rename: (id: number, name: string) =>
+    api<{ passkey: PasskeyInfo }>(`/passkey/${id}`, {
+      method: 'PUT',
+      body: { name },
+      token: getAuthToken()
+    })
+}

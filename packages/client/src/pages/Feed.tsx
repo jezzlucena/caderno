@@ -83,13 +83,13 @@ export function Feed() {
   }, [cursor, isLoadingMore, hasMore, pagesLoaded])
 
   // Enable more pages of infinite scroll
-  const enableMorePages = () => {
+  const enableMorePages = useCallback(() => {
     setPagesLoaded(0)
     setAutoScrollEnabled(true)
-  }
+  }, [])
 
   // Handle posting a new entry
-  const handlePost = async () => {
+  const handlePost = useCallback(async () => {
     if (!postTitle.trim() || !postContent.trim()) {
       setPostError('Please enter a title and content')
       return
@@ -118,7 +118,7 @@ export function Feed() {
     } finally {
       setIsPosting(false)
     }
-  }
+  }, [postTitle, postContent, postVisibility, loadFeed])
 
   // Initial load when key is ready
   useEffect(() => {

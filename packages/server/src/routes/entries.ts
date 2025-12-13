@@ -4,6 +4,11 @@ import { eq, and, desc } from 'drizzle-orm'
 import { db } from '../db/index.js'
 import { entries } from '../db/schema.js'
 import { authMiddleware } from '../middleware/auth.js'
+import { asyncHandler, notFound } from '../middleware/errorHandler.js'
+import { parseId, verifyOwnership } from '../utils/validation.js'
+import { createLogger } from '../utils/logger.js'
+
+const logger = createLogger('Entries')
 
 export const entriesRouter: RouterType = Router()
 
@@ -28,143 +33,88 @@ const updateEntrySchema = z.object({
 })
 
 // GET /api/entries - List all entries for current user
-entriesRouter.get('/', async (req, res) => {
-  try {
-    const userId = req.user!.userId
+entriesRouter.get('/', asyncHandler(async (req, res) => {
+  const userId = req.user!.userId
 
-    const userEntries = await db.query.entries.findMany({
-      where: eq(entries.userId, userId),
-      orderBy: [desc(entries.updatedAt)]
-    })
+  const userEntries = await db.query.entries.findMany({
+    where: eq(entries.userId, userId),
+    orderBy: [desc(entries.updatedAt)]
+  })
 
-    res.json({ entries: userEntries })
-  } catch (error) {
-    console.error('Failed to list entries:', error)
-    res.status(500).json({ error: 'Failed to list entries' })
-  }
-})
+  res.json({ entries: userEntries })
+}))
 
 // GET /api/entries/:id - Get single entry
-entriesRouter.get('/:id', async (req, res) => {
-  try {
-    const userId = req.user!.userId
-    const entryId = parseInt(req.params.id)
+entriesRouter.get('/:id', asyncHandler(async (req, res) => {
+  const userId = req.user!.userId
+  const entryId = parseId(req.params.id, 'entry')
 
-    if (isNaN(entryId)) {
-      res.status(400).json({ error: 'Invalid entry ID' })
-      return
-    }
+  const entry = await db.query.entries.findFirst({
+    where: and(eq(entries.id, entryId), eq(entries.userId, userId))
+  })
 
-    const entry = await db.query.entries.findFirst({
-      where: and(eq(entries.id, entryId), eq(entries.userId, userId))
-    })
-
-    if (!entry) {
-      res.status(404).json({ error: 'Entry not found' })
-      return
-    }
-
-    res.json({ entry })
-  } catch (error) {
-    console.error('Failed to get entry:', error)
-    res.status(500).json({ error: 'Failed to get entry' })
+  if (!entry) {
+    throw notFound('Entry')
   }
-})
+
+  res.json({ entry })
+}))
 
 // POST /api/entries - Create new entry
-entriesRouter.post('/', async (req, res) => {
-  try {
-    const userId = req.user!.userId
-    const { encryptedTitle, encryptedContent, iv } = createEntrySchema.parse(req.body)
+entriesRouter.post('/', asyncHandler(async (req, res) => {
+  const userId = req.user!.userId
+  const { encryptedTitle, encryptedContent, iv } = createEntrySchema.parse(req.body)
 
-    const [newEntry] = await db.insert(entries).values({
-      userId,
-      encryptedTitle,
-      encryptedContent,
-      iv
-    }).returning()
+  const [newEntry] = await db.insert(entries).values({
+    userId,
+    encryptedTitle,
+    encryptedContent,
+    iv
+  }).returning()
 
-    res.status(201).json({ entry: newEntry })
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      res.status(400).json({ error: error.issues[0].message })
-      return
-    }
-    console.error('Failed to create entry:', error)
-    res.status(500).json({ error: 'Failed to create entry' })
-  }
-})
+  logger.debug('Entry created', { entryId: newEntry.id, userId })
+  res.status(201).json({ entry: newEntry })
+}))
 
 // PUT /api/entries/:id - Update entry
-entriesRouter.put('/:id', async (req, res) => {
-  try {
-    const userId = req.user!.userId
-    const entryId = parseInt(req.params.id)
+entriesRouter.put('/:id', asyncHandler(async (req, res) => {
+  const userId = req.user!.userId
+  const entryId = parseId(req.params.id, 'entry')
+  const { encryptedTitle, encryptedContent, iv } = updateEntrySchema.parse(req.body)
 
-    if (isNaN(entryId)) {
-      res.status(400).json({ error: 'Invalid entry ID' })
-      return
-    }
+  // Verify ownership
+  const existing = await db.query.entries.findFirst({
+    where: and(eq(entries.id, entryId), eq(entries.userId, userId))
+  })
+  verifyOwnership(existing, userId, 'Entry')
 
-    const { encryptedTitle, encryptedContent, iv } = updateEntrySchema.parse(req.body)
-
-    // Verify ownership
-    const existing = await db.query.entries.findFirst({
-      where: and(eq(entries.id, entryId), eq(entries.userId, userId))
+  const [updatedEntry] = await db.update(entries)
+    .set({
+      encryptedTitle,
+      encryptedContent,
+      iv,
+      updatedAt: new Date()
     })
+    .where(eq(entries.id, entryId))
+    .returning()
 
-    if (!existing) {
-      res.status(404).json({ error: 'Entry not found' })
-      return
-    }
-
-    const [updatedEntry] = await db.update(entries)
-      .set({
-        encryptedTitle,
-        encryptedContent,
-        iv,
-        updatedAt: new Date()
-      })
-      .where(eq(entries.id, entryId))
-      .returning()
-
-    res.json({ entry: updatedEntry })
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      res.status(400).json({ error: error.issues[0].message })
-      return
-    }
-    console.error('Failed to update entry:', error)
-    res.status(500).json({ error: 'Failed to update entry' })
-  }
-})
+  logger.debug('Entry updated', { entryId, userId })
+  res.json({ entry: updatedEntry })
+}))
 
 // DELETE /api/entries/:id - Delete entry
-entriesRouter.delete('/:id', async (req, res) => {
-  try {
-    const userId = req.user!.userId
-    const entryId = parseInt(req.params.id)
+entriesRouter.delete('/:id', asyncHandler(async (req, res) => {
+  const userId = req.user!.userId
+  const entryId = parseId(req.params.id, 'entry')
 
-    if (isNaN(entryId)) {
-      res.status(400).json({ error: 'Invalid entry ID' })
-      return
-    }
+  // Verify ownership
+  const existing = await db.query.entries.findFirst({
+    where: and(eq(entries.id, entryId), eq(entries.userId, userId))
+  })
+  verifyOwnership(existing, userId, 'Entry')
 
-    // Verify ownership
-    const existing = await db.query.entries.findFirst({
-      where: and(eq(entries.id, entryId), eq(entries.userId, userId))
-    })
+  await db.delete(entries).where(eq(entries.id, entryId))
 
-    if (!existing) {
-      res.status(404).json({ error: 'Entry not found' })
-      return
-    }
-
-    await db.delete(entries).where(eq(entries.id, entryId))
-
-    res.json({ message: 'Entry deleted' })
-  } catch (error) {
-    console.error('Failed to delete entry:', error)
-    res.status(500).json({ error: 'Failed to delete entry' })
-  }
-})
+  logger.debug('Entry deleted', { entryId, userId })
+  res.json({ message: 'Entry deleted' })
+}))

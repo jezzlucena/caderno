@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { EyeSlashIcon, UserGroupIcon, LockClosedIcon, PlusIcon, NoSymbolIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { profileApi, federationApi, type PublicProfile, type ProfileNote, type NoteVisibility, ApiError } from '../lib/api'
@@ -40,6 +40,15 @@ export function Profile() {
   const [isEditing, setIsEditing] = useState(false)
 
   const [error, setError] = useState<string | null>(null)
+
+  // Memoize member since date - must be before any early returns
+  const memberSince = useMemo(() => {
+    if (!profile?.createdAt) return ''
+    return new Date(profile.createdAt).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long'
+    })
+  }, [profile?.createdAt])
 
   useEffect(() => {
     async function loadProfile() {
@@ -99,7 +108,7 @@ export function Profile() {
     loadNotes()
   }, [username, refreshKey, profile?.isRestricted])
 
-  const handleCreateNote = async (e: React.FormEvent) => {
+  const handleCreateNote = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
     setIsCreating(true)
     setError(null)
@@ -110,13 +119,13 @@ export function Profile() {
         content: newNoteContent,
         visibility: newNoteVisibility
       })
-      setNotes([{
+      setNotes(prev => [{
         id: entry.id,
         title: entry.title,
         content: entry.content,
         visibility: entry.visibility,
         published: entry.published
-      }, ...notes])
+      }, ...prev])
       setShowCreateModal(false)
       setNewNoteTitle('')
       setNewNoteContent('')
@@ -126,9 +135,9 @@ export function Profile() {
     } finally {
       setIsCreating(false)
     }
-  }
+  }, [newNoteTitle, newNoteContent, newNoteVisibility])
 
-  const handleEditNote = async (e: React.FormEvent) => {
+  const handleEditNote = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
     if (!editingNote) return
 
@@ -141,7 +150,7 @@ export function Profile() {
         content: editContent,
         visibility: editVisibility
       })
-      setNotes(notes.map(n => n.id === entry.id ? {
+      setNotes(prev => prev.map(n => n.id === entry.id ? {
         id: entry.id,
         title: entry.title,
         content: entry.content,
@@ -154,25 +163,25 @@ export function Profile() {
     } finally {
       setIsEditing(false)
     }
-  }
+  }, [editingNote, editTitle, editContent, editVisibility])
 
-  const handleDeleteNote = async (id: number) => {
+  const handleDeleteNote = useCallback(async (id: number) => {
     if (!confirm('Are you sure you want to delete this note?')) return
 
     try {
       await federationApi.unpublish(id)
-      setNotes(notes.filter(n => n.id !== id))
+      setNotes(prev => prev.filter(n => n.id !== id))
     } catch (err: any) {
       setError(err.message || 'Failed to delete note')
     }
-  }
+  }, [])
 
-  const openEditModal = (note: ProfileNote) => {
+  const openEditModal = useCallback((note: ProfileNote) => {
     setEditingNote(note)
     setEditTitle(note.title)
     setEditContent(note.content)
     setEditVisibility(note.visibility)
-  }
+  }, [])
 
   if (isLoading) {
     return (
@@ -258,11 +267,6 @@ export function Profile() {
       </div>
     )
   }
-
-  const memberSince = new Date(profile.createdAt).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long'
-  })
 
   return (
     <div className="min-h-screen bg-base-200 p-4 animate-fade-in flex flex-col">

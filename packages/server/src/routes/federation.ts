@@ -4,10 +4,14 @@ import { eq, and, inArray } from 'drizzle-orm'
 import { db } from '../db/index.js'
 import { users, publicEntries, followers, following, localFollowers } from '../db/schema.js'
 import { authMiddleware } from '../middleware/auth.js'
-import { generateRSAKeyPair, isValidUsername, normalizeUsername } from '../services/federation.service.js'
+import { generateRSAKeyPair, isValidUsername } from '../services/federation.service.js'
+import { createNotificationsForFollowers } from '../services/notification.service.js'
 import { env } from '../config/env.js'
 import { randomUUID } from 'crypto'
 import { deliverToFollowers, deliverActivity } from './activitypub.js'
+import { createLogger } from '../utils/logger.js'
+
+const logger = createLogger('Federation')
 
 export const federationRouter: RouterType = Router()
 
@@ -73,7 +77,7 @@ federationRouter.get('/profile', async (req, res) => {
       }
     })
   } catch (error) {
-    console.error('Failed to get federation profile:', error)
+    logger.error('Failed to get federation profile:', error)
     res.status(500).json({ error: 'Failed to get profile' })
   }
 })
@@ -141,7 +145,7 @@ federationRouter.post('/setup', async (req, res) => {
       }
     })
   } catch (error) {
-    console.error('Failed to setup federation:', error)
+    logger.error('Failed to setup federation:', error)
     res.status(500).json({ error: 'Failed to setup federation' })
   }
 })
@@ -184,7 +188,7 @@ federationRouter.put('/profile', async (req, res) => {
       res.status(400).json({ error: error.issues[0].message })
       return
     }
-    console.error('Failed to update federation settings:', error)
+    logger.error('Failed to update federation settings:', error)
     res.status(500).json({ error: 'Failed to update federation settings' })
   }
 })
@@ -228,6 +232,10 @@ federationRouter.post('/publish', async (req, res) => {
 
     // Only deliver to followers if visibility is public or followers
     if (visibility !== 'private') {
+      // Create notifications for local followers (async, don't block response)
+      createNotificationsForFollowers(userId, publicEntry.id)
+        .catch(err => logger.error('Failed to create new post notifications:', err))
+
       const actorUrl = `${env.SERVER_URL}/users/${user.username}`
       const followersUrl = `${actorUrl}/followers`
 
@@ -256,11 +264,11 @@ federationRouter.post('/publish', async (req, res) => {
         }
       }
 
-      // Deliver Create activity to followers (async, don't block response)
+      // Deliver Create activity to remote followers (async, don't block response)
       deliverToFollowers(
         { id: user.id, username: user.username, publicKey: user.publicKey, privateKey: user.privateKey },
         createActivity
-      ).catch(err => console.error('Failed to deliver to followers:', err))
+      ).catch(err => logger.error('Failed to deliver to followers:', err))
     }
 
     res.status(201).json({
@@ -280,7 +288,7 @@ federationRouter.post('/publish', async (req, res) => {
       res.status(400).json({ error: error.issues[0].message })
       return
     }
-    console.error('Failed to publish entry:', error)
+    logger.error('Failed to publish entry:', error)
     res.status(500).json({ error: 'Failed to publish entry' })
   }
 })
@@ -306,7 +314,7 @@ federationRouter.get('/published', async (req, res) => {
       }))
     })
   } catch (error) {
-    console.error('Failed to get published entries:', error)
+    logger.error('Failed to get published entries:', error)
     res.status(500).json({ error: 'Failed to get entries' })
   }
 })
@@ -373,7 +381,7 @@ federationRouter.put('/published/:id', async (req, res) => {
         deliverToFollowers(
           { id: user.id, username: user.username, publicKey: user.publicKey, privateKey: user.privateKey },
           deleteActivity
-        ).catch(err => console.error('Failed to deliver Delete activity:', err))
+        ).catch(err => logger.error('Failed to deliver Delete activity:', err))
       } else if (newVisibility !== 'private' && oldVisibility === 'private') {
         // Changed FROM private TO public/followers - send Create (note is now visible for first time)
         const to = newVisibility === 'public'
@@ -403,7 +411,7 @@ federationRouter.put('/published/:id', async (req, res) => {
         deliverToFollowers(
           { id: user.id, username: user.username, publicKey: user.publicKey, privateKey: user.privateKey },
           createActivity
-        ).catch(err => console.error('Failed to deliver Create activity:', err))
+        ).catch(err => logger.error('Failed to deliver Create activity:', err))
       } else if (newVisibility !== 'private') {
         // Note was already visible and is still visible - send Update
         const to = newVisibility === 'public'
@@ -434,7 +442,7 @@ federationRouter.put('/published/:id', async (req, res) => {
         deliverToFollowers(
           { id: user.id, username: user.username, publicKey: user.publicKey, privateKey: user.privateKey },
           updateActivity
-        ).catch(err => console.error('Failed to deliver Update activity:', err))
+        ).catch(err => logger.error('Failed to deliver Update activity:', err))
       }
     }
 
@@ -454,7 +462,7 @@ federationRouter.put('/published/:id', async (req, res) => {
       res.status(400).json({ error: error.issues[0].message })
       return
     }
-    console.error('Failed to update note:', error)
+    logger.error('Failed to update note:', error)
     res.status(500).json({ error: 'Failed to update note' })
   }
 })
@@ -508,12 +516,12 @@ federationRouter.delete('/published/:id', async (req, res) => {
       deliverToFollowers(
         { id: user.id, username: user.username, publicKey: user.publicKey, privateKey: user.privateKey },
         deleteActivity
-      ).catch(err => console.error('Failed to deliver Delete activity:', err))
+      ).catch(err => logger.error('Failed to deliver Delete activity:', err))
     }
 
     res.json({ message: 'Entry unpublished successfully' })
   } catch (error) {
-    console.error('Failed to unpublish entry:', error)
+    logger.error('Failed to unpublish entry:', error)
     res.status(500).json({ error: 'Failed to unpublish entry' })
   }
 })
@@ -534,7 +542,7 @@ federationRouter.get('/followers', async (req, res) => {
       }))
     })
   } catch (error) {
-    console.error('Failed to get followers:', error)
+    logger.error('Failed to get followers:', error)
     res.status(500).json({ error: 'Failed to get followers' })
   }
 })
@@ -556,7 +564,7 @@ federationRouter.get('/following', async (req, res) => {
       }))
     })
   } catch (error) {
-    console.error('Failed to get following:', error)
+    logger.error('Failed to get following:', error)
     res.status(500).json({ error: 'Failed to get following' })
   }
 })
@@ -673,7 +681,7 @@ federationRouter.post('/follow', async (req, res) => {
       res.status(400).json({ error: error.issues[0].message })
       return
     }
-    console.error('Failed to follow user:', error)
+    logger.error('Failed to follow user:', error)
     res.status(500).json({ error: 'Failed to follow user' })
   }
 })
@@ -750,14 +758,14 @@ federationRouter.delete('/follow', async (req, res) => {
           undoActivity
         )
       } catch (err) {
-        console.warn('Failed to send Undo Follow activity:', err)
+        logger.warn('Failed to send Undo Follow activity:', err)
         // Continue anyway - the local state is already updated
       }
     }
 
     res.json({ message: 'Unfollowed successfully' })
   } catch (error) {
-    console.error('Failed to unfollow user:', error)
+    logger.error('Failed to unfollow user:', error)
     res.status(500).json({ error: 'Failed to unfollow user' })
   }
 })
@@ -949,12 +957,12 @@ federationRouter.get('/feed', async (req, res) => {
               }
             }
           } catch (err) {
-            console.warn(`[Federation] Failed to fetch outbox for ${follow.targetActorUrl}:`, err)
+            logger.warn(`[Federation] Failed to fetch outbox for ${follow.targetActorUrl}:`, err)
             // Continue with other users
           }
         }
       } catch (err) {
-        console.warn(`[Federation] Error processing followed user ${follow.targetActorUrl}:`, err)
+        logger.warn(`[Federation] Error processing followed user ${follow.targetActorUrl}:`, err)
       }
     }
 
@@ -984,7 +992,7 @@ federationRouter.get('/feed', async (req, res) => {
       hasMore
     })
   } catch (error) {
-    console.error('Failed to get feed:', error)
+    logger.error('Failed to get feed:', error)
     res.status(500).json({ error: 'Failed to get feed' })
   }
 })
@@ -1038,7 +1046,7 @@ federationRouter.get('/lookup', async (req, res) => {
       }
     })
   } catch (error) {
-    console.error('Failed to lookup user:', error)
+    logger.error('Failed to lookup user:', error)
     res.status(500).json({ error: 'Failed to lookup user' })
   }
 })
@@ -1109,14 +1117,14 @@ async function resolveHandle(username: string, domain: string | null): Promise<R
   // Remote user - use WebFinger to discover
   try {
     const webfingerUrl = `https://${domain}/.well-known/webfinger?resource=acct:${username}@${domain}`
-    console.log(`[Federation] Looking up: ${webfingerUrl}`)
+    logger.debug(`[Federation] Looking up: ${webfingerUrl}`)
 
     const webfingerResponse = await fetch(webfingerUrl, {
       headers: { Accept: 'application/jrd+json' }
     })
 
     if (!webfingerResponse.ok) {
-      console.warn(`[Federation] WebFinger lookup failed: ${webfingerResponse.status}`)
+      logger.warn(`[Federation] WebFinger lookup failed: ${webfingerResponse.status}`)
       return null
     }
 
@@ -1128,7 +1136,7 @@ async function resolveHandle(username: string, domain: string | null): Promise<R
     )
 
     if (!cadernoLink) {
-      console.warn(`[Federation] ${domain} is not a Caderno instance - federation not allowed`)
+      logger.warn(`[Federation] ${domain} is not a Caderno instance - federation not allowed`)
       return null
     }
 
@@ -1138,7 +1146,7 @@ async function resolveHandle(username: string, domain: string | null): Promise<R
     )
 
     if (!actorLink?.href) {
-      console.warn('[Federation] No ActivityPub link in WebFinger response')
+      logger.warn('[Federation] No ActivityPub link in WebFinger response')
       return null
     }
 
@@ -1148,7 +1156,7 @@ async function resolveHandle(username: string, domain: string | null): Promise<R
     })
 
     if (!actorResponse.ok) {
-      console.warn(`[Federation] Actor fetch failed: ${actorResponse.status}`)
+      logger.warn(`[Federation] Actor fetch failed: ${actorResponse.status}`)
       return null
     }
 
@@ -1163,7 +1171,7 @@ async function resolveHandle(username: string, domain: string | null): Promise<R
       isLocal: false
     }
   } catch (error) {
-    console.error('[Federation] Handle resolution error:', error)
+    logger.error('[Federation] Handle resolution error:', error)
     return null
   }
 }

@@ -40,6 +40,7 @@ function base64ToBuffer(base64: string): ArrayBuffer {
 
 /**
  * Derive an encryption key from password and salt using PBKDF2
+ * Key is extractable so it can be encrypted with passkey PRF
  */
 export async function deriveKey(password: string, saltBase64: string): Promise<CryptoKey> {
   const salt = base64ToBuffer(saltBase64)
@@ -54,7 +55,7 @@ export async function deriveKey(password: string, saltBase64: string): Promise<C
     ['deriveKey']
   )
 
-  // Derive AES-GCM key
+  // Derive AES-GCM key (extractable for passkey encryption)
   return crypto.subtle.deriveKey(
     {
       name: 'PBKDF2',
@@ -64,7 +65,7 @@ export async function deriveKey(password: string, saltBase64: string): Promise<C
     },
     keyMaterial,
     { name: 'AES-GCM', length: KEY_LENGTH },
-    false,
+    true, // Extractable for passkey encryption
     ['encrypt', 'decrypt']
   )
 }
@@ -315,4 +316,115 @@ export async function decryptToBlob(
 ): Promise<Blob> {
   const decryptedBuffer = await decryptPayload(keyBase64, encryptedDataBase64, ivBase64)
   return new Blob([decryptedBuffer], { type: mimeType })
+}
+
+// ============================================
+// PRF-based Key Derivation (for Passkey Encryption)
+// ============================================
+
+/**
+ * Derive an encryption key from PRF output using HKDF
+ * PRF output is the raw bytes from WebAuthn PRF extension
+ */
+export async function deriveKeyFromPrf(prfOutput: ArrayBuffer): Promise<CryptoKey> {
+  // Import PRF output as key material for HKDF
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw',
+    prfOutput,
+    'HKDF',
+    false,
+    ['deriveKey']
+  )
+
+  // Derive AES-GCM key using HKDF
+  return crypto.subtle.deriveKey(
+    {
+      name: 'HKDF',
+      hash: 'SHA-256',
+      salt: new ArrayBuffer(0), // No additional salt needed - PRF output is already unique
+      info: stringToBuffer('caderno-master-key-encryption').buffer as ArrayBuffer
+    },
+    keyMaterial,
+    { name: 'AES-GCM', length: KEY_LENGTH },
+    false,
+    ['encrypt', 'decrypt', 'wrapKey', 'unwrapKey']
+  )
+}
+
+/**
+ * Export the master encryption key as raw bytes
+ * This is used to encrypt the key with PRF-derived key
+ */
+export async function exportMasterKey(key: CryptoKey): Promise<ArrayBuffer> {
+  return crypto.subtle.exportKey('raw', key)
+}
+
+/**
+ * Import raw key bytes as a CryptoKey (for decrypted master keys)
+ */
+export async function importMasterKey(keyBytes: ArrayBuffer): Promise<CryptoKey> {
+  return crypto.subtle.importKey(
+    'raw',
+    keyBytes,
+    { name: 'AES-GCM', length: KEY_LENGTH },
+    true, // Extractable so it can be re-exported if needed
+    ['encrypt', 'decrypt']
+  )
+}
+
+/**
+ * Encrypt the master key with a PRF-derived key
+ * Returns { encryptedKey, iv } as base64 strings
+ */
+export async function encryptMasterKeyWithPrf(
+  masterKey: CryptoKey,
+  prfKey: CryptoKey
+): Promise<{ encryptedKey: string; iv: string }> {
+  const iv = crypto.getRandomValues(new Uint8Array(12))
+
+  // Export and encrypt the master key
+  const masterKeyBytes = await exportMasterKey(masterKey)
+  const encryptedBytes = await crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv },
+    prfKey,
+    masterKeyBytes
+  )
+
+  return {
+    encryptedKey: bufferToBase64(encryptedBytes),
+    iv: bufferToBase64(iv)
+  }
+}
+
+/**
+ * Decrypt the master key with a PRF-derived key
+ * Returns the decrypted master key as a CryptoKey
+ */
+export async function decryptMasterKeyWithPrf(
+  encryptedKeyBase64: string,
+  ivBase64: string,
+  prfKey: CryptoKey
+): Promise<CryptoKey> {
+  const encryptedBytes = base64ToBuffer(encryptedKeyBase64)
+  const iv = base64ToBuffer(ivBase64)
+
+  const decryptedBytes = await crypto.subtle.decrypt(
+    { name: 'AES-GCM', iv },
+    prfKey,
+    encryptedBytes
+  )
+
+  return importMasterKey(decryptedBytes)
+}
+
+/**
+ * Convert base64url to ArrayBuffer (for PRF salt)
+ */
+export function base64UrlToBuffer(base64url: string): ArrayBuffer {
+  // Convert base64url to base64
+  const base64 = base64url
+    .replace(/-/g, '+')
+    .replace(/_/g, '/')
+    .padEnd(base64url.length + (4 - base64url.length % 4) % 4, '=')
+  return base64ToBuffer(base64)
 }

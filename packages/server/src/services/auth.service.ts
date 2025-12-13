@@ -4,6 +4,9 @@ import { users, type User } from '../db/schema.js'
 import { hashPassword, verifyPassword, generateSalt, generateToken } from '../utils/crypto.js'
 import { signToken } from '../utils/jwt.js'
 import { sendVerificationEmail } from './email.service.js'
+import { createLogger } from '../utils/logger.js'
+
+const logger = createLogger('AuthService')
 
 export interface AuthResult {
   user: Omit<User, 'passwordHash' | 'emailVerificationToken'>
@@ -13,7 +16,8 @@ export interface AuthResult {
 // Reserved usernames that match system routes
 const RESERVED_USERNAMES = [
   'login', 'register', 'verify-email', 'unlock', 'about', 'terms', 'privacy', 'support',
-  'dashboard', 'switches', 'federation', 'api', 'admin', 'settings', 'profile', 'user', 'users'
+  'dashboard', 'switches', 'federation', 'api', 'admin', 'settings', 'profile', 'user', 'users',
+  'setup', 'compare', 'feed', 'platform'
 ]
 
 export async function register(
@@ -71,12 +75,14 @@ export async function register(
   } catch (error) {
     // Delete the user we just created
     await db.delete(users).where(eq(users.id, newUser.id))
-    console.error('[Auth] Failed to send verification email, rolled back user creation:', error)
+    logger.error('Failed to send verification email, rolled back user creation', error)
     throw new Error('Failed to send verification email. Please try again.')
   }
 
   // Generate JWT
   const token = await signToken({ userId: newUser.id, email: newUser.email, role: newUser.role })
+
+  logger.debug('User registered', { userId: newUser.id, username: normalizedUsername })
 
   // Return user without sensitive fields
   const { passwordHash: _, emailVerificationToken: __, ...safeUser } = newUser
@@ -85,32 +91,30 @@ export async function register(
 
 export async function login(emailOrUsername: string, password: string): Promise<AuthResult> {
   const normalized = emailOrUsername.toLowerCase().trim()
-  console.log('[AuthService] login() called for:', normalized)
+  logger.debug('Login attempt', { identifier: normalized })
 
   // Find user by email or username
-  console.log('[AuthService] Querying database for user...')
   const user = await db.query.users.findFirst({
     where: or(
       eq(users.email, normalized),
       eq(users.username, normalized)
     )
   })
-  console.log('[AuthService] User found:', user ? `ID ${user.id}` : 'null')
 
   if (!user) {
-    console.log('[AuthService] User not found, throwing error')
+    logger.debug('User not found')
     throw new Error('Invalid email/username or password')
   }
 
   // Check if user is banned
   if (user.bannedOn) {
-    console.log('[AuthService] User is banned, throwing error')
+    logger.debug('User is banned', { userId: user.id })
     throw new Error('This account has been permanently banned')
   }
 
   // Check if user is suspended
   if (user.suspendedUntil && new Date(user.suspendedUntil) > new Date()) {
-    console.log('[AuthService] User is suspended until:', user.suspendedUntil)
+    logger.debug('User is suspended', { userId: user.id, until: user.suspendedUntil })
     const suspendedDate = new Date(user.suspendedUntil).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
@@ -120,22 +124,20 @@ export async function login(emailOrUsername: string, password: string): Promise<
   }
 
   // Verify password
-  console.log('[AuthService] Verifying password...')
   const isValid = await verifyPassword(password, user.passwordHash)
-  console.log('[AuthService] Password valid:', isValid)
 
   if (!isValid) {
+    logger.debug('Invalid password', { userId: user.id })
     throw new Error('Invalid email/username or password')
   }
 
   // Generate JWT
-  console.log('[AuthService] Generating JWT...')
   const token = await signToken({ userId: user.id, email: user.email, role: user.role })
-  console.log('[AuthService] JWT generated successfully')
+
+  logger.debug('Login successful', { userId: user.id })
 
   // Return user without sensitive fields
   const { passwordHash: _, emailVerificationToken: __, ...safeUser } = user
-  console.log('[AuthService] Returning safe user object with keys:', Object.keys(safeUser))
   return { user: safeUser, token }
 }
 
@@ -176,6 +178,7 @@ export async function verifyEmail(token: string): Promise<User> {
     .where(eq(users.id, user.id))
     .returning()
 
+  logger.debug('Email verified', { userId: user.id })
   return updatedUser
 }
 
@@ -394,6 +397,8 @@ export async function updateEmail(
       .where(eq(users.id, userId))
     throw new Error('Failed to send verification email. Email not updated.')
   }
+
+  logger.debug('Email updated', { userId })
 
   const { passwordHash: _, emailVerificationToken: __, ...safeUser } = updatedUser
   return safeUser

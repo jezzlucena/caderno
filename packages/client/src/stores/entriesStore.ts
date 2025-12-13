@@ -1,7 +1,9 @@
 import { create } from 'zustand'
-import { entriesApi, type Entry, ApiError } from '../lib/api'
+import { entriesApi, type Entry } from '../lib/api'
 import { useCryptoStore } from './cryptoStore'
 import { encryptEntry, decryptEntryCompat } from '../lib/crypto'
+import { getErrorMessage } from '../lib/storeUtils'
+import { getEncryptionKeyOrError } from '../hooks/useCryptoGuard'
 
 export interface DecryptedEntry {
   id: number
@@ -38,30 +40,21 @@ export const useEntriesStore = create<EntriesState>((set, get) => ({
 
   fetchEntries: async () => {
     // Prevent concurrent fetches
-    if (isFetching || get().isLoading) {
-      console.log('[EntriesStore] Skipping fetch - already in progress')
-      return
-    }
+    if (isFetching || get().isLoading) return
 
-    const cryptoStore = useCryptoStore.getState()
-    if (!cryptoStore.encryptionKey) {
-      console.log('[EntriesStore] No encryption key available')
-      set({ error: 'Encryption key not available' })
-      return
-    }
+    const encryptionKey = getEncryptionKeyOrError((err) => set({ error: err }))
+    if (!encryptionKey) return
 
     isFetching = true
     set({ isLoading: true, error: null })
     try {
-      console.log('[EntriesStore] Fetching entries from API...')
       const { entries } = await entriesApi.list()
-      console.log('[EntriesStore] API returned', entries.length, 'entries:', entries)
 
       // Decrypt all entries
       const decryptedEntries: DecryptedEntry[] = await Promise.all(
         entries.map(async (entry: Entry) => {
           const { title, content } = await decryptEntryCompat(
-            cryptoStore.encryptionKey!,
+            encryptionKey,
             entry.encryptedTitle,
             entry.encryptedContent,
             entry.iv
@@ -76,30 +69,24 @@ export const useEntriesStore = create<EntriesState>((set, get) => ({
         })
       )
 
-      console.log('[EntriesStore] Decrypted', decryptedEntries.length, 'entries')
       set({ entries: decryptedEntries, isLoading: false })
     } catch (error) {
-      const message = error instanceof ApiError ? error.message : 'Failed to fetch entries'
-      console.error('[EntriesStore] Failed to fetch entries:', error)
-      set({ error: message, isLoading: false })
+      set({ error: getErrorMessage(error, 'Failed to fetch entries'), isLoading: false })
     } finally {
       isFetching = false
     }
   },
 
   fetchEntry: async (id: number) => {
-    const cryptoStore = useCryptoStore.getState()
-    if (!cryptoStore.encryptionKey) {
-      set({ error: 'Encryption key not available' })
-      return
-    }
+    const encryptionKey = getEncryptionKeyOrError((err) => set({ error: err }))
+    if (!encryptionKey) return
 
     set({ isLoading: true, error: null })
     try {
       const { entry } = await entriesApi.get(id)
 
       const { title, content } = await decryptEntryCompat(
-        cryptoStore.encryptionKey!,
+        encryptionKey,
         entry.encryptedTitle,
         entry.encryptedContent,
         entry.iv
@@ -115,22 +102,21 @@ export const useEntriesStore = create<EntriesState>((set, get) => ({
 
       set({ currentEntry: decryptedEntry, isLoading: false })
     } catch (error) {
-      const message = error instanceof ApiError ? error.message : 'Failed to fetch entry'
-      set({ error: message, isLoading: false })
+      set({ error: getErrorMessage(error, 'Failed to fetch entry'), isLoading: false })
       throw error
     }
   },
 
   createEntry: async (title: string, content: string) => {
-    const cryptoStore = useCryptoStore.getState()
-    if (!cryptoStore.encryptionKey) {
+    const { encryptionKey } = useCryptoStore.getState()
+    if (!encryptionKey) {
       throw new Error('Encryption key not available')
     }
 
     set({ isLoading: true, error: null })
     try {
       // Encrypt the entry client-side
-      const encrypted = await encryptEntry(cryptoStore.encryptionKey, title, content)
+      const encrypted = await encryptEntry(encryptionKey, title, content)
 
       // Send encrypted data to server
       const { entry } = await entriesApi.create(encrypted)
@@ -152,22 +138,21 @@ export const useEntriesStore = create<EntriesState>((set, get) => ({
 
       return decryptedEntry
     } catch (error) {
-      const message = error instanceof ApiError ? error.message : 'Failed to create entry'
-      set({ error: message, isLoading: false })
+      set({ error: getErrorMessage(error, 'Failed to create entry'), isLoading: false })
       throw error
     }
   },
 
   updateEntry: async (id: number, title: string, content: string) => {
-    const cryptoStore = useCryptoStore.getState()
-    if (!cryptoStore.encryptionKey) {
+    const { encryptionKey } = useCryptoStore.getState()
+    if (!encryptionKey) {
       throw new Error('Encryption key not available')
     }
 
     set({ isLoading: true, error: null })
     try {
       // Encrypt the entry client-side
-      const encrypted = await encryptEntry(cryptoStore.encryptionKey, title, content)
+      const encrypted = await encryptEntry(encryptionKey, title, content)
 
       // Send encrypted data to server
       const { entry } = await entriesApi.update(id, encrypted)
@@ -187,8 +172,7 @@ export const useEntriesStore = create<EntriesState>((set, get) => ({
         isLoading: false
       }))
     } catch (error) {
-      const message = error instanceof ApiError ? error.message : 'Failed to update entry'
-      set({ error: message, isLoading: false })
+      set({ error: getErrorMessage(error, 'Failed to update entry'), isLoading: false })
       throw error
     }
   },
@@ -205,8 +189,7 @@ export const useEntriesStore = create<EntriesState>((set, get) => ({
         isLoading: false
       }))
     } catch (error) {
-      const message = error instanceof ApiError ? error.message : 'Failed to delete entry'
-      set({ error: message, isLoading: false })
+      set({ error: getErrorMessage(error, 'Failed to delete entry'), isLoading: false })
       throw error
     }
   },

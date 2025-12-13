@@ -426,7 +426,6 @@ form label:not(.relative) {
   top: 0;
   left: 0;
   transform: translateY(-50%);
-  background-color: white;
   font-size: 0.8rem;
   color: #666;
 }
@@ -469,7 +468,7 @@ form label:not(.relative) {
 }
 
 .Toastify__toast--success .Toastify__progress-bar {
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.85);
 }
 
 /* Error toast */
@@ -492,7 +491,7 @@ form label:not(.relative) {
 }
 
 .Toastify__toast--error .Toastify__progress-bar {
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.85);
 }
 
 /* Warning toast */
@@ -511,7 +510,7 @@ form label:not(.relative) {
 }
 
 .Toastify__toast--warning .Toastify__progress-bar {
-  background: rgba(120, 53, 15, 0.3);
+  background: rgba(120, 53, 15, 0.6);
 }
 
 /* Info toast */
@@ -530,7 +529,7 @@ form label:not(.relative) {
 }
 
 .Toastify__toast--info .Toastify__progress-bar {
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.85);
 }
 
 /* Toast body text */
@@ -543,7 +542,7 @@ form label:not(.relative) {
 
 /* Progress bar base */
 .Toastify__progress-bar {
-  height: 3px;
+  height: 4px;
 }
 
 /* Toast entrance/exit animations using iOS timing */

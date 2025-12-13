@@ -1,4 +1,5 @@
 import express from 'express'
+import { createServer } from 'http'
 import helmet from 'helmet'
 import cors from 'cors'
 import { env } from './config/env.js'
@@ -12,8 +13,16 @@ import { profileRouter } from './routes/profile.js'
 import { supportRouter } from './routes/support.js'
 import { adminRouter } from './routes/admin.js'
 import { platformRouter } from './routes/platform.js'
+import { setupRouter } from './routes/setup.js'
+import { notificationsRouter } from './routes/notifications.js'
+import { passkeyRouter } from './routes/passkey.js'
 import { startScheduler } from './services/scheduler.service.js'
-import { generalLimiter, federationLimiter } from './middleware/rateLimit.js'
+import { initializeWebSocket } from './services/websocket.service.js'
+import { generalLimiter } from './middleware/rateLimit.js'
+import { errorHandler } from './middleware/errorHandler.js'
+import { createLogger } from './utils/logger.js'
+
+const logger = createLogger('Server')
 
 const app = express()
 
@@ -62,16 +71,26 @@ app.use('/api/profile', profileRouter)
 app.use('/api/support', supportRouter)
 app.use('/api/admin', adminRouter)
 app.use('/api/platform', platformRouter)
+app.use('/api/setup', setupRouter)
+app.use('/api/notifications', notificationsRouter)
+app.use('/api/passkey', passkeyRouter)
 
 // ActivityPub Federation routes (mounted at root for proper URLs)
 if (env.VITE_FEDERATION_ENABLED === 'true') {
-  console.log(`[Federation] ActivityPub enabled for domain: ${env.FEDERATION_DOMAIN}`)
+  logger.info(`ActivityPub enabled for domain: ${env.FEDERATION_DOMAIN}`)
   app.use(activityPubRouter)
 }
 
+// Error handler - must be registered after all routes
+app.use(errorHandler)
+
+// Create HTTP server and initialize WebSocket
+const httpServer = createServer(app)
+initializeWebSocket(httpServer)
+
 // Start server
-app.listen(env.PORT, () => {
-  console.log(`Server running on port ${env.PORT}`)
+httpServer.listen(env.PORT, () => {
+  logger.info(`Server running on port ${env.PORT}`)
 
   // Start the Dead Man's Switch scheduler
   startScheduler()
