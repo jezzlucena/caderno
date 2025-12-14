@@ -19,6 +19,7 @@ export const users = pgTable('users', {
   privateKey: text('private_key'),                          // RSA private key for signing requests
   federationEnabled: boolean('federation_enabled').default(false).notNull(), // Opt-in to federation
   profileVisibility: text('profile_visibility').default('private').notNull(), // 'public' | 'restricted' | 'private'
+  theme: text('theme').default('system').notNull(), // 'light' | 'dark' | 'system'
   // Moderation fields
   bannedOn: timestamp('banned_on'),                            // Timestamp when user was permanently banned (null = not banned)
   suspendedUntil: timestamp('suspended_until'),                // Timestamp when temporary suspension expires (null = not suspended)

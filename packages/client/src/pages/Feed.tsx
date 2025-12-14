@@ -171,7 +171,7 @@ export function Feed() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8 max-w-2xl animate-fade-in">
+      <main id="main-content" className="container mx-auto px-4 py-8 max-w-2xl animate-fade-in">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">Your Feed</h1>
@@ -201,7 +201,7 @@ export function Feed() {
               <h3 className="font-semibold mb-3">Create a new post</h3>
 
               {postError && (
-                <div className="alert alert-error mb-3 py-2">
+                <div className="alert alert-error mb-3 py-2" role="alert">
                   <span className="text-sm">{postError}</span>
                 </div>
               )}
@@ -256,7 +256,7 @@ export function Feed() {
 
         {/* Error state */}
         {error && (
-          <div className="alert alert-error mb-4">
+          <div className="alert alert-error mb-4" role="alert">
             <span>{error}</span>
             <button className="btn btn-ghost btn-sm" onClick={() => loadFeed(true)}>
               Retry
@@ -317,7 +317,7 @@ export function Feed() {
             )}
           </div>
         )}
-      </div>
+      </main>
     </div>
   )
 }

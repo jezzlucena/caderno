@@ -40,7 +40,7 @@ export function JournalList({ onSelect, onNew, selectedId }: JournalListProps) {
 
   if (error) {
     return (
-      <div className="alert alert-error">
+      <div className="alert alert-error" role="alert">
         <span>{error}</span>
         <button className="btn btn-sm" onClick={() => fetchEntries()}>
           Retry

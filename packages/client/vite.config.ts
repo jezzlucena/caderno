@@ -13,6 +13,12 @@ export default defineConfig({
         target: 'http://server:5055',
         changeOrigin: true,
         secure: false
+      },
+      '/socket.io': {
+        target: 'http://server:5055',
+        changeOrigin: true,
+        secure: false,
+        ws: true
       }
     }
   }

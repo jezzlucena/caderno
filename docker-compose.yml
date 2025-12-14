@@ -36,6 +36,9 @@ services:
       VITE_FEDERATION_ENABLED: ${VITE_FEDERATION_ENABLED:-true}
       FEDERATION_DOMAIN: ${FEDERATION_DOMAIN:-localhost:5055}
       SERVER_URL: ${SERVER_URL:-http://localhost:5055}
+      WEBAUTHN_ORIGIN: ${WEBAUTHN_ORIGIN:-http://localhost:8085}
+      WEBAUTHN_RP_ID: ${WEBAUTHN_RP_ID:-localhost}
+      WEBAUTHN_RP_NAME: ${WEBAUTHN_RP_NAME:-Caderno}
     depends_on:
       db:
         condition: service_healthy

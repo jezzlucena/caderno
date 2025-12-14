@@ -273,10 +273,10 @@ export function PlatformSettings() {
 
         {/* Messages */}
         {errorMessage && (
-          <div className="alert alert-error mb-4">
+          <div className="alert alert-error mb-4" role="alert">
             <span>{errorMessage}</span>
-            <button className="btn btn-ghost btn-sm" onClick={() => setErrorMessage('')}>
-              &times;
+            <button className="btn btn-ghost btn-sm" onClick={() => setErrorMessage('')} aria-label="Dismiss error">
+              <span aria-hidden="true">&times;</span>
             </button>
           </div>
         )}

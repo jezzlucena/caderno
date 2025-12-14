@@ -2,11 +2,12 @@ import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { startRegistration, startAuthentication, browserSupportsWebAuthn } from '@simplewebauthn/browser'
-import { FingerPrintIcon, TrashIcon, PencilIcon } from '@heroicons/react/24/outline'
+import { FingerPrintIcon, TrashIcon, PencilIcon, SunIcon, MoonIcon, ComputerDesktopIcon } from '@heroicons/react/24/outline'
 import { useAuthStore } from '../stores/authStore'
 import { useCryptoStore } from '../stores/cryptoStore'
+import { useThemeStore } from '../stores/themeStore'
 import { authApi, federationApi, profileApi, passkeyApi, type FederationProfile, type FollowRequest, type PasskeyInfo } from '../lib/api'
-import { deriveKeyFromPrf, encryptMasterKeyWithPrf, base64UrlToBuffer } from '../lib/crypto'
+import { deriveKeyFromPrf, encryptMasterKeyWithPrf, base64UrlToBuffer, bufferToBase64Url } from '../lib/crypto'
 import { Navbar } from '../components/Navbar'
 import { Footer } from '../components/Footer'
 import { UnlockPrompt } from '../components/UnlockPrompt'
@@ -17,7 +18,9 @@ type TabType = 'profile' | 'followers'
 export function AccountSettings() {
   const { user, updateProfile, isLoading, clearError } = useAuthStore()
   const { isKeyReady } = useCryptoStore()
+  const { theme, setTheme } = useThemeStore()
   const [activeTab, setActiveTab] = useState<TabType>('profile')
+  const [isSavingTheme, setIsSavingTheme] = useState(false)
 
   // Profile form state
   const [username, setUsername] = useState('')
@@ -157,17 +160,19 @@ export function AccountSettings() {
       }
 
       // If PRF is supported, encrypt the master key with passkey
+      console.log('[Passkey] PRF check:', { prfSupported, prfSalt, passkeyId: passkey.id, credentialId: passkey.credentialId })
       if (prfSupported && prfSalt) {
         try {
           // Need to authenticate with PRF to get the secret
           // Build authentication options with PRF eval
           const prfSaltBuffer = base64UrlToBuffer(prfSalt)
+          console.log('[Passkey] PRF salt buffer created')
 
           const authOptions = {
             rpId: (options as any).rp?.id || window.location.hostname,
-            challenge: crypto.getRandomValues(new Uint8Array(32)),
+            challenge: bufferToBase64Url(crypto.getRandomValues(new Uint8Array(32))),
             allowCredentials: [{
-              id: passkey.id.toString(),
+              id: passkey.credentialId,
               type: 'public-key' as const,
               transports: ['internal' as const]
             }],
@@ -182,28 +187,36 @@ export function AccountSettings() {
           }
 
           // Get PRF output through authentication
+          console.log('[Passkey] Starting PRF authentication with options:', authOptions)
           const authResponse = await startAuthentication({
             optionsJSON: authOptions as any
           })
+          console.log('[Passkey] Auth response:', authResponse)
+          console.log('[Passkey] Client extension results:', (authResponse as any).clientExtensionResults)
 
           // Get PRF result from client extension results
           const prfResult = (authResponse as any).clientExtensionResults?.prf?.results?.first
+          console.log('[Passkey] PRF result:', prfResult)
           if (prfResult) {
             // Derive encryption key from PRF output
             const prfKey = await deriveKeyFromPrf(prfResult)
+            console.log('[Passkey] PRF key derived')
 
             // Encrypt master key with PRF-derived key
             const { encryptedKey, iv } = await encryptMasterKeyWithPrf(masterKey, prfKey)
+            console.log('[Passkey] Master key encrypted, storing on server...')
 
             // Store encrypted key on server
             await passkeyApi.storeEncryptedKey(passkey.id, encryptedKey, iv)
+            console.log('[Passkey] Encrypted key stored successfully')
 
             toast.success('Passkey added with E2EE key backup!')
           } else {
+            console.warn('[Passkey] No PRF result in auth response')
             toast.success('Passkey added (without E2EE key backup)')
           }
         } catch (prfError) {
-          console.warn('PRF key encryption failed:', prfError)
+          console.error('[Passkey] PRF key encryption failed:', prfError)
           toast.success('Passkey added (E2EE key backup not available)')
         }
       } else {
@@ -456,7 +469,7 @@ export function AccountSettings() {
     <div className="min-h-screen bg-base-200 flex flex-col">
       <Navbar currentPage="settings" />
 
-      <div className="container mx-auto px-4 py-8 max-w-4xl animate-fade-in">
+      <main id="main-content" className="container mx-auto px-4 py-8 max-w-4xl animate-fade-in">
         {/* Tabs */}
         {import.meta.env.VITE_FEDERATION_ENABLED === 'true' && (
           <div className="tabs tabs-boxed mb-6 bg-base-100 p-1">
@@ -672,6 +685,85 @@ export function AccountSettings() {
                   {isLoading ? <span className="loading loading-spinner"></span> : 'Save Changes'}
                 </button>
               </form>
+
+              {/* Theme Section */}
+              <div className="divider mt-8"></div>
+
+              <h2 className="card-title text-xl mb-4">
+                <SunIcon className="h-6 w-6" />
+                Appearance
+              </h2>
+              <p className="text-sm text-base-content/70 mb-4">
+                Choose how Caderno looks for you. Select a theme below.
+              </p>
+
+              <div className="flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  className={`btn ${theme === 'light' ? 'btn-primary' : 'btn-outline'} gap-2`}
+                  onClick={async () => {
+                    setTheme('light')
+                    setIsSavingTheme(true)
+                    try {
+                      await updateProfile({ theme: 'light' })
+                    } catch {
+                      // Error handled in store
+                    } finally {
+                      setIsSavingTheme(false)
+                    }
+                  }}
+                  disabled={isSavingTheme}
+                >
+                  <SunIcon className="h-5 w-5" />
+                  Light
+                </button>
+                <button
+                  type="button"
+                  className={`btn ${theme === 'dark' ? 'btn-primary' : 'btn-outline'} gap-2`}
+                  onClick={async () => {
+                    setTheme('dark')
+                    setIsSavingTheme(true)
+                    try {
+                      await updateProfile({ theme: 'dark' })
+                    } catch {
+                      // Error handled in store
+                    } finally {
+                      setIsSavingTheme(false)
+                    }
+                  }}
+                  disabled={isSavingTheme}
+                >
+                  <MoonIcon className="h-5 w-5" />
+                  Dark
+                </button>
+                <button
+                  type="button"
+                  className={`btn ${theme === 'system' ? 'btn-primary' : 'btn-outline'} gap-2`}
+                  onClick={async () => {
+                    setTheme('system')
+                    setIsSavingTheme(true)
+                    try {
+                      await updateProfile({ theme: 'system' })
+                    } catch {
+                      // Error handled in store
+                    } finally {
+                      setIsSavingTheme(false)
+                    }
+                  }}
+                  disabled={isSavingTheme}
+                >
+                  <ComputerDesktopIcon className="h-5 w-5" />
+                  System
+                </button>
+                {isSavingTheme && <span className="loading loading-spinner loading-sm"></span>}
+              </div>
+              <span className="label pt-2">
+                <span className="label-text-alt">
+                  {theme === 'light' && 'Always use light theme'}
+                  {theme === 'dark' && 'Always use dark theme'}
+                  {theme === 'system' && 'Match your operating system theme'}
+                </span>
+              </span>
 
               {/* Passkeys Section */}
               <div className="divider mt-8"></div>
@@ -1072,7 +1164,7 @@ export function AccountSettings() {
             )}
           </div>
         )}
-      </div>
+      </main>
       <Footer />
     </div>
   )

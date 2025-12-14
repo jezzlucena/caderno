@@ -13,15 +13,15 @@ export const generalLimiter = rateLimit({
   legacyHeaders: false
 })
 
-// Auth rate limit - 5 requests per minute for login/register
-// More restrictive to prevent brute force attacks
+// Auth rate limit - 10 requests per minute for login/register
+// Restrictive to prevent brute force attacks while allowing normal usage
 export const authLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
-  max: 5,
+  max: 10,
   message: { error: 'Too many authentication attempts, please try again later' },
   standardHeaders: true,
   legacyHeaders: false,
-  skipSuccessfulRequests: false
+  skipSuccessfulRequests: true // Don't count successful requests against the limit
 })
 
 // Strict auth rate limit - 3 requests per 15 minutes

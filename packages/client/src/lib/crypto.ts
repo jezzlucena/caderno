@@ -428,3 +428,15 @@ export function base64UrlToBuffer(base64url: string): ArrayBuffer {
     .padEnd(base64url.length + (4 - base64url.length % 4) % 4, '=')
   return base64ToBuffer(base64)
 }
+
+/**
+ * Convert ArrayBuffer to base64url string
+ */
+export function bufferToBase64Url(buffer: ArrayBuffer | Uint8Array): string {
+  const base64 = bufferToBase64(buffer)
+  // Convert base64 to base64url
+  return base64
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '')
+}

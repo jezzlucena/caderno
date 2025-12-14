@@ -29,9 +29,9 @@ export interface NoteCardProps {
 const MAX_CONTENT_LENGTH = 300
 
 const VISIBILITY_ICONS: Record<VisibilityIconType, React.ReactNode> = {
-  globe: <GlobeAltIcon className="h-3 w-3" />,
-  users: <UserGroupIcon className="h-3 w-3" />,
-  lock: <LockClosedIcon className="h-3 w-3" />
+  globe: <GlobeAltIcon className="h-3 w-3" aria-hidden="true" />,
+  users: <UserGroupIcon className="h-3 w-3" aria-hidden="true" />,
+  lock: <LockClosedIcon className="h-3 w-3" aria-hidden="true" />
 }
 
 function NoteCardComponent({
@@ -125,18 +125,18 @@ function NoteCardComponent({
                   <button
                     className="btn btn-ghost btn-xs"
                     onClick={onEdit}
-                    title="Edit note"
+                    aria-label="Edit note"
                   >
-                    <PencilIcon className="h-4 w-4" />
+                    <PencilIcon className="h-4 w-4" aria-hidden="true" />
                   </button>
                 )}
                 {onDelete && (
                   <button
                     className="btn btn-ghost btn-xs text-error"
                     onClick={onDelete}
-                    title="Delete note"
+                    aria-label="Delete note"
                   >
-                    <TrashIcon className="h-4 w-4" />
+                    <TrashIcon className="h-4 w-4" aria-hidden="true" />
                   </button>
                 )}
               </div>

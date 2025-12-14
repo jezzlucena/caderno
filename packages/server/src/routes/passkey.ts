@@ -12,7 +12,7 @@ import {
   storeEncryptedMasterKey
 } from '../services/passkey.service.js'
 import { authMiddleware, optionalAuthMiddleware } from '../middleware/auth.js'
-import { authLimiter } from '../middleware/rateLimit.js'
+import { authLimiter, generalLimiter } from '../middleware/rateLimit.js'
 import { asyncHandler, unauthorized, notFound } from '../middleware/errorHandler.js'
 import { createLogger } from '../utils/logger.js'
 
@@ -20,8 +20,8 @@ const logger = createLogger('Passkey')
 
 export const passkeyRouter: RouterType = Router()
 
-// Apply rate limiting
-passkeyRouter.use(authLimiter)
+// Apply general rate limiting to all routes
+passkeyRouter.use(generalLimiter)
 
 // POST /api/passkey/register/options - Get registration options (protected - adding passkey to existing account)
 passkeyRouter.post('/register/options', authMiddleware, asyncHandler(async (req, res) => {
@@ -54,6 +54,7 @@ passkeyRouter.post('/register/verify', authMiddleware, asyncHandler(async (req, 
     success: true,
     passkey: result.passkey ? {
       id: result.passkey.id,
+      credentialId: result.passkey.credentialId,
       name: result.passkey.name,
       deviceType: result.passkey.deviceType,
       backedUp: result.passkey.backedUp,
@@ -66,7 +67,8 @@ passkeyRouter.post('/register/verify', authMiddleware, asyncHandler(async (req, 
 }))
 
 // POST /api/passkey/authenticate/options - Get authentication options (public)
-passkeyRouter.post('/authenticate/options', asyncHandler(async (req, res) => {
+// Apply strict auth rate limiting to public authentication routes
+passkeyRouter.post('/authenticate/options', authLimiter, asyncHandler(async (req, res) => {
   const schema = z.object({
     emailOrUsername: z.string().optional()
   })
@@ -79,7 +81,7 @@ passkeyRouter.post('/authenticate/options', asyncHandler(async (req, res) => {
 }))
 
 // POST /api/passkey/authenticate/verify - Verify authentication (public - login with passkey)
-passkeyRouter.post('/authenticate/verify', asyncHandler(async (req, res) => {
+passkeyRouter.post('/authenticate/verify', authLimiter, asyncHandler(async (req, res) => {
   const schema = z.object({
     challengeKey: z.string(),
     response: z.any() // WebAuthn response object

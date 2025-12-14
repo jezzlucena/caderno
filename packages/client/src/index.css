@@ -1,5 +1,7 @@
 @import "tailwindcss";
-@plugin "daisyui";
+@plugin "daisyui" {
+  themes: corporate --default, business;
+}
 
 /* ============================================
    iOS-Style Animations
@@ -448,18 +450,19 @@ form label:not(.relative) {
   min-height: auto;
 }
 
-/* Success toast - uses brand gradient */
+/* Success toast - uses DaisyUI success color */
 .Toastify__toast--success {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: oklch(var(--su));
+  color: oklch(var(--suc));
+  --toastify-icon-color-success: oklch(var(--suc));
 }
 
 .Toastify__toast--success .Toastify__toast-icon svg {
-  fill: white;
+  fill: currentColor;
 }
 
 .Toastify__toast--success .Toastify__close-button {
-  color: white;
+  color: currentColor;
   opacity: 0.8;
 }
 
@@ -468,21 +471,22 @@ form label:not(.relative) {
 }
 
 .Toastify__toast--success .Toastify__progress-bar {
-  background: rgba(255, 255, 255, 0.85);
+  background: oklch(var(--suc) / 0.5);
 }
 
-/* Error toast */
+/* Error toast - uses DaisyUI error color */
 .Toastify__toast--error {
-  background: #f87171;
-  color: white;
+  background: oklch(var(--er));
+  color: oklch(var(--erc));
+  --toastify-icon-color-error: oklch(var(--erc));
 }
 
 .Toastify__toast--error .Toastify__toast-icon svg {
-  fill: white;
+  fill: currentColor;
 }
 
 .Toastify__toast--error .Toastify__close-button {
-  color: white;
+  color: currentColor;
   opacity: 0.8;
 }
 
@@ -491,45 +495,47 @@ form label:not(.relative) {
 }
 
 .Toastify__toast--error .Toastify__progress-bar {
-  background: rgba(255, 255, 255, 0.85);
+  background: oklch(var(--erc) / 0.5);
 }
 
-/* Warning toast */
+/* Warning toast - uses DaisyUI warning color */
 .Toastify__toast--warning {
-  background: #fbbf24;
-  color: #78350f;
+  background: oklch(var(--wa));
+  color: oklch(var(--wac));
+  --toastify-icon-color-warning: oklch(var(--wac));
 }
 
 .Toastify__toast--warning .Toastify__toast-icon svg {
-  fill: #78350f;
+  fill: currentColor;
 }
 
 .Toastify__toast--warning .Toastify__close-button {
-  color: #78350f;
+  color: currentColor;
   opacity: 0.8;
 }
 
 .Toastify__toast--warning .Toastify__progress-bar {
-  background: rgba(120, 53, 15, 0.6);
+  background: oklch(var(--wac) / 0.5);
 }
 
-/* Info toast */
+/* Info toast - uses DaisyUI info color */
 .Toastify__toast--info {
-  background: #38bdf8;
-  color: white;
+  background: oklch(var(--in));
+  color: oklch(var(--inc));
+  --toastify-icon-color-info: oklch(var(--inc));
 }
 
 .Toastify__toast--info .Toastify__toast-icon svg {
-  fill: white;
+  fill: currentColor;
 }
 
 .Toastify__toast--info .Toastify__close-button {
-  color: white;
+  color: currentColor;
   opacity: 0.8;
 }
 
 .Toastify__toast--info .Toastify__progress-bar {
-  background: rgba(255, 255, 255, 0.85);
+  background: oklch(var(--inc) / 0.5);
 }
 
 /* Toast body text */
@@ -585,7 +591,7 @@ form label:not(.relative) {
 }
 
 .Toastify__close-button:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: oklch(var(--bc) / 0.15);
 }
 
 /* Toast icon */

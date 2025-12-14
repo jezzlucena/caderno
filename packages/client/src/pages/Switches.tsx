@@ -96,7 +96,7 @@ export function Switches() {
         )}
 
         {error && (
-          <div className="alert alert-error mb-4">
+          <div className="alert alert-error mb-4" role="alert">
             <span>{error}</span>
           </div>
         )}

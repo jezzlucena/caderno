@@ -389,7 +389,13 @@ export async function verifyPasskeyAuthentication(
     role: passkey.user.role
   })
 
-  logger.debug('Passkey authentication successful', { userId: passkey.user.id, prfSupported: passkey.prfSupported })
+  logger.debug('Passkey authentication successful', {
+    userId: passkey.user.id,
+    prfSupported: passkey.prfSupported,
+    hasEncryptedKey: !!passkey.encryptedMasterKey,
+    hasMasterKeyIv: !!passkey.masterKeyIv,
+    hasPrfSalt: !!passkey.prfSalt
+  })
 
   // Return user without sensitive fields
   const { passwordHash: _, emailVerificationToken: __, ...safeUser } = passkey.user

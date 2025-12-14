@@ -228,13 +228,13 @@ export function CreateSwitchModal({ onClose, onCreate }: CreateSwitchModalProps)
   }
 
   return (
-    <div className="modal modal-open">
-      <div className="modal-backdrop modal-backdrop-enter" onClick={onClose} />
+    <div className="modal modal-open" role="dialog" aria-modal="true" aria-labelledby="create-switch-modal-title" aria-describedby={error ? "create-switch-error" : undefined}>
+      <div className="modal-backdrop modal-backdrop-enter" onClick={onClose} aria-label="Close modal" />
       <div className="modal-box max-w-2xl max-h-[90vh] overflow-y-auto modal-content-enter ios-scroll">
-        <h3 className="font-bold text-lg">Create Dead Man's Switch</h3>
+        <h3 id="create-switch-modal-title" className="font-bold text-lg">Create Dead Man's Switch</h3>
 
         {error && (
-          <div className="alert alert-error mt-4">
+          <div id="create-switch-error" className="alert alert-error mt-4" role="alert">
             <span>{error}</span>
           </div>
         )}
@@ -327,8 +327,8 @@ export function CreateSwitchModal({ onClose, onCreate }: CreateSwitchModalProps)
               </div>
 
               {entriesLoading ? (
-                <div className="flex justify-center py-4">
-                  <span className="loading loading-spinner loading-sm"></span>
+                <div className="flex justify-center py-4" aria-busy="true">
+                  <span className="loading loading-spinner loading-sm" aria-hidden="true"></span>
                   <span className="ml-2 text-sm">Loading entries...</span>
                 </div>
               ) : entriesError ? (
@@ -399,8 +399,9 @@ export function CreateSwitchModal({ onClose, onCreate }: CreateSwitchModalProps)
                       type="button"
                       className="btn btn-ghost btn-square"
                       onClick={() => removeRecipient(i)}
+                      aria-label={`Remove recipient ${i + 1}`}
                     >
-                      ✕
+                      <span aria-hidden="true">✕</span>
                     </button>
                   )}
                 </div>
@@ -417,10 +418,10 @@ export function CreateSwitchModal({ onClose, onCreate }: CreateSwitchModalProps)
             <button type="button" className="btn btn-ghost" onClick={onClose} disabled={isSubmitting}>
               Cancel
             </button>
-            <button type="submit" className="btn btn-primary" disabled={isSubmitting || (includePdf && entries.length === 0)}>
+            <button type="submit" className="btn btn-primary" disabled={isSubmitting || (includePdf && entries.length === 0)} aria-busy={isSubmitting}>
               {isSubmitting ? (
                 <>
-                  <span className="loading loading-spinner loading-sm"></span>
+                  <span className="loading loading-spinner loading-sm" aria-hidden="true"></span>
                   {generatingPdf ? 'Generating PDF...' : 'Creating...'}
                 </>
               ) : (

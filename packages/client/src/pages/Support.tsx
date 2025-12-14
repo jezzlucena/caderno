@@ -261,14 +261,15 @@ export function Support() {
               </div>
 
               {error && (
-                <div className="alert alert-error">
+                <div className="alert alert-error" role="alert">
                   <span>{error}</span>
                   <button
                     type="button"
                     className="btn btn-ghost btn-sm"
                     onClick={() => setError(null)}
+                    aria-label="Dismiss error"
                   >
-                    &times;
+                    <span aria-hidden="true">&times;</span>
                   </button>
                 </div>
               )}

@@ -1,6 +1,6 @@
 import { Router, type Router as RouterType } from 'express'
 import { z } from 'zod'
-import { eq, and, desc } from 'drizzle-orm'
+import { eq, and, desc, sql } from 'drizzle-orm'
 import { db } from '../db/index.js'
 import { entries } from '../db/schema.js'
 import { authMiddleware } from '../middleware/auth.js'
@@ -30,6 +30,15 @@ const updateEntrySchema = z.object({
   encryptedTitle: z.string().min(1).max(70000).regex(BASE64_REGEX, 'Invalid encrypted data format'),
   encryptedContent: z.string().min(1).max(15000000).regex(BASE64_REGEX, 'Invalid encrypted data format'),
   iv: z.string().min(16).max(24).regex(BASE64_REGEX, 'Invalid IV format')
+})
+
+// Schema for importing entries with original timestamps
+const importEntrySchema = z.object({
+  encryptedTitle: z.string().min(1).max(70000).regex(BASE64_REGEX, 'Invalid encrypted data format'),
+  encryptedContent: z.string().min(1).max(15000000).regex(BASE64_REGEX, 'Invalid encrypted data format'),
+  iv: z.string().min(16).max(24).regex(BASE64_REGEX, 'Invalid IV format'),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime()
 })
 
 // GET /api/entries - List all entries for current user
@@ -76,6 +85,42 @@ entriesRouter.post('/', asyncHandler(async (req, res) => {
   res.status(201).json({ entry: newEntry })
 }))
 
+// POST /api/entries/import - Import entry with original timestamps (for backup restore)
+entriesRouter.post('/import', asyncHandler(async (req, res) => {
+  const userId = req.user!.userId
+  const { encryptedTitle, encryptedContent, iv, createdAt, updatedAt } = importEntrySchema.parse(req.body)
+
+  // Use raw SQL to insert with custom timestamps (Drizzle doesn't allow inserting into defaultNow columns directly)
+  const result = await db.execute(sql`
+    INSERT INTO entries (user_id, encrypted_title, encrypted_content, iv, created_at, updated_at)
+    VALUES (${userId}, ${encryptedTitle}, ${encryptedContent}, ${iv}, ${createdAt}::timestamp, ${updatedAt}::timestamp)
+    RETURNING id, user_id, encrypted_title, encrypted_content, iv, created_at, updated_at
+  `)
+
+  const row = result[0] as {
+    id: number
+    user_id: number
+    encrypted_title: string
+    encrypted_content: string
+    iv: string
+    created_at: Date
+    updated_at: Date
+  }
+
+  const newEntry = {
+    id: row.id,
+    userId: row.user_id,
+    encryptedTitle: row.encrypted_title,
+    encryptedContent: row.encrypted_content,
+    iv: row.iv,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at
+  }
+
+  logger.debug('Entry imported', { entryId: newEntry.id, userId })
+  res.status(201).json({ entry: newEntry })
+}))
+
 // PUT /api/entries/:id - Update entry
 entriesRouter.put('/:id', asyncHandler(async (req, res) => {
   const userId = req.user!.userId
@@ -93,7 +138,7 @@ entriesRouter.put('/:id', asyncHandler(async (req, res) => {
       encryptedTitle,
       encryptedContent,
       iv,
-      updatedAt: new Date()
+      updatedAt: sql`now()`
     })
     .where(eq(entries.id, entryId))
     .returning()

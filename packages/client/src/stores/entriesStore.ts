@@ -23,6 +23,7 @@ interface EntriesState {
   fetchEntries: () => Promise<void>
   fetchEntry: (id: number) => Promise<void>
   createEntry: (title: string, content: string) => Promise<DecryptedEntry>
+  importEntry: (title: string, content: string, createdAt: string, updatedAt: string) => Promise<DecryptedEntry>
   updateEntry: (id: number, title: string, content: string) => Promise<void>
   deleteEntry: (id: number) => Promise<void>
   setCurrentEntry: (entry: DecryptedEntry | null) => void
@@ -139,6 +140,42 @@ export const useEntriesStore = create<EntriesState>((set, get) => ({
       return decryptedEntry
     } catch (error) {
       set({ error: getErrorMessage(error, 'Failed to create entry'), isLoading: false })
+      throw error
+    }
+  },
+
+  importEntry: async (title: string, content: string, createdAt: string, updatedAt: string) => {
+    const { encryptionKey } = useCryptoStore.getState()
+    if (!encryptionKey) {
+      throw new Error('Encryption key not available')
+    }
+
+    try {
+      // Encrypt the entry client-side
+      const encrypted = await encryptEntry(encryptionKey, title, content)
+
+      // Send encrypted data to server with original timestamps
+      const { entry } = await entriesApi.import({
+        ...encrypted,
+        createdAt,
+        updatedAt
+      })
+
+      const decryptedEntry: DecryptedEntry = {
+        id: entry.id,
+        title,
+        content,
+        createdAt: entry.createdAt,
+        updatedAt: entry.updatedAt
+      }
+
+      // Add to local state (don't set as current entry during import)
+      set((state) => ({
+        entries: [decryptedEntry, ...state.entries]
+      }))
+
+      return decryptedEntry
+    } catch (error) {
       throw error
     }
   },

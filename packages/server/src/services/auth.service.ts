@@ -200,6 +200,7 @@ export interface UpdateProfileData {
   profileVisibility?: 'public' | 'restricted' | 'private'
   displayName?: string | null
   bio?: string | null
+  theme?: 'light' | 'dark' | 'system'
 }
 
 export async function updateProfile(

@@ -64,7 +64,7 @@ export function Notifications() {
         </div>
 
         {error && (
-          <div className="alert alert-error mb-4">
+          <div className="alert alert-error mb-4" role="alert">
             <span>{error}</span>
             <button className="btn btn-sm btn-ghost" onClick={clearError}>
               Dismiss

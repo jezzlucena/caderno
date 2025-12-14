@@ -273,7 +273,7 @@ export function Profile() {
       <div className="w-full min-w-[300px] sm:min-w-[500px] max-w-2xl mx-auto flex-1">
         {/* Error alert */}
         {error && (
-          <div className="alert alert-error mb-4">
+          <div className="alert alert-error mb-4" role="alert">
             <span>{error}</span>
             <button className="btn btn-ghost btn-sm" onClick={() => setError(null)}>Dismiss</button>
           </div>

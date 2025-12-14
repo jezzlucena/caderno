@@ -4,13 +4,8 @@ import { useAuthStore } from '../stores/authStore'
 import { useNotificationStore } from '../stores/notificationStore'
 import type { Notification } from '../lib/api'
 
-// Get WebSocket URL - same as API but for WebSocket connection
+// Get WebSocket URL - uses same origin (Vite proxies /socket.io in dev)
 const getSocketUrl = () => {
-  // In development, connect to the server directly
-  // In production, use the same origin
-  if (import.meta.env.DEV) {
-    return 'http://localhost:3000'
-  }
   return window.location.origin
 }
 

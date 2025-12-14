@@ -61,6 +61,7 @@ export interface User {
   role: 'admin' | 'moderator' | 'user'
   username: string | null
   profileVisibility: 'public' | 'restricted' | 'private'
+  theme: 'light' | 'dark' | 'system'
   displayName: string | null
   bio: string | null
   avatarUrl: string | null
@@ -76,6 +77,7 @@ export interface AuthResponse {
 export interface UpdateProfileData {
   username?: string
   profileVisibility?: 'public' | 'restricted' | 'private'
+  theme?: 'light' | 'dark' | 'system'
   displayName?: string | null
   bio?: string | null
 }
@@ -132,6 +134,14 @@ interface CreateEntryData {
   iv: string
 }
 
+interface ImportEntryData {
+  encryptedTitle: string
+  encryptedContent: string
+  iv: string
+  createdAt: string
+  updatedAt: string
+}
+
 // Helper to get token from auth store
 function getAuthToken(): string | null {
   const stored = localStorage.getItem('caderno-auth')
@@ -153,6 +163,9 @@ export const entriesApi = {
 
   create: (data: CreateEntryData) =>
     api<{ entry: Entry }>('/entries', { method: 'POST', body: data, token: getAuthToken() }),
+
+  import: (data: ImportEntryData) =>
+    api<{ entry: Entry }>('/entries/import', { method: 'POST', body: data, token: getAuthToken() }),
 
   update: (id: number, data: CreateEntryData) =>
     api<{ entry: Entry }>(`/entries/${id}`, { method: 'PUT', body: data, token: getAuthToken() }),
@@ -629,6 +642,7 @@ export const notificationApi = {
 // Passkey API (WebAuthn)
 export interface PasskeyInfo {
   id: number
+  credentialId: string
   name: string | null
   deviceType: string
   backedUp: boolean

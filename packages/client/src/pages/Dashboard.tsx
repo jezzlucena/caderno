@@ -77,7 +77,7 @@ export function Dashboard() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex overflow-hidden relative">
+      <main id="main-content" className="flex-1 flex overflow-hidden relative">
         {/* Mobile sidebar overlay */}
         {isSidebarOpen && (
           <div
@@ -130,7 +130,7 @@ export function Dashboard() {
             </div>
           )}
         </div>
-      </div>
+      </main>
 
       {showVerificationModal && (
         <EmailVerificationRequiredModal onClose={() => setShowVerificationModal(false)} />

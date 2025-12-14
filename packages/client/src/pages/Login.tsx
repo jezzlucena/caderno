@@ -131,7 +131,7 @@ export function Login() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-base-200/10 p-4 animate-fade-in relative">
       <ParticleBackground colorScheme="purple" />
-      <div className="card bg-base-100/90 backdrop-blur-lg shadow-xl w-full max-w-md ios-card animate-fade-in-up relative z-10">
+      <main id="main-content" className="card bg-base-100/90 backdrop-blur-lg shadow-xl w-full max-w-md ios-card animate-fade-in-up relative z-10">
         <div className="card-body">
           <h1 className="card-title text-2xl justify-center mb-4">Sign in to {displayName}</h1>
 
@@ -203,7 +203,7 @@ export function Login() {
             </Link>
           </p>
         </div>
-      </div>
+      </main>
 
       <div className="relative z-10">
         <Footer />

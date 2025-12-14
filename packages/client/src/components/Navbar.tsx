@@ -7,7 +7,7 @@ import { usePlatformStore } from '../stores/platformStore'
 import { NotificationBell } from './NotificationBell'
 import logoUrl from '../assets/logo.svg'
 
-type Page = 'journal' | 'feed' | 'switches' | 'settings' | 'platform' | 'about' | 'terms' | 'privacy' | 'support' | 'compare' | 'notifications'
+type Page = 'journal' | 'feed' | 'switches' | 'settings' | 'platform' | 'about' | 'terms' | 'privacy' | 'support' | 'compare' | 'notifications' | 'export' | 'import'
 
 interface NavbarProps {
   currentPage: Page
@@ -29,6 +29,8 @@ export function Navbar({ currentPage }: NavbarProps) {
     { to: '/', label: 'Journal', page: 'journal' },
     { to: '/feed', label: 'Feed', page: 'feed' },
     { to: '/switches', label: 'Switches', page: 'switches' },
+    { to: '/export', label: 'Export', page: 'export' },
+    { to: '/import', label: 'Import', page: 'import' },
     { to: '/settings', label: 'Account', page: 'settings' },
     // Platform link only visible to admins/moderators
     ...(user?.role === 'admin' || user?.role === 'moderator'
@@ -76,9 +78,9 @@ export function Navbar({ currentPage }: NavbarProps) {
           <Link
             to="/settings"
             className={`btn btn-ghost btn-sm btn-circle hidden sm:flex ${currentPage === 'settings' ? 'btn-active' : ''}`}
-            title="Account Settings"
+            aria-label="Account Settings"
           >
-            <Cog6ToothIcon className="h-5 w-5" />
+            <Cog6ToothIcon className="h-5 w-5" aria-hidden="true" />
           </Link>
         )}
 
@@ -89,32 +91,37 @@ export function Navbar({ currentPage }: NavbarProps) {
 
         {/* E2EE badge (only when authenticated) */}
         {isAuthenticated && (
-          <div className="badge badge-success badge-sm gap-1 flex" title="End-to-End Encryption">
-            <LockClosedIcon className="h-3 w-3" />
-            E2EE
+          <div className="badge badge-success badge-sm gap-1 flex" aria-label="End-to-End Encryption enabled">
+            <LockClosedIcon className="h-3 w-3" aria-hidden="true" />
+            <span aria-hidden="true">E2EE</span>
           </div>
         )}
 
         {/* Mobile dropdown menu */}
         <div className="dropdown dropdown-end">
-          <label tabIndex={0} className="btn btn-ghost btn-sm btn-circle">
-            <Bars3Icon className="h-5 w-5" />
-          </label>
-          <ul tabIndex={0} className="dropdown-content z-1 menu p-2 shadow bg-base-100 rounded-box w-52">
+          <button
+            tabIndex={0}
+            className="btn btn-ghost btn-sm btn-circle"
+            aria-label="Navigation menu"
+            aria-haspopup="true"
+          >
+            <Bars3Icon className="h-5 w-5" aria-hidden="true" />
+          </button>
+          <ul tabIndex={0} className="dropdown-content z-1 menu p-2 shadow bg-base-100 rounded-box w-52" role="menu">
             {isAuthenticated ? (
               <>
                 {appNavLinks.map(link => (
-                  <li key={link.to}><Link to={link.to} className={currentPage === link.page ? 'underline' : ''}>{link.label}</Link></li>
+                  <li key={link.to} role="none"><Link to={link.to} role="menuitem" className={currentPage === link.page ? 'underline' : ''}>{link.label}</Link></li>
                 ))}
                 {user?.username && (
-                  <li><Link to={`/${user.username}`} className="text-xs opacity-70">@{user.username}</Link></li>
+                  <li role="none"><Link to={`/${user.username}`} role="menuitem" className="text-xs opacity-70">@{user.username}</Link></li>
                 )}
-                <li><button onClick={logout}>Logout</button></li>
+                <li role="none"><button role="menuitem" onClick={logout}>Logout</button></li>
               </>
             ) : (
               <>
-                <li><Link to="/login">Login</Link></li>
-                <li><Link to="/register">Register</Link></li>
+                <li role="none"><Link to="/login" role="menuitem">Login</Link></li>
+                <li role="none"><Link to="/register" role="menuitem">Register</Link></li>
               </>
             )}
           </ul>

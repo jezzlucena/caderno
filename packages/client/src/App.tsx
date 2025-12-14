@@ -4,7 +4,9 @@ import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useAuthStore } from './stores/authStore'
 import { useSetupStore } from './stores/setupStore'
+import { useThemeStore } from './stores/themeStore'
 import { ProtectedRoute } from './components/ProtectedRoute'
+import { SkipLink } from './components/SkipLink'
 import { Login } from './pages/Login'
 import { Register } from './pages/Register'
 import { Setup } from './pages/Setup'
@@ -23,10 +25,18 @@ import { NotePage } from './pages/NotePage'
 import { AccountSettings } from './pages/AccountSettings'
 import { PlatformSettings } from './pages/PlatformSettings'
 import { Notifications } from './pages/Notifications'
+import { Export } from './pages/Export'
+import { Import } from './pages/Import'
 
 function App() {
-  const { token, checkAuth } = useAuthStore()
+  const { token, user, checkAuth } = useAuthStore()
   const { needsSetup, isLoading: setupLoading, checkSetupStatus } = useSetupStore()
+  const { initTheme, syncFromUser } = useThemeStore()
+
+  // Initialize theme from localStorage on mount
+  useEffect(() => {
+    initTheme()
+  }, [initTheme])
 
   useEffect(() => {
     checkSetupStatus()
@@ -37,6 +47,13 @@ function App() {
       checkAuth()
     }
   }, [token, checkAuth])
+
+  // Sync theme from user data when available
+  useEffect(() => {
+    if (user?.theme) {
+      syncFromUser(user.theme)
+    }
+  }, [user?.theme, syncFromUser])
 
   // Show loading while checking setup status
   if (needsSetup === null || setupLoading) {
@@ -72,6 +89,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <SkipLink />
       <ToastContainer
         position="top-right"
         autoClose={4000}
@@ -139,6 +157,22 @@ function App() {
           element={
             <ProtectedRoute>
               <Notifications />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/export"
+          element={
+            <ProtectedRoute>
+              <Export />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/import"
+          element={
+            <ProtectedRoute>
+              <Import />
             </ProtectedRoute>
           }
         />
