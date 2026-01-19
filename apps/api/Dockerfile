@@ -49,9 +49,9 @@ RUN mkdir -p /app/data
 WORKDIR /app/apps/api
 
 ENV NODE_ENV=production
-ENV PORT=3001
+ENV PORT=5055
 ENV DATA_DIR=/app/data
 
-EXPOSE 3001
+EXPOSE 5055
 
 CMD ["node", "dist/index.js"]

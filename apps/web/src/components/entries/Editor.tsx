@@ -39,8 +39,8 @@ const theme = {
     ol: 'list-decimal ml-6 mb-2',
     listitem: 'mb-1',
   },
-  quote: 'border-l-4 border-slate-300 pl-4 italic text-slate-600 dark:border-slate-600 dark:text-slate-400 mb-2',
-  code: 'bg-slate-100 dark:bg-slate-800 rounded px-1 py-0.5 font-mono text-sm',
+  quote: 'border-l-4 border-slate-300 pl-4 italic text-slate-600 dark:border-slate-600 dark:text-slate-400 mb-2 transition-colors',
+  code: 'bg-slate-100 dark:bg-slate-800 rounded px-1 py-0.5 font-mono text-sm transition-colors',
   codeHighlight: {
     atrule: 'text-blue-500',
     attr: 'text-blue-500',
@@ -73,19 +73,19 @@ const theme = {
     url: 'text-blue-500',
     variable: 'text-red-500',
   },
-  link: 'text-primary-600 hover:text-primary-700 underline dark:text-primary-400',
+  link: 'text-primary-600 hover:text-primary-700 underline dark:text-primary-400 transition-colors',
   text: {
     bold: 'font-bold',
     italic: 'italic',
     strikethrough: 'line-through',
     underline: 'underline',
-    code: 'bg-slate-100 dark:bg-slate-800 rounded px-1 py-0.5 font-mono text-sm',
+    code: 'bg-slate-100 dark:bg-slate-800 rounded px-1 py-0.5 font-mono text-sm transition-colors',
   },
 };
 
 function Placeholder({ text }: { text: string }) {
   return (
-    <div className="editor-placeholder text-slate-400 dark:text-slate-500">
+    <div className="editor-placeholder text-slate-400 dark:text-slate-500 transition-colors">
       {text}
     </div>
   );
@@ -110,8 +110,8 @@ function ToolbarButton({
       title={title}
       className={`p-1.5 rounded hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors ${
         isActive
-          ? 'bg-slate-200 dark:bg-slate-700 text-primary-600 dark:text-primary-400'
-          : 'text-slate-600 dark:text-slate-400'
+          ? 'bg-slate-200 dark:bg-slate-700 text-primary-600 dark:text-primary-400 transition-colors'
+          : 'text-slate-600 dark:text-slate-400 transition-colors'
       }`}
     >
       {children}
@@ -121,7 +121,7 @@ function ToolbarButton({
 
 // Toolbar divider
 function ToolbarDivider() {
-  return <div className="w-px h-6 bg-slate-300 dark:bg-slate-600 mx-1" />;
+  return <div className="w-px h-6 bg-slate-300 dark:bg-slate-600 mx-1 transition-colors" />;
 }
 
 // Toolbar plugin
@@ -182,7 +182,7 @@ function ToolbarPlugin() {
   };
 
   return (
-    <div className="flex items-center gap-0.5 p-2 border-b border-slate-200 dark:border-slate-700 flex-wrap">
+    <div className="flex items-center gap-0.5 p-2 border-b border-slate-200 dark:border-slate-700 flex-wrap transition-colors">
       {/* Text formatting */}
       <ToolbarButton
         onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold')}
@@ -354,7 +354,7 @@ export function Editor({
 
   return (
     <LexicalComposer initialConfig={initialConfig}>
-      <div className="editor-container relative rounded-lg border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
+      <div className="editor-container relative rounded-lg border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 transition-colors">
         <ToolbarPlugin />
         <RichTextPlugin
           contentEditable={

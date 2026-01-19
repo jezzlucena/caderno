@@ -65,7 +65,7 @@ export function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+      <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 transition-colors">
         {t('settings.title')}
       </h1>
 
@@ -117,7 +117,7 @@ export function SettingsPage() {
                 onChange={(e) => handleFontSizeChange(parseInt(e.target.value))}
                 className="flex-1"
               />
-              <span className="w-12 text-sm text-slate-600 dark:text-slate-400">
+              <span className="w-12 text-sm text-slate-600 dark:text-slate-400 transition-colors">
                 {preferences.editorFontSize}px
               </span>
             </div>
@@ -149,7 +149,7 @@ export function SettingsPage() {
               {t('settings.exportPdf')}
             </Button>
           </div>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+          <p className="text-sm text-slate-500 dark:text-slate-400 transition-colors">
             {t('settings.exportDescription')}
           </p>
         </CardContent>
@@ -161,7 +161,7 @@ export function SettingsPage() {
           <CardTitle>{t('settings.emailConfiguration')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+          <p className="text-sm text-slate-600 dark:text-slate-400 mb-4 transition-colors">
             {t('settings.emailConfigDescription')}
           </p>
           {showSmtpForm ? (
@@ -201,7 +201,7 @@ export function SettingsPage() {
           <CardTitle>{t('settings.about')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
+          <div className="space-y-2 text-sm text-slate-600 dark:text-slate-400 transition-colors">
             <p>
               <strong>Caderno</strong> - {t('settings.aboutDescription')}
             </p>

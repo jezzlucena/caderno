@@ -29,7 +29,7 @@ export function EntryList() {
 
   if (error) {
     return (
-      <div className="rounded-lg bg-red-50 p-4 text-red-800 dark:bg-red-900/20 dark:text-red-300">
+      <div className="rounded-lg bg-red-50 p-4 text-red-800 dark:bg-red-900/20 dark:text-red-300 transition-colors">
         {error}
       </div>
     );
@@ -62,10 +62,10 @@ export function EntryList() {
             />
           )}
         </svg>
-        <h3 className="mt-2 text-sm font-medium text-slate-900 dark:text-slate-100">
+        <h3 className="mt-2 text-sm font-medium text-slate-900 dark:text-slate-100 transition-colors">
           {hasSearchFilter ? t('entries.noEntriesFound') : t('entries.noEntries')}
         </h3>
-        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 transition-colors">
           {hasSearchFilter ? t('entries.tryDifferentSearch') : t('entries.startWriting')}
         </p>
       </div>
@@ -90,7 +90,7 @@ export function EntryList() {
           >
             {t('common.previous')}
           </Button>
-          <span className="text-sm text-slate-600 dark:text-slate-400">
+          <span className="text-sm text-slate-600 dark:text-slate-400 transition-colors">
             {t('common.pageOf', {
               page: pagination.page,
               total: pagination.totalPages,

@@ -40,7 +40,7 @@ export function Modal({ isOpen, onClose, title, children, className = '' }: Moda
 
       {/* Modal content */}
       <div
-        className={`relative z-10 w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-slate-900 ${className}`}
+        className={`relative z-10 w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-slate-900 transition-colors ${className}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby={title ? 'modal-title' : undefined}
@@ -48,7 +48,7 @@ export function Modal({ isOpen, onClose, title, children, className = '' }: Moda
         {title && (
           <h2
             id="modal-title"
-            className="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100"
+            className="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100 transition-colors"
           >
             {title}
           </h2>
@@ -58,7 +58,7 @@ export function Modal({ isOpen, onClose, title, children, className = '' }: Moda
 
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 text-slate-400 hover:text-slate-500 dark:hover:text-slate-300"
+          className="absolute right-4 top-4 text-slate-400 hover:text-slate-500 dark:hover:text-slate-300 transition-colors"
           aria-label="Close"
         >
           <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">

@@ -2,6 +2,8 @@
 
 A privacy-first, self-hosted digital journal web application.
 
+**[Live Demo](https://caderno.jezzlucena.com/)** | **[Website](https://caderno-hub.jezzlucena.com/)**
+
 ## Features
 
 - **Privacy-focused**: Your data stays on your server
@@ -50,7 +52,7 @@ A privacy-first, self-hosted digital journal web application.
 
 ```bash
 # Build and run all services
-docker compose -f docker-compose.prod.yml up -d --build
+docker compose up -d --build
 
 # Access the application
 open http://localhost
@@ -67,9 +69,8 @@ caderno/
 │   └── shared/                 # Shared types & validation (Zod)
 ├── docker/
 │   └── nginx/                  # Reverse proxy config
-├── docker-compose.yml          # Full stack development
-├── docker-compose.dev.yml      # MongoDB only
-└── docker-compose.prod.yml     # Production deployment
+├── docker-compose.yml          # Full stack / production deployment
+└── docker-compose.dev.yml      # MongoDB only (development)
 ```
 
 ## Configuration
@@ -84,16 +85,31 @@ Most settings can be configured through the UI during onboarding.
 
 ## API Endpoints
 
+### Health
+- `GET /api/v1/health` - Health check
+
 ### Authentication
 - `POST /api/v1/auth/register` - Register new user
 - `POST /api/v1/auth/login` - Login with password
 - `POST /api/v1/auth/logout` - Logout
 - `POST /api/v1/auth/refresh` - Refresh access token
-- `POST /api/v1/auth/passkey/*` - Passkey authentication
-- `POST /api/v1/auth/magic-link/*` - Magic link authentication
+- `GET /api/v1/auth/methods` - Get available auth methods
+
+### Magic Link
+- `POST /api/v1/auth/magic-link/request` - Request magic link
+- `POST /api/v1/auth/magic-link/verify` - Verify magic link
+
+### Passkey Authentication
+- `POST /api/v1/auth/passkey/register/options` - Get registration options (authenticated)
+- `POST /api/v1/auth/passkey/register/verify` - Verify registration (authenticated)
+- `GET /api/v1/auth/passkey/login/options` - Get login options
+- `POST /api/v1/auth/passkey/login/verify` - Verify login
+- `GET /api/v1/auth/passkeys` - List user passkeys (authenticated)
+- `DELETE /api/v1/auth/passkeys/:id` - Remove passkey (authenticated)
 
 ### Journal Entries
 - `GET /api/v1/entries` - List entries
+- `GET /api/v1/entries/tags` - Get all tags
 - `POST /api/v1/entries` - Create entry
 - `GET /api/v1/entries/:id` - Get entry
 - `PUT /api/v1/entries/:id` - Update entry
@@ -104,10 +120,26 @@ Most settings can be configured through the UI during onboarding.
 - `GET /api/v1/export/pdf` - Export as PDF
 - `POST /api/v1/import/json` - Import from JSON
 
+### Settings
+- `GET /api/v1/settings/onboarding/status` - Get onboarding status
+- `POST /api/v1/settings/onboarding/complete` - Complete onboarding (authenticated)
+- `GET /api/v1/settings/info` - Get app info
+- `GET /api/v1/settings/preferences` - Get user preferences (authenticated)
+- `PUT /api/v1/settings/preferences` - Update preferences (authenticated)
+- `GET /api/v1/settings/smtp` - Get SMTP settings (authenticated)
+- `PUT /api/v1/settings/smtp` - Update SMTP settings (authenticated)
+
 ### Safety Timer
 - `GET /api/v1/safety-timer` - Get timer status
 - `PUT /api/v1/safety-timer` - Update timer config
-- `POST /api/v1/safety-timer/check-in` - Reset timer
+- `POST /api/v1/safety-timer/check-in` - Check in / reset timer
+- `POST /api/v1/safety-timer/recipients` - Add recipient
+- `PUT /api/v1/safety-timer/recipients/:id` - Update recipient
+- `DELETE /api/v1/safety-timer/recipients/:id` - Delete recipient
+- `POST /api/v1/safety-timer/reminders` - Add reminder
+- `DELETE /api/v1/safety-timer/reminders/:id` - Delete reminder
+- `POST /api/v1/safety-timer/verify-smtp` - Verify SMTP configuration
+- `POST /api/v1/safety-timer/test` - Send test email
 
 ## License
 

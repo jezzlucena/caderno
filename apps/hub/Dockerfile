@@ -8,30 +8,27 @@ RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
 
 # Copy package files
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
-COPY apps/web/package.json ./apps/web/
-COPY packages/shared/package.json ./packages/shared/
+COPY apps/hub/package.json ./apps/hub/
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile
 
 # Copy source code
-COPY packages/shared ./packages/shared
-COPY apps/web ./apps/web
+COPY apps/hub ./apps/hub
 COPY tsconfig.json ./
 
-# Build shared package and web app
-RUN pnpm --filter @caderno/shared build
-RUN pnpm --filter @caderno/web build
+# Build hub app
+RUN pnpm --filter @caderno/hub build
 
 # Production stage - serve with nginx
 FROM nginx:alpine
 
 # Copy built files
-COPY --from=builder /app/apps/web/dist /usr/share/nginx/html
+COPY --from=builder /app/apps/hub/dist /usr/share/nginx/html
 
 # Copy nginx configuration
-COPY docker/nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY docker/nginx/hub.conf /etc/nginx/conf.d/default.conf
 
-EXPOSE 8085
+EXPOSE 8086
 
 CMD ["nginx", "-g", "daemon off;"]

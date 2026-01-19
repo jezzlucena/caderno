@@ -55,12 +55,6 @@ export async function registerUser(
     authMethods: ['password'],
   });
 
-  // Disable registration after first user (single-user mode)
-  if (!settings.isOnboardingComplete) {
-    settings.isRegistrationEnabled = false;
-    await settings.save();
-  }
-
   // Create session
   return createSession(user, userAgent, ipAddress);
 }

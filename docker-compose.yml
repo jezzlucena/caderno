@@ -25,11 +25,12 @@ services:
     volumes:
       - caderno-data:/app/data
     ports:
-      - "3001:3001"
+      - "5055:5055"
     environment:
-      NODE_ENV: development
+      NODE_ENV: production
       MONGODB_URI: mongodb://mongo:27017/caderno
-      ORIGIN: http://localhost:5173
+      ORIGIN: http://localhost:8085
+      PORT: 5055
       RP_ID: localhost
       RP_NAME: Caderno
     depends_on:
@@ -43,9 +44,18 @@ services:
       context: .
       dockerfile: apps/web/Dockerfile
     ports:
-      - "80:80"
+      - "8085:8085"
     depends_on:
       - api
+    restart: unless-stopped
+
+  hub:
+    container_name: caderno-hub
+    build:
+      context: .
+      dockerfile: apps/hub/Dockerfile
+    ports:
+      - "8086:8086"
     restart: unless-stopped
 
 volumes:

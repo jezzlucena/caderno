@@ -210,10 +210,10 @@ export function SafetyTimerPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 transition-colors">
           {t('safetyTimer.title')}
         </h1>
-        <p className="mt-1 text-slate-600 dark:text-slate-400">
+        <p className="mt-1 text-slate-600 dark:text-slate-400 transition-colors">
           {t('safetyTimer.description')}
         </p>
       </div>
@@ -239,7 +239,7 @@ export function SafetyTimerPage() {
                 <div>
                   <p className="text-lg font-medium">
                     {status.isEnabled ? (
-                      <span className="text-green-600 dark:text-green-400">
+                      <span className="text-green-600 dark:text-green-400 transition-colors">
                         {t('safetyTimer.active')}
                       </span>
                     ) : (
@@ -251,34 +251,34 @@ export function SafetyTimerPage() {
                   {status.isEnabled && countdown && (
                     <div className="mt-3 flex items-start gap-4">
                       <div className="flex flex-col items-center">
-                        <span className="font-mono text-4xl font-bold text-slate-800 dark:text-slate-200">
+                        <span className="font-mono text-4xl font-bold text-slate-800 dark:text-slate-200 transition-colors">
                           {countdown.days}
                         </span>
-                        <span className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                        <span className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 transition-colors">
                           {t('safetyTimer.countdownDays')}
                         </span>
                       </div>
                       <div className="flex flex-col items-center">
-                        <span className="font-mono text-4xl font-bold text-slate-800 dark:text-slate-200">
+                        <span className="font-mono text-4xl font-bold text-slate-800 dark:text-slate-200 transition-colors">
                           {countdown.hours.toString().padStart(2, '0')}
                         </span>
-                        <span className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                        <span className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 transition-colors">
                           {t('safetyTimer.countdownHours')}
                         </span>
                       </div>
                       <div className="flex flex-col items-center">
-                        <span className="font-mono text-4xl font-bold text-slate-800 dark:text-slate-200">
+                        <span className="font-mono text-4xl font-bold text-slate-800 dark:text-slate-200 transition-colors">
                           {countdown.minutes.toString().padStart(2, '0')}
                         </span>
-                        <span className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                        <span className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 transition-colors">
                           {t('safetyTimer.countdownMinutes')}
                         </span>
                       </div>
                       <div className="flex flex-col items-center">
-                        <span className="font-mono text-4xl font-bold text-slate-800 dark:text-slate-200">
+                        <span className="font-mono text-4xl font-bold text-slate-800 dark:text-slate-200 transition-colors">
                           {countdown.seconds.toString().padStart(2, '0')}
                         </span>
-                        <span className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                        <span className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400 transition-colors">
                           {t('safetyTimer.countdownSeconds')}
                         </span>
                       </div>
@@ -297,13 +297,13 @@ export function SafetyTimerPage() {
               </div>
 
               {status.isEnabled && (
-                <div className="mt-4 border-t border-slate-200 pt-4 dark:border-slate-700">
+                <div className="mt-4 border-t border-slate-200 pt-4 dark:border-slate-700 transition-colors">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-slate-600 dark:text-slate-400">
+                      <p className="text-sm text-slate-600 dark:text-slate-400 transition-colors">
                         {t('safetyTimer.nextDelivery')}: {formatDate(status.nextDeliveryAt)}
                       </p>
-                      <p className="text-sm text-slate-600 dark:text-slate-400">
+                      <p className="text-sm text-slate-600 dark:text-slate-400 transition-colors">
                         {t('safetyTimer.lastCheckIn')}: {formatDate(status.lastResetAt)}
                       </p>
                     </div>
@@ -363,7 +363,7 @@ export function SafetyTimerPage() {
             </CardHeader>
             <CardContent>
               {status.recipients.length === 0 ? (
-                <p className="text-sm text-slate-500 dark:text-slate-400">
+                <p className="text-sm text-slate-500 dark:text-slate-400 transition-colors">
                   {t('safetyTimer.noRecipients')}
                 </p>
               ) : (
@@ -371,16 +371,16 @@ export function SafetyTimerPage() {
                   {status.recipients.map((recipient) => (
                     <li
                       key={recipient.id}
-                      className="flex items-center justify-between rounded-lg bg-slate-50 p-3 dark:bg-slate-800"
+                      className="flex items-center justify-between rounded-lg bg-slate-50 p-3 dark:bg-slate-800 transition-colors"
                     >
                       <div>
-                        <p className="font-medium text-slate-900 dark:text-slate-100">
+                        <p className="font-medium text-slate-900 dark:text-slate-100 transition-colors">
                           {recipient.name}
                         </p>
-                        <p className="text-sm text-slate-500 dark:text-slate-400">
+                        <p className="text-sm text-slate-500 dark:text-slate-400 transition-colors">
                           {recipient.email}
                         </p>
-                        <p className="text-xs text-slate-400 dark:text-slate-500">
+                        <p className="text-xs text-slate-400 dark:text-slate-500 transition-colors">
                           {recipient.entryFilter === 'all'
                             ? t('safetyTimer.allEntries')
                             : recipient.filterTags?.[0]
@@ -419,7 +419,7 @@ export function SafetyTimerPage() {
             </CardHeader>
             <CardContent>
               {(status.reminders || []).length === 0 ? (
-                <p className="text-sm text-slate-500 dark:text-slate-400">
+                <p className="text-sm text-slate-500 dark:text-slate-400 transition-colors">
                   {t('safetyTimer.noReminders')}
                 </p>
               ) : (
@@ -427,10 +427,10 @@ export function SafetyTimerPage() {
                   {status.reminders.map((reminder) => (
                     <li
                       key={reminder.id}
-                      className="flex items-center justify-between rounded-lg bg-slate-50 p-3 dark:bg-slate-800"
+                      className="flex items-center justify-between rounded-lg bg-slate-50 p-3 dark:bg-slate-800 transition-colors"
                     >
                       <div>
-                        <p className="font-medium text-slate-900 dark:text-slate-100">
+                        <p className="font-medium text-slate-900 dark:text-slate-100 transition-colors">
                           {t('safetyTimer.reminderBefore', { time: formatReminderTime(reminder.reminderMinutesBefore) })}
                         </p>
                       </div>
@@ -550,7 +550,7 @@ export function SafetyTimerPage() {
         title={t('safetyTimer.addReminder')}
       >
         <div className="space-y-4">
-          <p className="text-sm text-slate-600 dark:text-slate-400">
+          <p className="text-sm text-slate-600 dark:text-slate-400 transition-colors">
             {t('safetyTimer.reminderExplanation')}
           </p>
           <div>
@@ -576,7 +576,7 @@ export function SafetyTimerPage() {
               />
             </div>
             {!isReminderValid() && reminderValue > 0 && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400 transition-colors">
                 {t('safetyTimer.reminderTooLong')}
               </p>
             )}

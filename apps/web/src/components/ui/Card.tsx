@@ -3,10 +3,12 @@ import React from 'react';
 interface CardProps {
   children: React.ReactNode;
   className?: string;
+  variant?: 'default' | 'glass';
 }
 
-export function Card({ children, className = '' }: CardProps) {
-  return <div className={`card ${className}`}>{children}</div>;
+export function Card({ children, className = '', variant = 'default' }: CardProps) {
+  const baseClass = variant === 'glass' ? 'card-glass' : 'card';
+  return <div className={`${baseClass} ${className}`}>{children}</div>;
 }
 
 interface CardHeaderProps {
@@ -25,7 +27,7 @@ interface CardTitleProps {
 
 export function CardTitle({ children, className = '' }: CardTitleProps) {
   return (
-    <h3 className={`text-lg font-semibold text-slate-900 dark:text-slate-100 ${className}`}>
+    <h3 className={`text-lg font-semibold text-slate-900 dark:text-slate-100 transition-colors ${className}`}>
       {children}
     </h3>
   );
@@ -38,7 +40,7 @@ interface CardDescriptionProps {
 
 export function CardDescription({ children, className = '' }: CardDescriptionProps) {
   return (
-    <p className={`text-sm text-slate-500 dark:text-slate-400 ${className}`}>
+    <p className={`text-sm text-slate-500 dark:text-slate-400 transition-colors ${className}`}>
       {children}
     </p>
   );

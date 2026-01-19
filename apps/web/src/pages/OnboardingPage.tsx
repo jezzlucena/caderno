@@ -80,7 +80,7 @@ export function OnboardingPage() {
       content: (
         <div className="text-center">
           <h2 className="text-3xl font-bold text-primary-600">Caderno</h2>
-          <p className="mt-4 text-slate-600 dark:text-slate-400">
+          <p className="mt-4 text-slate-600 dark:text-slate-400 transition-colors">
             {t('onboarding.welcomeMessage')}
           </p>
           <Button className="mt-6" onClick={() => setStep(1)}>
@@ -140,7 +140,7 @@ export function OnboardingPage() {
       content: (
         <div className="space-y-4">
           <Alert variant="info">{t('onboarding.smtpOptional')}</Alert>
-          <p className="text-sm text-slate-600 dark:text-slate-400">
+          <p className="text-sm text-slate-600 dark:text-slate-400 transition-colors">
             {t('onboarding.smtpExplanation')}
           </p>
           <SmtpConfigForm
@@ -170,8 +170,8 @@ export function OnboardingPage() {
                 onClick={() => handleLanguageSelect(lang.code as 'en' | 'es' | 'pt-BR')}
                 className={`rounded-lg border p-3 text-left transition-colors ${
                   language === lang.code
-                    ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-                    : 'border-slate-200 hover:border-primary-300 dark:border-slate-700'
+                    ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 transition-colors'
+                    : 'border-slate-200 hover:border-primary-300 dark:border-slate-700 transition-colors'
                 }`}
               >
                 {lang.name}
@@ -226,7 +226,7 @@ export function OnboardingPage() {
                 className={`h-1 flex-1 rounded-full ${
                   index <= currentStep
                     ? 'bg-primary-600'
-                    : 'bg-slate-200 dark:bg-slate-700'
+                    : 'bg-slate-200 dark:bg-slate-700 transition-colors'
                 }`}
               />
             ))}

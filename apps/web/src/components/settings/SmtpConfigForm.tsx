@@ -136,7 +136,7 @@ export function SmtpConfigForm({
           onChange={(e) => setSecure(e.target.checked)}
           className="h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500"
         />
-        <label htmlFor="smtp-secure" className="text-sm text-slate-700 dark:text-slate-300">
+        <label htmlFor="smtp-secure" className="text-sm text-slate-700 dark:text-slate-300 transition-colors">
           {t('settings.smtpSecure')}
         </label>
       </div>
@@ -176,7 +176,7 @@ export function SmtpConfigForm({
         />
       </div>
 
-      <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
+      <div className="border-t border-slate-200 dark:border-slate-700 pt-4 transition-colors">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
           <Input
             label={t('settings.testEmailAddress')}

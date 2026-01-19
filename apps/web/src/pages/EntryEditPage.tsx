@@ -126,7 +126,7 @@ export function EntryEditPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 transition-colors">
           {isNew ? t('entries.newEntry') : t('entries.editEntry')}
         </h1>
         <div className="flex gap-2">
@@ -170,12 +170,12 @@ export function EntryEditPage() {
             {tags.map((tag) => (
               <span
                 key={tag}
-                className="inline-flex items-center gap-1 rounded-full bg-primary-50 px-3 py-1 text-sm text-primary-700 dark:bg-primary-900/30 dark:text-primary-300"
+                className="inline-flex items-center gap-1 rounded-full bg-primary-50 px-3 py-1 text-sm text-primary-700 dark:bg-primary-900/30 dark:text-primary-300 transition-colors"
               >
                 {tag}
                 <button
                   onClick={() => handleRemoveTag(tag)}
-                  className="ml-1 hover:text-primary-900 dark:hover:text-primary-100"
+                  className="ml-1 hover:text-primary-900 dark:hover:text-primary-100 transition-colors"
                 >
                   &times;
                 </button>
@@ -208,7 +208,7 @@ export function EntryEditPage() {
             onChange={(e) => setIncludeInSafetyTimer(e.target.checked)}
             className="h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500"
           />
-          <span className="text-sm text-slate-700 dark:text-slate-300">
+          <span className="text-sm text-slate-700 dark:text-slate-300 transition-colors">
             {t('entries.includeInSafetyTimer')}
           </span>
         </label>
@@ -217,11 +217,11 @@ export function EntryEditPage() {
       {/* Delete confirmation modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="w-full max-w-sm rounded-lg bg-white p-6 dark:bg-slate-900">
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+          <div className="w-full max-w-sm rounded-lg bg-white p-6 dark:bg-slate-900 transition-colors">
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 transition-colors">
               {t('entries.deleteConfirm')}
             </h3>
-            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 transition-colors">
               {t('entries.deleteWarning')}
             </p>
             <div className="mt-4 flex justify-end gap-2">

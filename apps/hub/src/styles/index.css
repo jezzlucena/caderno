@@ -27,51 +27,28 @@
   }
 
   .btn-primary {
-    @apply btn bg-primary-600 text-white hover:bg-primary-700
-           px-4 py-2;
+    @apply btn bg-primary-600 text-white hover:bg-primary-700 px-6 py-3;
   }
 
   .btn-secondary {
     @apply btn bg-slate-100 text-slate-900 hover:bg-slate-200
            dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700
-           px-4 py-2;
+           px-6 py-3;
   }
 
-  .btn-ghost {
-    @apply btn hover:bg-slate-100 dark:hover:bg-slate-800 px-4 py-2;
-  }
-
-  .btn-danger {
-    @apply btn bg-red-600 text-white hover:bg-red-700 px-4 py-2;
-  }
-
-  .btn-sm {
-    @apply px-3 py-1.5 text-sm;
-  }
-
-  .btn-lg {
-    @apply px-6 py-3 text-lg;
-  }
-
-  .input {
-    @apply flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm
-           placeholder:text-slate-400
-           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500
-           disabled:cursor-not-allowed disabled:opacity-50
-           dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100;
-  }
-
-  .label {
-    @apply text-sm font-medium text-slate-700 dark:text-slate-300;
+  .btn-outline {
+    @apply btn border-2 border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white
+           dark:border-primary-400 dark:text-primary-400 dark:hover:bg-primary-600 dark:hover:text-white
+           px-6 py-3;
   }
 
   .card {
-    @apply rounded-lg border border-slate-200 bg-white p-6 shadow-sm
+    @apply rounded-xl border border-slate-200 bg-white p-6 shadow-sm
            dark:border-slate-800 dark:bg-slate-900 transition-colors;
   }
 
   .card-glass {
-    @apply rounded-xl border border-white/20 p-6 shadow-xl
+    @apply rounded-xl border border-white/20 p-8 shadow-xl
            bg-white/70 backdrop-blur-sm
            dark:border-white/10 dark:bg-slate-900/70
            transition-all;
@@ -79,21 +56,13 @@
 
   .link {
     @apply text-primary-600 hover:text-primary-700 dark:text-primary-400
-           dark:hover:text-primary-300 underline-offset-4 hover:underline;
+           dark:hover:text-primary-300 underline-offset-4 hover:underline transition-colors;
   }
 }
 
-/* Lexical editor styles */
-.editor-container {
-  @apply relative;
-}
-
-.editor-input {
-  @apply min-h-[300px] outline-none;
-}
-
-.editor-placeholder {
-  @apply absolute top-0 left-0 text-slate-400 pointer-events-none;
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
 }
 
 /* Custom scrollbar */
