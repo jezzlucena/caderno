@@ -7,7 +7,7 @@ services:
     volumes:
       - mongo-data:/data/db
     ports:
-      - "27017:27017"
+      - "27018:27017"
     environment:
       MONGO_INITDB_DATABASE: caderno
     healthcheck:
@@ -28,7 +28,7 @@ services:
       - "5055:5055"
     environment:
       NODE_ENV: production
-      MONGODB_URI: mongodb://mongo:27017/caderno
+      MONGODB_URI: mongodb://mongo:27018/caderno
       ORIGIN: http://localhost:8085
       PORT: 5055
       RP_ID: localhost
