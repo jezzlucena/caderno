@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 255 255 255;
+    --foreground: 15 23 42;
+  }
+
+  .dark {
+    --background: 15 23 42;
+    --foreground: 248 250 252;
+  }
+
+  body {
+    @apply bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center rounded-md font-medium transition-colors
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500
+           disabled:pointer-events-none disabled:opacity-50;
+  }
+
+  .btn-primary {
+    @apply btn bg-primary-600 text-white hover:bg-primary-700
+           px-4 py-2;
+  }
+
+  .btn-secondary {
+    @apply btn bg-slate-100 text-slate-900 hover:bg-slate-200
+           dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700
+           px-4 py-2;
+  }
+
+  .btn-ghost {
+    @apply btn hover:bg-slate-100 dark:hover:bg-slate-800 px-4 py-2;
+  }
+
+  .btn-danger {
+    @apply btn bg-red-600 text-white hover:bg-red-700 px-4 py-2;
+  }
+
+  .btn-sm {
+    @apply px-3 py-1.5 text-sm;
+  }
+
+  .btn-lg {
+    @apply px-6 py-3 text-lg;
+  }
+
+  .input {
+    @apply flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm
+           placeholder:text-slate-400
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500
+           disabled:cursor-not-allowed disabled:opacity-50
+           dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100;
+  }
+
+  .label {
+    @apply text-sm font-medium text-slate-700 dark:text-slate-300;
+  }
+
+  .card {
+    @apply rounded-lg border border-slate-200 bg-white p-6 shadow-sm
+           dark:border-slate-800 dark:bg-slate-900;
+  }
+
+  .link {
+    @apply text-primary-600 hover:text-primary-700 dark:text-primary-400
+           dark:hover:text-primary-300 underline-offset-4 hover:underline;
+  }
+}
+
+/* Lexical editor styles */
+.editor-container {
+  @apply relative;
+}
+
+.editor-input {
+  @apply min-h-[300px] outline-none;
+}
+
+.editor-placeholder {
+  @apply absolute top-0 left-0 text-slate-400 pointer-events-none;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-slate-100 dark:bg-slate-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-300 dark:bg-slate-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-400 dark:bg-slate-500;
+}

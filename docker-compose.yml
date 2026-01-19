@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:7
+    container_name: caderno-mongo
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: caderno
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/caderno --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  api:
+    container_name: caderno-api
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    volumes:
+      - caderno-data:/app/data
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: development
+      MONGODB_URI: mongodb://mongo:27017/caderno
+      ORIGIN: http://localhost:5173
+      RP_ID: localhost
+      RP_NAME: Caderno
+    depends_on:
+      mongo:
+        condition: service_healthy
+    restart: unless-stopped
+
+  web:
+    container_name: caderno-web
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  mongo-data:
+  caderno-data:

@@ -1,0 +1,22 @@
+{
+  "name": "caderno",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A privacy-first, self-hosted digital journal",
+  "scripts": {
+    "dev": "pnpm -r --parallel run dev",
+    "dev:api": "pnpm --filter @caderno/api dev",
+    "dev:web": "pnpm --filter @caderno/web dev",
+    "build": "pnpm -r run build",
+    "build:api": "pnpm --filter @caderno/api build",
+    "build:web": "pnpm --filter @caderno/web build",
+    "lint": "pnpm -r run lint",
+    "test": "pnpm -r run test",
+    "clean": "pnpm -r run clean && rm -rf node_modules"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.15.0"
+}
