@@ -13,7 +13,7 @@ const app = express();
 // Security middleware
 app.use(helmet());
 app.use(cors({
-  origin: env.ORIGIN,
+  origin: env.ORIGIN.split(','),
   credentials: true,
 }));
 app.use(generalRateLimiter);
