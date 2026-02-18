@@ -28,7 +28,18 @@
     "hasAccount": "Already have an account?",
     "passwordMismatch": "Passwords do not match",
     "passwordTooShort": "Password must be at least 12 characters",
-    "passwordRequirements": "Password must be at least 12 characters with uppercase, lowercase, and a number"
+    "passwordRequirements": "Password must be at least 12 characters with uppercase, lowercase, and a number",
+    "enterEmail": "Enter your email to continue",
+    "authMethodsError": "Could not retrieve sign-in methods",
+    "sendMagicLink": "Send Magic Link",
+    "magicLinkSent": "Magic link sent! Check your email inbox.",
+    "magicLinkError": "Failed to send magic link",
+    "signInWithPasskey": "Sign in with Passkey",
+    "passkeyError": "Passkey authentication failed",
+    "verifyingMagicLink": "Verifying your magic link...",
+    "magicLinkInvalid": "This magic link is invalid or has expired.",
+    "backToLogin": "Back to Sign In",
+    "orDivider": "or"
   },
   "entries": {
     "title": "Journal Entries",
@@ -99,7 +110,11 @@
     "countdownDays": "days",
     "countdownHours": "hours",
     "countdownMinutes": "minutes",
-    "countdownSeconds": "seconds"
+    "countdownSeconds": "seconds",
+    "enableHint": "To enable Safety Timer, add at least one Recipient below",
+    "smtpRequiredTitle": "Email Configuration Required",
+    "smtpRequiredMessage": "The Safety Timer requires email configuration to send warnings and deliver journal entries. Please set up your Email Configuration under Settings before using the Safety Timer.",
+    "goToSettings": "Go to Settings"
   },
   "settings": {
     "title": "Settings",
@@ -137,6 +152,25 @@
     "testEmailSent": "Test email sent successfully!",
     "testEmailFailed": "Failed to send test email.",
     "enterTestEmail": "Please enter a test email address",
+    "clearSmtp": "Clear Configuration",
+    "clearSmtpConfirmTitle": "Clear Email Configuration",
+    "clearSmtpConfirmMessage": "Are you sure you want to clear your email configuration? Magic link authentication and Safety Timer email delivery will stop working until you configure it again.",
+    "passkeys": "Passkeys",
+    "passkeysDescription": "Manage passkeys for passwordless sign-in to your account.",
+    "noPasskeys": "No passkeys registered yet.",
+    "addPasskey": "Add Passkey",
+    "passkeyName": "Passkey Name",
+    "passkeyNamePlaceholder": "e.g. MacBook Touch ID",
+    "passkeyAdded": "Passkey added successfully!",
+    "passkeyAddFailed": "Failed to add passkey. Please try again.",
+    "passkeyDeleted": "Passkey deleted successfully.",
+    "passkeyDeleteFailed": "Failed to delete passkey.",
+    "deletePasskeyConfirm": "Delete Passkey",
+    "deletePasskeyWarning": "Are you sure you want to delete this passkey? You won't be able to use it to sign in anymore.",
+    "passkeyDeviceType": "Device",
+    "passkeyCreated": "Created",
+    "passkeyLastUsed": "Last used",
+    "passkeyNeverUsed": "Never",
     "about": "About",
     "aboutDescription": "A privacy-first, self-hosted digital journal.",
     "version": "Version",
@@ -160,6 +194,9 @@
     "completeDescription": "Your journal is ready to use",
     "instanceName": "Instance Name",
     "instanceNameHint": "This name will appear in the header",
-    "finish": "Start Writing"
+    "finish": "Start Writing",
+    "alreadyComplete": "Onboarding Complete",
+    "alreadyCompleteDescription": "Your instance has already been set up.",
+    "goToLogin": "Go to Login"
   }
 }

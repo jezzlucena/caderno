@@ -171,14 +171,12 @@ class ApiClient {
   }
 
   // Passkeys
-  async getPasskeyRegistrationOptions(name?: string) {
-    return this.request<PublicKeyCredentialCreationOptionsJSON>(
-      '/auth/passkey/register/options',
-      {
-        method: 'POST',
-        body: JSON.stringify({ name }),
-      }
-    );
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async getPasskeyRegistrationOptions(name?: string): Promise<any> {
+    return this.request('/auth/passkey/register/options', {
+      method: 'POST',
+      body: JSON.stringify({ name }),
+    });
   }
 
   async verifyPasskeyRegistration(response: unknown, name?: string) {
@@ -191,8 +189,9 @@ class ApiClient {
     );
   }
 
-  async getPasskeyLoginOptions(email: string) {
-    return this.request<PublicKeyCredentialRequestOptionsJSON>(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async getPasskeyLoginOptions(email: string): Promise<any> {
+    return this.request(
       `/auth/passkey/login/options?email=${encodeURIComponent(email)}`
     );
   }
@@ -399,6 +398,12 @@ class ApiClient {
     return this.request<{ success: boolean }>('/settings/smtp', {
       method: 'PUT',
       body: JSON.stringify(config),
+    });
+  }
+
+  async deleteSmtpSettings() {
+    return this.request<{ success: boolean }>('/settings/smtp', {
+      method: 'DELETE',
     });
   }
 

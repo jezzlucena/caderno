@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document, Types } from 'mongoose';
-import { EncryptedData } from '../config/encryption.js';
+import type { EncryptedData } from '../config/encryption.js';
 
 export interface IReminder {
   _id: Types.ObjectId;
@@ -15,18 +15,6 @@ export interface IRecipient {
   filterTags?: string[];
 }
 
-export interface ISmtpConfig {
-  host: string;
-  port: number;
-  secure: boolean;
-  encryptedAuth: {
-    user: EncryptedData;
-    pass: EncryptedData;
-  };
-  fromAddress: string;
-  fromName?: string;
-}
-
 export interface ISafetyTimer extends Document {
   _id: Types.ObjectId;
   userId: Types.ObjectId;
@@ -38,7 +26,6 @@ export interface ISafetyTimer extends Document {
   status: 'active' | 'warning' | 'delivered' | 'disabled';
   recipients: IRecipient[];
   reminders: IReminder[];
-  smtpConfig?: ISmtpConfig;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -68,21 +55,6 @@ const ReminderSchema = new Schema<IReminder>(
   }
 );
 
-const SmtpConfigSchema = new Schema<ISmtpConfig>(
-  {
-    host: { type: String, required: true },
-    port: { type: Number, required: true },
-    secure: { type: Boolean, default: true },
-    encryptedAuth: {
-      user: { type: EncryptedDataSchema, required: true },
-      pass: { type: EncryptedDataSchema, required: true },
-    },
-    fromAddress: { type: String, required: true },
-    fromName: { type: String },
-  },
-  { _id: false }
-);
-
 const SafetyTimerSchema = new Schema<ISafetyTimer>(
   {
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
@@ -98,7 +70,6 @@ const SafetyTimerSchema = new Schema<ISafetyTimer>(
     },
     recipients: [RecipientSchema],
     reminders: [ReminderSchema],
-    smtpConfig: SmtpConfigSchema,
   },
   {
     timestamps: true,

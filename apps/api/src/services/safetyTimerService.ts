@@ -72,7 +72,7 @@ async function processWarningEmail(userId: string, daysRemaining: number): Promi
   const user = await User.findById(userId);
   if (!user) return;
 
-  await sendWarningEmail(user.email, daysRemaining, user.email);
+  await sendWarningEmail(userId, user.email, daysRemaining, user.email);
 }
 
 async function processReminderEmail(userId: string, minutesBefore: number): Promise<void> {
@@ -84,7 +84,7 @@ async function processReminderEmail(userId: string, minutesBefore: number): Prom
 
   // Format the time remaining for the email
   const timeRemaining = formatTimeRemaining(minutesBefore);
-  await sendWarningEmail(user.email, 0, user.email, timeRemaining);
+  await sendWarningEmail(userId, user.email, 0, user.email, timeRemaining);
 }
 
 function formatTimeRemaining(minutes: number): string {
@@ -128,6 +128,7 @@ async function processDelivery(userId: string): Promise<void> {
       });
 
       await sendDeliveryEmail(
+        userId,
         email,
         recipient.name,
         recipient.personalMessage,
@@ -207,6 +208,7 @@ export interface SafetyTimerResponse {
 
 export async function getSafetyTimerStatus(userId: string): Promise<SafetyTimerResponse> {
   const timer = await getOrCreateSafetyTimer(userId);
+  const user = await User.findById(userId);
 
   return {
     isEnabled: timer.isEnabled,
@@ -227,7 +229,7 @@ export async function getSafetyTimerStatus(userId: string): Promise<SafetyTimerR
       id: r._id.toString(),
       reminderMinutesBefore: r.reminderMinutesBefore,
     })),
-    smtpConfigured: !!timer.smtpConfig,
+    smtpConfigured: !!(user?.smtpConfig?.host && user.smtpConfig.encryptedAuth?.user && user.smtpConfig.encryptedAuth?.pass),
   };
 }
 

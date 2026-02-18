@@ -63,7 +63,17 @@ export const env = {
   // WebAuthn settings
   RP_NAME: process.env.RP_NAME || 'Caderno',
   RP_ID: process.env.RP_ID || 'localhost',
-  ORIGIN: process.env.ORIGIN || 'http://localhost:5173',
+  ORIGIN: process.env.ORIGIN || 'http://localhost:8085',
+  CORS_ALLOWLIST: process.env.CORS_ALLOWLIST || 'http://localhost:8085,https://app.cadernoapp.com',
+
+  // System SMTP (optional — enables magic link login for all users)
+  SMTP_HOST: process.env.SMTP_HOST || '',
+  SMTP_PORT: parseInt(process.env.SMTP_PORT || '587', 10),
+  SMTP_SECURE: process.env.SMTP_SECURE === 'true',
+  SMTP_USER: process.env.SMTP_USER || '',
+  SMTP_PASS: process.env.SMTP_PASS || '',
+  SMTP_FROM_ADDRESS: process.env.SMTP_FROM_ADDRESS || '',
+  SMTP_FROM_NAME: process.env.SMTP_FROM_NAME || 'Caderno',
 
   // Rate limiting
   RATE_LIMIT_WINDOW_MS: 15 * 60 * 1000, // 15 minutes

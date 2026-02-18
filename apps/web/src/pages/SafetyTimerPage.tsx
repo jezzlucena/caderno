@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useSafetyTimerStore } from '../stores';
 import { api } from '../lib/api';
@@ -43,6 +44,7 @@ function toMinutes(value: number, unit: DurationUnit): number {
 
 export function SafetyTimerPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const {
     status,
     isLoading,
@@ -285,15 +287,35 @@ export function SafetyTimerPage() {
                     </div>
                   )}
                 </div>
-                <Button
-                  variant={status.isEnabled ? 'secondary' : 'primary'}
-                  onClick={handleToggleTimer}
-                  disabled={!status.isEnabled && status.recipients.length === 0}
-                >
-                  {status.isEnabled
-                    ? t('safetyTimer.disable')
-                    : t('safetyTimer.enable')}
-                </Button>
+                <div className="flex items-center gap-2">
+                  {!status.isEnabled && status.recipients.length === 0 && (
+                    <div className="relative group">
+                      <svg
+                        className="h-5 w-5 text-slate-400 dark:text-slate-500 cursor-help"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      <div className="absolute bottom-full right-0 mb-2 hidden group-hover:block w-56 rounded-lg bg-slate-800 dark:bg-slate-700 px-3 py-2 text-xs text-white shadow-lg z-10">
+                        {t('safetyTimer.enableHint')}
+                      </div>
+                    </div>
+                  )}
+                  <Button
+                    variant={status.isEnabled ? 'secondary' : 'primary'}
+                    onClick={handleToggleTimer}
+                    disabled={!status.isEnabled && status.recipients.length === 0}
+                  >
+                    {status.isEnabled
+                      ? t('safetyTimer.disable')
+                      : t('safetyTimer.enable')}
+                  </Button>
+                </div>
               </div>
 
               {status.isEnabled && (
@@ -538,6 +560,27 @@ export function SafetyTimerPage() {
               }
             >
               {t('common.add')}
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* SMTP Required Modal */}
+      <Modal
+        isOpen={!!status && !status.smtpConfigured}
+        onClose={() => navigate('/entries')}
+        title={t('safetyTimer.smtpRequiredTitle')}
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-slate-600 dark:text-slate-400 transition-colors">
+            {t('safetyTimer.smtpRequiredMessage')}
+          </p>
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => navigate('/entries')}>
+              {t('common.cancel')}
+            </Button>
+            <Button onClick={() => navigate('/settings')}>
+              {t('safetyTimer.goToSettings')}
             </Button>
           </div>
         </div>

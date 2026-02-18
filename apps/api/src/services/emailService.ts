@@ -1,11 +1,8 @@
 import nodemailer from 'nodemailer';
 import type { Transporter } from 'nodemailer';
-import { getAppSettings, IAppSettings } from '../models/AppSettings.js';
-import { ISafetyTimer } from '../models/SafetyTimer.js';
+import { User, IUserSmtpConfig } from '../models/User.js';
 import { decrypt } from '../config/encryption.js';
 import { env } from '../config/env.js';
-
-let transporter: Transporter | null = null;
 
 export interface SmtpConfig {
   host: string;
@@ -29,44 +26,77 @@ function createTransporter(config: SmtpConfig): Transporter {
   });
 }
 
-async function getGlobalSmtpConfig(): Promise<SmtpConfig | null> {
-  const settings = await getAppSettings();
-
-  if (!settings.smtpConfig) {
-    return null;
-  }
-
+function decryptSmtpConfig(smtpConfig: IUserSmtpConfig): SmtpConfig {
   return {
-    host: settings.smtpConfig.host,
-    port: settings.smtpConfig.port,
-    secure: settings.smtpConfig.secure,
-    user: decrypt(settings.smtpConfig.encryptedAuth.user),
-    pass: decrypt(settings.smtpConfig.encryptedAuth.pass),
-    fromAddress: settings.smtpConfig.fromAddress,
-    fromName: settings.smtpConfig.fromName,
+    host: smtpConfig.host,
+    port: smtpConfig.port,
+    secure: smtpConfig.secure,
+    user: decrypt(smtpConfig.encryptedAuth.user),
+    pass: decrypt(smtpConfig.encryptedAuth.pass),
+    fromAddress: smtpConfig.fromAddress,
+    fromName: smtpConfig.fromName,
   };
 }
 
-export async function isSmtpConfigured(): Promise<boolean> {
-  const config = await getGlobalSmtpConfig();
-  return config !== null;
-}
-
-// Get SMTP config for display (without password)
-export async function getSmtpConfigForDisplay(): Promise<Omit<SmtpConfig, 'pass'> | null> {
-  const settings = await getAppSettings();
-
-  if (!settings.smtpConfig) {
+function getSystemSmtpConfig(): SmtpConfig | null {
+  if (!env.SMTP_HOST) {
     return null;
   }
 
   return {
-    host: settings.smtpConfig.host,
-    port: settings.smtpConfig.port,
-    secure: settings.smtpConfig.secure,
-    user: decrypt(settings.smtpConfig.encryptedAuth.user),
-    fromAddress: settings.smtpConfig.fromAddress,
-    fromName: settings.smtpConfig.fromName,
+    host: env.SMTP_HOST,
+    port: env.SMTP_PORT,
+    secure: env.SMTP_SECURE,
+    user: env.SMTP_USER,
+    pass: env.SMTP_PASS,
+    fromAddress: env.SMTP_FROM_ADDRESS,
+    fromName: env.SMTP_FROM_NAME,
+  };
+}
+
+export function isSystemSmtpConfigured(): boolean {
+  return !!env.SMTP_HOST;
+}
+
+async function getUserSmtpConfig(userId: string): Promise<SmtpConfig | null> {
+  const user = await User.findById(userId);
+
+  if (!user?.smtpConfig) {
+    return null;
+  }
+
+  return decryptSmtpConfig(user.smtpConfig);
+}
+
+async function getSmtpConfigByEmail(email: string): Promise<SmtpConfig | null> {
+  const user = await User.findOne({ email });
+
+  if (!user?.smtpConfig) {
+    return null;
+  }
+
+  return decryptSmtpConfig(user.smtpConfig);
+}
+
+export async function isSmtpConfigured(userId: string): Promise<boolean> {
+  const config = await getUserSmtpConfig(userId);
+  return config !== null || isSystemSmtpConfigured();
+}
+
+export async function getSmtpConfigForDisplay(userId: string): Promise<Omit<SmtpConfig, 'pass'> | null> {
+  const user = await User.findById(userId);
+
+  if (!user?.smtpConfig) {
+    return null;
+  }
+
+  return {
+    host: user.smtpConfig.host,
+    port: user.smtpConfig.port,
+    secure: user.smtpConfig.secure,
+    user: decrypt(user.smtpConfig.encryptedAuth.user),
+    fromAddress: user.smtpConfig.fromAddress,
+    fromName: user.smtpConfig.fromName,
   };
 }
 
@@ -74,7 +104,7 @@ export async function sendMagicLinkEmail(
   email: string,
   token: string
 ): Promise<boolean> {
-  const config = await getGlobalSmtpConfig();
+  const config = await getSmtpConfigByEmail(email) ?? getSystemSmtpConfig();
 
   if (!config) {
     console.warn('SMTP not configured, cannot send magic link email');
@@ -119,12 +149,13 @@ export async function sendMagicLinkEmail(
 }
 
 export async function sendWarningEmail(
+  userId: string,
   email: string,
   daysRemaining: number,
   recipientName: string,
   timeRemainingOverride?: string
 ): Promise<boolean> {
-  const config = await getGlobalSmtpConfig();
+  const config = await getUserSmtpConfig(userId) ?? getSystemSmtpConfig();
 
   if (!config) {
     return false;
@@ -169,13 +200,14 @@ export async function sendWarningEmail(
 }
 
 export async function sendDeliveryEmail(
+  userId: string,
   recipientEmail: string,
   recipientName: string,
   personalMessage: string | undefined,
   senderEmail: string,
   pdfBuffer: Buffer
 ): Promise<boolean> {
-  const config = await getGlobalSmtpConfig();
+  const config = await getUserSmtpConfig(userId) ?? getSystemSmtpConfig();
 
   if (!config) {
     return false;

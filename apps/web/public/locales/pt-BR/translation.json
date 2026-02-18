@@ -28,7 +28,18 @@
     "hasAccount": "Já tem conta?",
     "passwordMismatch": "As senhas não coincidem",
     "passwordTooShort": "A senha deve ter pelo menos 12 caracteres",
-    "passwordRequirements": "A senha deve ter pelo menos 12 caracteres com maiúsculas, minúsculas e um número"
+    "passwordRequirements": "A senha deve ter pelo menos 12 caracteres com maiúsculas, minúsculas e um número",
+    "enterEmail": "Digite seu email para continuar",
+    "authMethodsError": "Não foi possível obter os métodos de login",
+    "sendMagicLink": "Enviar Link Mágico",
+    "magicLinkSent": "Link mágico enviado! Verifique sua caixa de entrada.",
+    "magicLinkError": "Falha ao enviar link mágico",
+    "signInWithPasskey": "Entrar com Passkey",
+    "passkeyError": "Falha na autenticação com passkey",
+    "verifyingMagicLink": "Verificando seu link mágico...",
+    "magicLinkInvalid": "Este link mágico é inválido ou expirou.",
+    "backToLogin": "Voltar para Login",
+    "orDivider": "ou"
   },
   "entries": {
     "title": "Entradas do Diário",
@@ -99,7 +110,11 @@
     "countdownDays": "dias",
     "countdownHours": "horas",
     "countdownMinutes": "minutos",
-    "countdownSeconds": "segundos"
+    "countdownSeconds": "segundos",
+    "enableHint": "Para habilitar o Timer de Segurança, adicione pelo menos um Destinatário abaixo",
+    "smtpRequiredTitle": "Configuração de Email Necessária",
+    "smtpRequiredMessage": "O Timer de Segurança requer configuração de email para enviar avisos e entregar entradas do diário. Por favor configure seu Email em Configurações antes de usar o Timer de Segurança.",
+    "goToSettings": "Ir para Configurações"
   },
   "settings": {
     "title": "Configurações",
@@ -137,6 +152,25 @@
     "testEmailSent": "Email de teste enviado com sucesso!",
     "testEmailFailed": "Falha ao enviar email de teste.",
     "enterTestEmail": "Por favor insira um endereço de email de teste",
+    "clearSmtp": "Limpar Configuração",
+    "clearSmtpConfirmTitle": "Limpar Configuração de Email",
+    "clearSmtpConfirmMessage": "Tem certeza de que deseja limpar sua configuração de email? A autenticação por link mágico e o envio de emails do Timer de Segurança deixarão de funcionar até que você configure novamente.",
+    "passkeys": "Passkeys",
+    "passkeysDescription": "Gerencie passkeys para login sem senha na sua conta.",
+    "noPasskeys": "Nenhuma passkey registrada ainda.",
+    "addPasskey": "Adicionar Passkey",
+    "passkeyName": "Nome da Passkey",
+    "passkeyNamePlaceholder": "ex. MacBook Touch ID",
+    "passkeyAdded": "Passkey adicionada com sucesso!",
+    "passkeyAddFailed": "Falha ao adicionar passkey. Tente novamente.",
+    "passkeyDeleted": "Passkey excluída com sucesso.",
+    "passkeyDeleteFailed": "Falha ao excluir passkey.",
+    "deletePasskeyConfirm": "Excluir Passkey",
+    "deletePasskeyWarning": "Tem certeza de que deseja excluir esta passkey? Você não poderá mais usá-la para fazer login.",
+    "passkeyDeviceType": "Dispositivo",
+    "passkeyCreated": "Criada em",
+    "passkeyLastUsed": "Último uso",
+    "passkeyNeverUsed": "Nunca",
     "about": "Sobre",
     "aboutDescription": "Um diário digital privado e auto-hospedado.",
     "version": "Versão",
@@ -160,6 +194,9 @@
     "completeDescription": "Seu diário está pronto para usar",
     "instanceName": "Nome da Instância",
     "instanceNameHint": "Este nome aparecerá no cabeçalho",
-    "finish": "Começar a Escrever"
+    "finish": "Começar a Escrever",
+    "alreadyComplete": "Configuração Concluída",
+    "alreadyCompleteDescription": "Sua instância já foi configurada.",
+    "goToLogin": "Ir para o Login"
   }
 }

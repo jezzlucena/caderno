@@ -19,7 +19,7 @@ export async function getOnboardingStatus(
       isComplete: settings.isOnboardingComplete,
       currentStep: settings.isOnboardingComplete ? 5 : 0,
       hasUser: userCount > 0,
-      hasSmtp: !!settings.smtpConfig,
+      hasSmtp: !!(await User.findOne({ smtpConfig: { $exists: true } })),
     });
   } catch (error) {
     next(error);
@@ -101,7 +101,7 @@ export async function getSmtpSettings(
   next: NextFunction
 ): Promise<void> {
   try {
-    const config = await getSmtpConfigForDisplay();
+    const config = await getSmtpConfigForDisplay(req.userId!);
 
     if (!config) {
       res.json({ configured: false, config: null });
@@ -153,9 +153,13 @@ export async function updateSmtpSettings(
       return;
     }
 
-    const settings = await getAppSettings();
+    const user = await User.findById(req.userId);
 
-    settings.smtpConfig = {
+    if (!user) {
+      throw new AppError(404, 'USER_NOT_FOUND', 'User not found');
+    }
+
+    user.smtpConfig = {
       host: config.host,
       port: config.port,
       secure: config.secure,
@@ -167,7 +171,28 @@ export async function updateSmtpSettings(
       fromName: config.fromName,
     };
 
-    await settings.save();
+    await user.save();
+
+    res.json({ success: true });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function deleteSmtpSettings(
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const user = await User.findById(req.userId);
+
+    if (!user) {
+      throw new AppError(404, 'USER_NOT_FOUND', 'User not found');
+    }
+
+    user.smtpConfig = undefined;
+    await user.save();
 
     res.json({ success: true });
   } catch (error) {

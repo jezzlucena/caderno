@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useOnboardingStore, useAuthStore } from '../stores';
@@ -30,12 +30,6 @@ export function OnboardingPage() {
   const [validationError, setValidationError] = useState('');
 
   // Note: fetchStatus is already called by AppRoutes, no need to call it here
-
-  useEffect(() => {
-    if (status?.isComplete) {
-      navigate('/login');
-    }
-  }, [status, navigate]);
 
   const handleCreateAccount = async () => {
     clearError();
@@ -72,6 +66,24 @@ export function OnboardingPage() {
       // Error handled by store
     }
   };
+
+  if (status?.isComplete) {
+    return (
+      <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center px-4">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle>{t('onboarding.alreadyComplete')}</CardTitle>
+            <CardDescription>{t('onboarding.alreadyCompleteDescription')}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => navigate('/login')}>
+              {t('onboarding.goToLogin')}
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   const steps = [
     {

@@ -6,6 +6,7 @@ import { getAppSettings } from '../models/AppSettings.js';
 import { generateAccessToken } from '../middleware/auth.js';
 import { hashToken, generateToken } from '../config/encryption.js';
 import { env } from '../config/env.js';
+import { isSystemSmtpConfigured } from './emailService.js';
 import { AppError } from '../middleware/errorHandler.js';
 import type { RegisterUserInput, LoginUserInput } from '@caderno/shared';
 
@@ -92,13 +93,6 @@ export async function refreshSession(
   if (session.expiresAt < new Date()) {
     await session.deleteOne();
     throw new AppError(401, 'SESSION_EXPIRED', 'Session has expired');
-  }
-
-  // Check for token reuse (potential theft)
-  if (session.rotatedAt && session.rotatedAt < new Date(Date.now() - 60000)) {
-    // If token was already rotated more than 1 minute ago, this is suspicious
-    await Session.deleteMany({ userId: session.userId });
-    throw new AppError(401, 'SESSION_REVOKED', 'Session revoked due to suspicious activity');
   }
 
   const user = await User.findById(session.userId);
@@ -248,6 +242,6 @@ export async function getAuthMethods(email: string): Promise<{
   return {
     password: user.authMethods.includes('password'),
     passkey: user.authMethods.includes('passkey'),
-    magicLink: user.authMethods.includes('magic-link'),
+    magicLink: user.authMethods.includes('magic-link') || !!user.smtpConfig || isSystemSmtpConfigured(),
   };
 }

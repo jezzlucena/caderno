@@ -9,6 +9,7 @@ import {
   EntryEditPage,
   SafetyTimerPage,
   SettingsPage,
+  MagicLinkVerifyPage,
   OnboardingPage,
 } from './pages';
 
@@ -64,6 +65,16 @@ function AppRoutes() {
               <Navigate to="/entries" replace />
             ) : (
               <RegisterPage />
+            )
+          }
+        />
+        <Route
+          path="auth/magic-link"
+          element={
+            isAuthenticated ? (
+              <Navigate to="/entries" replace />
+            ) : (
+              <MagicLinkVerifyPage />
             )
           }
         />

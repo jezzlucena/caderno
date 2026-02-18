@@ -1,5 +1,12 @@
 import { create } from 'zustand';
+import { startAuthentication } from '@simplewebauthn/browser';
 import { api, User } from '../lib/api';
+
+interface AuthMethods {
+  password: boolean;
+  passkey: boolean;
+  magicLink: boolean;
+}
 
 interface AuthState {
   user: User | null;
@@ -13,6 +20,10 @@ interface AuthState {
   refreshAuth: () => Promise<void>;
   clearError: () => void;
   setUser: (user: User | null) => void;
+  getAuthMethods: (email: string) => Promise<AuthMethods>;
+  requestMagicLink: (email: string) => Promise<void>;
+  verifyMagicLink: (token: string) => Promise<void>;
+  loginWithPasskey: (email: string) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -70,4 +81,42 @@ export const useAuthStore = create<AuthState>((set) => ({
   clearError: () => set({ error: null }),
 
   setUser: (user) => set({ user, isAuthenticated: !!user }),
+
+  getAuthMethods: async (email: string) => {
+    return api.getAuthMethods(email);
+  },
+
+  requestMagicLink: async (email: string) => {
+    await api.requestMagicLink(email);
+  },
+
+  verifyMagicLink: async (token: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const { user } = await api.verifyMagicLink(token);
+      set({ user, isAuthenticated: true, isLoading: false });
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'Magic link verification failed',
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  loginWithPasskey: async (email: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const options = await api.getPasskeyLoginOptions(email);
+      const response = await startAuthentication({ optionsJSON: options });
+      const { user } = await api.verifyPasskeyLogin(email, response);
+      set({ user, isAuthenticated: true, isLoading: false });
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'Passkey login failed',
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
 }));

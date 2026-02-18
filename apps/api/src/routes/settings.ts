@@ -36,4 +36,6 @@ router.put(
   settingsController.updateSmtpSettings
 );
 
+router.delete('/smtp', authenticate, settingsController.deleteSmtpSettings);
+
 export default router;

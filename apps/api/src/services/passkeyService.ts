@@ -101,7 +101,9 @@ export async function verifyRegistrationForUser(
       expectedRPID: env.RP_ID,
     });
   } catch (error) {
-    throw new AppError(400, 'VERIFICATION_FAILED', 'Passkey verification failed');
+    const detail = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Passkey registration verification failed:', detail);
+    throw new AppError(400, 'VERIFICATION_FAILED', `Passkey verification failed: ${detail}`);
   }
 
   if (!verification.verified || !verification.registrationInfo) {
@@ -206,7 +208,9 @@ export async function verifyAuthenticationForUser(
       },
     });
   } catch (error) {
-    throw new AppError(401, 'VERIFICATION_FAILED', 'Passkey verification failed');
+    const detail = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Passkey login verification failed:', detail);
+    throw new AppError(401, 'VERIFICATION_FAILED', `Passkey verification failed: ${detail}`);
   }
 
   if (!verification.verified) {

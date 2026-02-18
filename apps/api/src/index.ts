@@ -6,6 +6,7 @@ import { env } from './config/env.js';
 import { connectDatabase, disconnectDatabase } from './config/database.js';
 import { generalRateLimiter, errorHandler, notFoundHandler } from './middleware/index.js';
 import { initializeAgenda, shutdownAgenda } from './services/safetyTimerService.js';
+import { runMigrations } from './config/migrations.js';
 import routes from './routes/index.js';
 
 const app = express();
@@ -13,7 +14,7 @@ const app = express();
 // Security middleware
 app.use(helmet());
 app.use(cors({
-  origin: env.ORIGIN.split(','),
+  origin: env.CORS_ALLOWLIST.split(','),
   credentials: true,
 }));
 app.use(generalRateLimiter);
@@ -48,6 +49,7 @@ process.on('SIGINT', shutdown);
 async function start(): Promise<void> {
   try {
     await connectDatabase();
+    await runMigrations();
     await initializeAgenda();
 
     app.listen(env.API_PORT, () => {

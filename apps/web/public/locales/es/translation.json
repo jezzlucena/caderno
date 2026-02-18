@@ -28,7 +28,18 @@
     "hasAccount": "¿Ya tienes cuenta?",
     "passwordMismatch": "Las contraseñas no coinciden",
     "passwordTooShort": "La contraseña debe tener al menos 12 caracteres",
-    "passwordRequirements": "La contraseña debe tener al menos 12 caracteres con mayúsculas, minúsculas y un número"
+    "passwordRequirements": "La contraseña debe tener al menos 12 caracteres con mayúsculas, minúsculas y un número",
+    "enterEmail": "Ingresa tu correo electrónico para continuar",
+    "authMethodsError": "No se pudieron obtener los métodos de inicio de sesión",
+    "sendMagicLink": "Enviar Enlace Mágico",
+    "magicLinkSent": "¡Enlace mágico enviado! Revisa tu bandeja de entrada.",
+    "magicLinkError": "Error al enviar el enlace mágico",
+    "signInWithPasskey": "Iniciar sesión con Passkey",
+    "passkeyError": "Error en la autenticación con passkey",
+    "verifyingMagicLink": "Verificando tu enlace mágico...",
+    "magicLinkInvalid": "Este enlace mágico es inválido o ha expirado.",
+    "backToLogin": "Volver a Iniciar Sesión",
+    "orDivider": "o"
   },
   "entries": {
     "title": "Entradas del Diario",
@@ -99,7 +110,11 @@
     "countdownDays": "días",
     "countdownHours": "horas",
     "countdownMinutes": "minutos",
-    "countdownSeconds": "segundos"
+    "countdownSeconds": "segundos",
+    "enableHint": "Para habilitar el Temporizador de Seguridad, agrega al menos un Destinatario abajo",
+    "smtpRequiredTitle": "Configuración de Email Requerida",
+    "smtpRequiredMessage": "El Temporizador de Seguridad requiere configuración de email para enviar avisos y entregar entradas del diario. Por favor configura tu Email en Configuración antes de usar el Temporizador de Seguridad.",
+    "goToSettings": "Ir a Configuración"
   },
   "settings": {
     "title": "Configuración",
@@ -137,6 +152,25 @@
     "testEmailSent": "¡Email de prueba enviado correctamente!",
     "testEmailFailed": "Error al enviar email de prueba.",
     "enterTestEmail": "Por favor ingresa una dirección de email de prueba",
+    "clearSmtp": "Borrar Configuración",
+    "clearSmtpConfirmTitle": "Borrar Configuración de Email",
+    "clearSmtpConfirmMessage": "¿Estás seguro de que deseas borrar tu configuración de email? La autenticación por enlace mágico y el envío de emails del Temporizador de Seguridad dejarán de funcionar hasta que lo configures nuevamente.",
+    "passkeys": "Passkeys",
+    "passkeysDescription": "Administra passkeys para iniciar sesión sin contraseña.",
+    "noPasskeys": "No hay passkeys registradas aún.",
+    "addPasskey": "Agregar Passkey",
+    "passkeyName": "Nombre del Passkey",
+    "passkeyNamePlaceholder": "ej. MacBook Touch ID",
+    "passkeyAdded": "¡Passkey agregado correctamente!",
+    "passkeyAddFailed": "Error al agregar passkey. Inténtalo de nuevo.",
+    "passkeyDeleted": "Passkey eliminado correctamente.",
+    "passkeyDeleteFailed": "Error al eliminar passkey.",
+    "deletePasskeyConfirm": "Eliminar Passkey",
+    "deletePasskeyWarning": "¿Estás seguro de que deseas eliminar este passkey? Ya no podrás usarlo para iniciar sesión.",
+    "passkeyDeviceType": "Dispositivo",
+    "passkeyCreated": "Creado",
+    "passkeyLastUsed": "Último uso",
+    "passkeyNeverUsed": "Nunca",
     "about": "Acerca de",
     "aboutDescription": "Un diario digital privado y autoalojado.",
     "version": "Versión",
@@ -160,6 +194,9 @@
     "completeDescription": "Tu diario está listo para usar",
     "instanceName": "Nombre de la Instancia",
     "instanceNameHint": "Este nombre aparecerá en el encabezado",
-    "finish": "Empezar a Escribir"
+    "finish": "Empezar a Escribir",
+    "alreadyComplete": "Configuración Completa",
+    "alreadyCompleteDescription": "Tu instancia ya ha sido configurada.",
+    "goToLogin": "Ir al Inicio de Sesión"
   }
 }

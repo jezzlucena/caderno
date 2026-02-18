@@ -11,8 +11,6 @@ import {
   deleteReminder,
 } from '../services/safetyTimerService.js';
 import { verifySmtpConfig, sendTestEmail, SmtpConfig } from '../services/emailService.js';
-import { AppSettings } from '../models/AppSettings.js';
-import { encrypt } from '../config/encryption.js';
 
 export async function getStatus(
   req: AuthRequest,
