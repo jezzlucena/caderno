@@ -93,7 +93,7 @@
 }
 
 .editor-placeholder {
-  @apply absolute top-0 left-0 text-slate-400 pointer-events-none;
+  @apply absolute top-0 left-0 pt-[71px] pl-[17px] text-slate-400 pointer-events-none;
 }
 
 /* Custom scrollbar */

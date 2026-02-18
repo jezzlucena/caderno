@@ -27,12 +27,15 @@ services:
     ports:
       - "5055:5055"
     environment:
-      NODE_ENV: production
-      MONGODB_URI: mongodb://mongo:27017/caderno
-      ORIGIN: http://localhost:8085
-      PORT: 5055
-      RP_ID: localhost
-      RP_NAME: Caderno
+      NODE_ENV: ${NODE_ENV}
+      MONGODB_URI: ${MONGODB_URI}
+      ORIGIN: ${ORIGIN}
+      REGISTRATION_ENABLED: ${REGISTRATION_ENABLED}
+      API_PORT: ${API_PORT}
+      RP_ID: ${RP_ID}
+      RP_NAME: ${RP_NAME}
+      SESSION_SECRET: ${SESSION_SECRET:-}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-}
     depends_on:
       mongo:
         condition: service_healthy

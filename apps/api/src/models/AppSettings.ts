@@ -16,7 +16,6 @@ export interface IGlobalSmtpConfig {
 export interface IAppSettings extends Document {
   _id: Types.ObjectId;
   isOnboardingComplete: boolean;
-  isRegistrationEnabled: boolean;
   instanceName: string;
   smtpConfig?: IGlobalSmtpConfig;
   createdAt: Date;
@@ -50,7 +49,6 @@ const GlobalSmtpConfigSchema = new Schema<IGlobalSmtpConfig>(
 const AppSettingsSchema = new Schema<IAppSettings>(
   {
     isOnboardingComplete: { type: Boolean, default: false },
-    isRegistrationEnabled: { type: Boolean, default: true },
     instanceName: { type: String, default: 'Caderno', maxlength: 100 },
     smtpConfig: GlobalSmtpConfigSchema,
   },

@@ -34,7 +34,7 @@ function AppRoutes() {
   }
 
   // If onboarding is not complete, redirect to onboarding
-  if (status && !status.isComplete && !status.hasUser) {
+  if (status && !status.isComplete) {
     return (
       <Routes>
         <Route path="/onboarding" element={<OnboardingPage />} />

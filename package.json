@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "A privacy-first, self-hosted digital journal",
+  "homepage": "https://cadernoapp.com",
   "scripts": {
     "dev": "pnpm -r --parallel run dev",
     "dev:api": "pnpm --filter @caderno/api dev",

@@ -2,7 +2,7 @@
 
 A privacy-first, self-hosted digital journal web application.
 
-**[Live Demo](https://caderno.jezzlucena.com/)** | **[Website](https://caderno-hub.jezzlucena.com/)**
+**[Live Demo](https://cadernoapp.com)** | **[Landing Page](https://hub.cadernoapp.com)**
 
 ## Features
 

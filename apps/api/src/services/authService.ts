@@ -33,9 +33,7 @@ export async function registerUser(
   userAgent?: string,
   ipAddress?: string
 ): Promise<AuthResult> {
-  const settings = await getAppSettings();
-
-  if (!settings.isRegistrationEnabled) {
+  if (!env.REGISTRATION_ENABLED) {
     throw new AppError(403, 'REGISTRATION_DISABLED', 'Registration is disabled');
   }
 

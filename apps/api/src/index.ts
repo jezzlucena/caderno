@@ -50,8 +50,8 @@ async function start(): Promise<void> {
     await connectDatabase();
     await initializeAgenda();
 
-    app.listen(env.PORT, () => {
-      console.log(`API server running on port ${env.PORT}`);
+    app.listen(env.API_PORT, () => {
+      console.log(`API server running on port ${env.API_PORT}`);
       console.log(`Environment: ${env.NODE_ENV}`);
     });
   } catch (error) {

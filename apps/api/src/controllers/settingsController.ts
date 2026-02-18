@@ -1,7 +1,7 @@
 import { Response, NextFunction, Request } from 'express';
 import { AuthRequest } from '../middleware/auth.js';
 import { User } from '../models/User.js';
-import { AppSettings, getAppSettings } from '../models/AppSettings.js';
+import { getAppSettings } from '../models/AppSettings.js';
 import { encrypt } from '../config/encryption.js';
 import { verifySmtpConfig, SmtpConfig, getSmtpConfigForDisplay } from '../services/emailService.js';
 import { AppError } from '../middleware/errorHandler.js';
@@ -39,7 +39,6 @@ export async function completeOnboarding(
     }
 
     settings.isOnboardingComplete = true;
-    settings.isRegistrationEnabled = false; // Disable registration after onboarding
     await settings.save();
 
     res.json({ success: true });

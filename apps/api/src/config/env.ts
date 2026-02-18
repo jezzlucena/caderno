@@ -46,15 +46,18 @@ const secrets = loadOrCreateSecrets();
 
 export const env = {
   NODE_ENV: process.env.NODE_ENV || 'development',
-  PORT: parseInt(process.env.PORT || '5055', 10),
+  API_PORT: parseInt(process.env.API_PORT || '5055', 10),
   MONGODB_URI: process.env.MONGODB_URI || 'mongodb://localhost:27017/caderno',
 
   // Auto-generated secrets
   SESSION_SECRET: process.env.SESSION_SECRET || secrets.sessionSecret,
   ENCRYPTION_KEY: process.env.ENCRYPTION_KEY || secrets.encryptionKey,
 
+  // Registration settings
+  REGISTRATION_ENABLED: process.env.REGISTRATION_ENABLED === "true",
+
   // JWT settings
-  ACCESS_TOKEN_EXPIRY: '15m',
+  ACCESS_TOKEN_EXPIRY: '7d',
   REFRESH_TOKEN_EXPIRY_DAYS: 7,
 
   // WebAuthn settings

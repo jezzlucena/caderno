@@ -4,7 +4,6 @@ import { SmtpConfigSchema } from './safety-timer.js';
 export const AppSettingsSchema = z.object({
   id: z.string(),
   isOnboardingComplete: z.boolean().default(false),
-  isRegistrationEnabled: z.boolean().default(true),
   instanceName: z.string().max(100).default('Caderno'),
   smtpConfigured: z.boolean().default(false),
   createdAt: z.date(),

@@ -93,7 +93,7 @@ export function RegisterPage() {
 
               <Button
                 type="submit"
-                className="w-full"
+                className="w-full pointer-events-auto"
                 isLoading={isLoading}
               >
                 {t('auth.register')}
