@@ -64,7 +64,8 @@ export function SettingsPage() {
       setShowAddPasskey(false);
       setPasskeyName('');
       fetchPasskeys();
-    } catch {
+    } catch (error) {
+      console.error('Error adding passkey:', error);
       setPasskeyAlert({ type: 'error', message: t('settings.passkeyAddFailed') });
     } finally {
       setIsAddingPasskey(false);
